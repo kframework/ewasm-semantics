@@ -1,0 +1,16 @@
+[submodule "deps/k"]
+	path = deps/k
+	url = https://github.com/kframework/k
+	ignore = untracked
+[submodule "deps/pandoc-tangle"]
+	path = deps/pandoc-tangle
+	url = https://github.com/ehildenb/pandoc-tangle
+	ignore = untracked
+[submodule "deps/wasm-semantics"]
+	path = deps/wasm-semantics
+	url = https://github.com/kframework/wasm-semantics
+	ignore = untracked
+[submodule "deps/eei-semantics"]
+	path = deps/eei-semantics
+	url = https://github.com/hjorthjort/eei-semantics
+	ignore = untracked
