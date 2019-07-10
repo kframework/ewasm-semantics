@@ -52,11 +52,11 @@ The following function helps with this task.
 ```k
     syntax Instrs ::= #storeEeiResult(Int, Int, Int) [function]
  // -----------------------------------------------------------
-    rule #storeEeiResult(STARTIDX, LENGHTBYTES, VALUE)
+    rule #storeEeiResult(STARTIDX, LENGTHBYTES, VALUE)
       => (i32.store8 (i32.const STARTIDX) (i32.const VALUE))
          #storeEeiResult(STARTIDX +Int 1, LENGTHBYTES -Int 1, VALUE /Int 256)
-      requires LENGHTBYTES >Int 0
-    rule #storeEeiResults(_, 0, _) => nop
+      requires LENGTHBYTES >Int 0
+    rule #storeEeiResult(_, 0, _) => nop
 ```
 
 Exceptional halting
@@ -81,7 +81,7 @@ Load the caller address (20 bytes) into memory at the spcified location.
     rule <k> eei.getCaller => #waiting(EEI.getCaller) ... </k>
          <eeiK> . => EEI.getCaller </eeiK>
 
-    rule <k> #waiting(EEI.getCaller PTR) => #storeEeiResult(PTR, 20, ADDR) ... </k>
+    rule <k> #waiting(EEI.getCaller) => #storeEeiResult(PTR, 20, ADDR) ... </k>
          <valstack> <i32> PTR : STACK => STACK </valstack>
          <eeiK> #result(ADDR) </eeiK>
 ```
