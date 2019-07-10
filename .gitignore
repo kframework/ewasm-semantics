@@ -1,0 +1,9 @@
+/.build/*
+
+*.pdf
+*.sty
+
+.krun*
+.kompile*
+
+tmp/
