@@ -16,6 +16,15 @@ module EWASM
       </ewasm>
 ```
 
+Conventions
+-----------
+
+Instructions for calling into the EEI from Wasm are prefixed with *lowercase* `eei.`, e.g. `eei.getCaller`.
+EEI methods are prefixed with *uppercase* `EEI`, e.g. `EEI.getCaller`.
+
+Storing code in contracts
+-------------------------
+
 Make a wasm program storable in contract code.
 
 ```k
