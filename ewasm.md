@@ -36,8 +36,29 @@ The token `#waiting` dosen't have associated rules in either transition system, 
  // ---------------------------------------------
 ```
 
+Many instructions return a value, a certain number of bytes in length, that needs to be stored to Wasm linear memory.
+The trapping conditions for these stores is the same as for regular Wasm stores.
+The following function helps with this task.
 
 ```k
+    syntax Instrs ::= #storeEeiResult(Int, Int, Int) [function]
+ // -----------------------------------------------------------
+    rule #storeEeiResult(STARTIDX, LENGHTBYTES, VALUE)
+      => (i32.store8 (i32.const STARTIDX) (i32.const VALUE))
+         #storeEeiResult(STARTIDX +Int 1, LENGTHBYTES -Int 1, VALUE /Int 256)
+      requires LENGHTBYTES >Int 0
+    rule #storeEeiResults(_, 0, _) => nop
+```
+
+Exceptional halting
+-------------------
+
+An exception in the EEI translates into a `trap` in Wasm.
+
+```k
+    rule <k> #waiting(_) => trap ... </k>
+         <statusCode> STATUSCODE </statusCode>
+      requires notBool isEndStatusCode(STATUSCODE)
 ```
 
 EEI calls
