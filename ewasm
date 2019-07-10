@@ -1,0 +1,144 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+shopt -s extglob
+
+ewasm_dir="${EWASM_DIR:-$(dirname $0)}"
+build_dir="$ewasm_dir/.build"
+defn_dir="$build_dir/defn"
+lib_dir="$build_dir/local/lib"
+k_release_dir="${K_RELEASE:-$ewasm_dir/deps/k/k-distribution/target/release/k}"
+
+export PATH="$k_release_dir/lib/native/linux:$k_release_dir/lib/native/linux64:$k_release_dir/bin/:$PATH"
+export LD_LIBRARY_PATH="$k_release_dir/lib/native/linux64:$lib_dir:${LD_LIBRARY_PATH:-}"
+
+test_logs="$build_dir/logs"
+mkdir -p "$test_logs"
+test_log="$test_logs/tests.log"
+
+KLAB_OUT="${KLAB_OUT:-$build_dir/klab}"
+KLAB_NODE_STACK_SIZE="${KLAB_NODE_STACK_SIZE:-30000}"
+export KLAB_OUT
+
+# Utilities
+# ---------
+
+notif() { echo "== $@" >&2 ; }
+fatal() { echo "[FATAL] $@" ; exit 1 ; }
+
+pretty_diff() {
+    git --no-pager diff --no-index --ignore-all-space "$@"
+}
+
+# Runners
+# -------
+
+run_krun() {
+    export K_OPTS=-Xss500m
+    krun --directory "$backend_dir" "$run_file" "$@"
+}
+
+run_kast() {
+    local output_mode
+
+    output_mode="${1:-kast}" ; shift
+    kast --directory "$backend_dir" "$run_file" --output "$output_mode" "$@"
+}
+
+run_prove() {
+    export K_OPTS=-Xmx8G
+    kprove --directory "$backend_dir" "$run_file" "$@"
+}
+
+run_klab() {
+    local run_mode klab_log
+
+    run_mode="$1" ; shift
+    klab_log="$(basename "${run_file%-spec.k}")"
+
+    "$0" "$run_mode" --backend java "$run_file" \
+        --state-log --state-log-path "$KLAB_OUT/data" --state-log-id "$klab_log" \
+        --state-log-events OPEN,EXECINIT,SEARCHINIT,REACHINIT,REACHTARGET,REACHPROVED,NODE,RULE,SRULE,RULEATTEMPT,IMPLICATION,Z3QUERY,Z3RESULT,CLOSE \
+        --output-flatten "_Map_ #And" \
+        --output-tokenize "listInstr <_>_ i32_WASM-DATA i64_WASM-DATA _:__WASM-DATA" \
+        --no-alpha-renaming --restore-original-names --no-sort-collections \
+        --output json \
+        "$@"
+}
+
+view_klab() {
+    local klab_log
+
+    klab_log="$(basename "${run_file%-spec.k}")"
+
+    # klab often runs out of stack space when running long-running KWasm programs
+    # klab debug "$klab_log"
+    node --stack-size=$KLAB_NODE_STACK_SIZE $(dirname $(which klab))/../libexec/klab-debug "$klab_log"
+}
+
+# Main
+# ----
+
+usage() {
+    echo "
+    usage: $0 run        [--backend (ocaml|java|haskell)] <pgm>  <K args>*
+           $0 kast       [--backend (ocaml|java)]         <pgm>  <output format> <K args>*
+           $0 prove      [--backend (java|haskell)]       <spec> <K args>* -m <def_module>
+           $0 klab-run                                    <pgm>  <K arg>*
+           $0 klab-prove                                  <spec> <K arg>* -m <def_module>
+           $0 klab-view                                   [<pgm>|<spec>]
+
+       $0 run   : Run a single WebAssembly program
+       $0 kast  : Parse a single WebAssembly program and output it in supported format
+       $0 prove : Run a WebAssembly K proof
+       $0 klab-(run|prove) : Run or prove a spec and dump StateLogs which KLab can read
+       $0 klab-view : Launch KLab on the StateLog associated with the given program/spec.
+
+       Note: <pgm> is a path to a file containing a WebAssembly program.
+             <spec> is a K specification to be proved.
+             <K args> are any arguments you want to pass to K when executing/proving.
+             <output format> is the format for Kast to output the term in.
+             <def_module> is the module to take as axioms for verification.
+
+       KLab: Make sure that the 'klab/bin' directory is on your PATH to use this option.
+"
+}
+
+usage_fatal() {
+    usage
+    fatal "$@"
+}
+
+[[ ! -z ${1:-} ]] || usage_fatal "Must supply a command to run."
+if [[ "$1" == '--help' ]] || [ "$1" == 'help' ]; then
+    usage
+    exit 0
+fi
+
+run_command="$1"; shift
+
+[[ ! -z ${1:-} ]] || usage_fatal "Must supply a file to work on."
+
+backend="ocaml"
+[[ ! "$run_command" == 'prove' ]] || backend='java'
+[[ ! "$run_command" =~ klab*   ]] || backend='java'
+if [[ $# -gt 1 ]] && [[ $1 == '--backend' ]] || [[ $1 == '--definition' ]]; then
+    backend="${2#wasm-}"
+    shift 2
+fi
+backend_dir="$defn_dir/$backend"
+[[ ! "$backend" == "ocaml" ]] || eval $(opam config env)
+
+# get the run file
+[[ ! -z ${1:-} ]] || usage_fatal "Must supply a file to run on."
+run_file="$1" ; shift
+[[ -f "$run_file" ]] || fatal "File does not exist: $run_file"
+
+case "$run_command-$backend" in
+    run-@(ocaml|java|haskell)  ) run_krun                        "$@" ;;
+    kast-@(ocaml|java)         ) run_kast                        "$@" ;;
+    prove-@(java|haskell)      ) run_prove                       "$@" ;;
+    klab-@(run|prove)-java     ) run_klab "${run_command#klab-}" "$@" ;;
+    klab-view-java             ) view_klab                       "$@" ;;
+    *) usage_fatal "Unknown command on '$backend' backend: $run_command" ;;
+esac
