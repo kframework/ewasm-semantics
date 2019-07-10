@@ -26,7 +26,7 @@ Make a wasm program storable in contract code.
     syntax Intr ::= "eei.getCaller"
  // -------------------------------
     rule <k> eei.getCaller => . ... </k>
-         <sim> . => EEI.getCaller </sim>
+         <eeiK> . => EEI.getCaller </eeiK>
 
 ```
 
