@@ -1,14 +1,23 @@
-EWASM specification
+EWasm specification
 =================
 
 ```k
-require "deps/wasm-semantics/test.k"
+require "deps/wasm-semantics/wasm.k"
 require "deps/eei-semantics/eei.k"
 
 module EWASM
+```
+
+EWasm consists of a WebAssembly (Wasm) semantics, and an Ethereum Environment Interface (EEI) semantics, and rules to pass calls and data between them.
+
+```k
     imports EEI
-    imports WASM-TEST
-    
+    imports WASM
+```
+
+The configuration composes both the top level cells of the Wasm and EEI semantics.
+
+```k
     configuration
       <ewasm>
         <eei/>
@@ -28,13 +37,14 @@ Storing code in contracts
 Make a wasm program storable in contract code.
 
 ```k
-    syntax Code ::= Defns
+    syntax Code ::= ModuleDecl
+ // --------------------------
 ```
 
 Helper instructions
 -------------------
 
-The Wasm will sometimes produce instructions for the EEI to execute, and then waits to consume the result.
+The Wasm semantics will sometimes produce instructions for the EEI to execute, and then waits to consume the result.
 The EEI produces results, and waits for instructions from the Wasm engine.
 The Wasm engine needs to not make any further progress while waiting for the EEI.
 The EEI signals end of execution by setting an appropriate status code.

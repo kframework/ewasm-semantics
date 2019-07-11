@@ -50,7 +50,7 @@ ocaml-deps:
 
 wasm_files:=$(patsubst %, $(wasm_submodule)/%, test.k wasm.k data.k)
 eei_files:=$(eei_submodule)/eei.k
-ewasm_files:=ewasm.k $(wasm_files) $(eei_files)
+ewasm_files:=driver.k ewasm.k $(wasm_files) $(eei_files)
 
 ocaml_dir:=$(defn_dir)/ocaml
 ocaml_defn:=$(patsubst %, $(ocaml_dir)/%, $(ewasm_files))
@@ -95,19 +95,22 @@ build-haskell: $(haskell_kompiled)
 
 $(ocaml_kompiled): $(ocaml_defn)
 	@echo "== kompile: $@"
-	eval $$(opam config env)                                 \
-	    $(k_bin)/kompile -O3 --non-strict --backend ocaml    \
-	    --directory $(ocaml_dir) -I $(ocaml_dir)             \
-	    --main-module EWASM --syntax-module EWASM $<
+	eval $$(opam config env)                              \
+	    $(k_bin)/kompile -O3 --non-strict --backend ocaml --debug \
+	    --directory $(ocaml_dir) -I $(ocaml_dir)          \
+	    --main-module   ETHEREUM-SIMULATION               \
+      --syntax-module ETHEREUM-SIMULATION $<
 
 $(java_kompiled): $(java_defn)
 	@echo "== kompile: $@"
-	$(k_bin)/kompile --backend java                          \
-	    --directory $(java_dir) -I $(java_dir)               \
-	    --main-module EWASM --syntax-module EWASM $<
+	$(k_bin)/kompile --backend java            \
+	    --directory $(java_dir) -I $(java_dir) \
+	    --main-module   ETHEREUM-SIMULATION    \
+      --syntax-module ETHEREUM-SIMULATION $<
 
 $(haskell_kompiled): $(haskell_defn)
 	@echo "== kompile: $@"
-	$(k_bin)/kompile --backend haskell                       \
-	    --directory $(haskell_dir) -I $(haskell_dir)         \
-	    --main-module EWASM --syntax-module EWASM $<
+	$(k_bin)/kompile --backend haskell               \
+	    --directory $(haskell_dir) -I $(haskell_dir) \
+	    --main-module   ETHEREUM-SIMULATION          \
+      --syntax-module ETHEREUM-SIMULATION $<
