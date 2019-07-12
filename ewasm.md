@@ -19,10 +19,8 @@ The configuration composes both the top level cells of the Wasm and EEI semantic
 
 ```k
     configuration
-      <ewasm>
-        <eei/>
-        <wasm/>
-      </ewasm>
+      <eei/>
+      <wasm/>
 ```
 
 Conventions
@@ -89,11 +87,11 @@ Load the caller address (20 bytes) into memory at the spcified location.
     syntax PlainInstr ::= "eei.getCaller"
  // -------------------------------------
     rule <k> eei.getCaller => #waiting(EEI.getCaller) ... </k>
-         <eeiK> . => EEI.getCaller </eeiK>
+         <eeiK> . => EEI.getCaller ... </eeiK>
 
     rule <k> #waiting(EEI.getCaller) => #storeEeiResult(PTR, 20, ADDR) ... </k>
          <valstack> <i32> PTR : STACK => STACK </valstack>
-         <eeiK> #result(ADDR) </eeiK>
+         <eeiK> #result(ADDR) => . ... </eeiK>
 ```
 
 ```k
