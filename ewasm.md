@@ -33,10 +33,11 @@ Storing code in contracts
 -------------------------
 
 Make a wasm program storable in contract code.
+The code will point to the module instance of the contract.
 
 ```k
-    syntax Code ::= ModuleDecl
- // --------------------------
+    syntax Code ::= Int
+ // ------------------
 ```
 
 Helper instructions

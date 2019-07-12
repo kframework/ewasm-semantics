@@ -24,29 +24,38 @@ To test and query the blockchain state, we also allow direct client calls in the
 ```k
     syntax EthereumCommand ::= "#invokeContract" Int Int List
  // ---------------------------------------------------------
-    rule <k> #transfer ACCTFROM ACCTTO CALLDATA => CODE ~> ( invoke "main" )... </k>
+    rule <k> #invokeContract ACCTFROM ACCTTO CALLDATA => (invoke FADDR) ... </k>
          <acct> _ => ACCTFROM </acct>
          <account>
            <id> ACCTTO </id>
-           <code> CODE </code>
+           <code> MODADDR </code>
            ...
          </account>
-      requires CODE =/=K .Code
-
+         <moduleInst>
+           <exports> ... "main" |-> TFIDX ... </exports>
+           <funcIds> FIDS </funcIds>
+           <funcAddrs> ... #ContextLookup(FIDS, TFIDX) |-> FADDR ... </funcAddrs>
+           ...
+         </moduleInst>
 ```
 
 Setting up the blockchain state
 -------------------------------
 
 ```k
-    syntax EthereumCommand ::= "#createContract" Int Code
- // -----------------------------------------------------
-    rule <k> #createContract ADDRESS CODE => . ... </k>
+    syntax EthereumCommand ::= "#createContract" Int ModuleDecl
+ // -----------------------------------------------------------
+    rule <k> #createContract ADDRESS CODE => CODE ~> #storeModuleAt ADDRESS ... </k>
+
+    syntax EthereumCommand ::= "#storeModuleAt" Int
+ // ----------------------------------------------
+    rule <k> #storeModuleAt ADDRESS => . ... </k>
+         <curModIdx> CUR </curModIdx>
          <accounts>
            (.Bag
          => <account>
               <id> ADDRESS </id>
-              <code> CODE </code>
+              <code> CUR </code>
               ...
             </account>
            )
