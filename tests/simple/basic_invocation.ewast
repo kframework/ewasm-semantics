@@ -1,0 +1,9 @@
+#createContract 42
+  (module
+    (memory (export "memory") 1)
+    (func (export "main")
+      (i64.store (i32.const 1) (i64.const 2 ^Int 64 -Int 1))
+    )
+  )
+
+#invokeContract 1 42 .List
