@@ -96,7 +96,7 @@ build-haskell: $(haskell_kompiled)
 $(ocaml_kompiled): $(ocaml_defn)
 	@echo "== kompile: $@"
 	eval $$(opam config env)                              \
-	    $(k_bin)/kompile -O3 --non-strict --backend ocaml --debug \
+	    $(k_bin)/kompile -O3 --non-strict --backend ocaml \
 	    --directory $(ocaml_dir) -I $(ocaml_dir)          \
 	    --main-module   ETHEREUM-SIMULATION               \
       --syntax-module ETHEREUM-SIMULATION $<
