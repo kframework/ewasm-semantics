@@ -22,15 +22,17 @@ To test and query the blockchain state, we also allow direct client calls in the
 ```
 
 ```k
-    syntax EthereumCommand ::= "#transfer" Int Int List
- // ---------------------------------------------------
-    rule <k> #transfer ACCTFROM ACCTTO CALLDATA => CODE ... </k>
+    syntax EthereumCommand ::= "#invokeContract" Int Int List
+ // ---------------------------------------------------------
+    rule <k> #transfer ACCTFROM ACCTTO CALLDATA => CODE ~> ( invoke "main" )... </k>
          <acct> _ => ACCTFROM </acct>
          <account>
            <id> ACCTTO </id>
            <code> CODE </code>
            ...
          </account>
+      requires CODE =/=K .Code
+
 ```
 
 Setting up the blockchain state
