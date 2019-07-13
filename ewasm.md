@@ -37,7 +37,15 @@ The code will point to the module instance of the contract.
 
 ```k
     syntax Code ::= Int
- // ------------------
+ // -------------------
+```
+
+Extending the Wasm instruction set with host calls
+--------------------------------------------------
+
+```k
+    syntax Instr ::= HostCall
+ // -------------------------
 ```
 
 Helper instructions
@@ -50,22 +58,23 @@ The EEI signals end of execution by setting an appropriate status code.
 The token `#waiting` dosen't have associated rules in either transition system, and so will only be processed by rules in this embedder.
 
 ```k
-    syntax Instr ::= "#waiting" "(" EEIMethod ")"
- // ---------------------------------------------
+    syntax Instr ::= "#waiting" "(" HostCall ")"
+ // --------------------------------------------
 ```
 
 Many instructions return a value, a certain number of bytes in length, that needs to be stored to Wasm linear memory.
 The trapping conditions for these stores is the same as for regular Wasm stores.
 The following function helps with this task.
+All data that gets passed is a number of bytes divisible by 4, the same number of bytes as an i32, so storage will happen in increments of 4 bytes.
 
 ```k
     syntax Instrs ::= #storeEeiResult(Int, Int, Int) [function]
  // -----------------------------------------------------------
     rule #storeEeiResult(STARTIDX, LENGTHBYTES, VALUE)
-      => (i32.store8 (i32.const STARTIDX) (i32.const VALUE))
-         #storeEeiResult(STARTIDX +Int 1, LENGTHBYTES -Int 1, VALUE /Int 256)
+      => (i32.store (i32.const STARTIDX) (i32.const VALUE))
+         #storeEeiResult(STARTIDX +Int 4, LENGTHBYTES -Int 4, VALUE /Int #pow(i32))
       requires LENGTHBYTES >Int 0
-    rule #storeEeiResult(_, 0, _) => nop
+    rule #storeEeiResult(_, 0, _) => .Instrs
 ```
 
 Exceptional halting
@@ -82,16 +91,20 @@ An exception in the EEI translates into a `trap` in Wasm.
 EEI calls
 ---------
 
+### Call state methods
+
+#### `getCaller`
+
 Load the caller address (20 bytes) into memory at the spcified location.
 
 ```k
-    syntax PlainInstr ::= "eei.getCaller"
- // -------------------------------------
-    rule <k> eei.getCaller => #waiting(EEI.getCaller) ... </k>
+    syntax HostCall ::= "eei.getCaller"
+ // -----------------------------------
+    rule <k> eei.getCaller => #waiting(eei.getCaller) ... </k>
          <eeiK> . => EEI.getCaller ... </eeiK>
 
-    rule <k> #waiting(EEI.getCaller) => #storeEeiResult(PTR, 20, ADDR) ... </k>
-         <valstack> <i32> PTR : STACK => STACK </valstack>
+    rule <k> #waiting(eei.getCaller) => #storeEeiResult(PTR, 20, ADDR) ... </k>
+         <locals> 0 |-> <i32> PTR </locals>
          <eeiK> #result(ADDR) => . ... </eeiK>
 ```
 
