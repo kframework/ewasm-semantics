@@ -84,8 +84,12 @@ An exception in the EEI translates into a `trap` in Wasm.
 
 ```k
     rule <k> #waiting(_) => trap ... </k>
+         <eeiK> . </eeiK>
          <statusCode> STATUSCODE </statusCode>
-      requires notBool isEndStatusCode(STATUSCODE)
+      requires notBool (STATUSCODE ==K .StatusCode
+                 orBool isEndStatusCode(STATUSCODE)
+                       )
+```
 ```
 
 EEI calls
