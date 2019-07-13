@@ -26,6 +26,7 @@ To test and query the blockchain state, we also allow direct client calls in the
  // ---------------------------------------------------------
     rule <k> #invokeContract ACCTFROM ACCTTO CALLDATA => (invoke FADDR) ... </k>
          <acct> _ => ACCTFROM </acct>
+         <caller> _ => ACCTFROM </caller>
          <account>
            <id> ACCTTO </id>
            <code> MODADDR </code>
