@@ -54,15 +54,15 @@ ewasm_files:=driver.k ewasm.k $(wasm_files) $(eei_files)
 
 ocaml_dir:=$(defn_dir)/ocaml
 ocaml_defn:=$(patsubst %, $(ocaml_dir)/%, $(ewasm_files))
-ocaml_kompiled:=$(ocaml_dir)/ewasm-kompiled/interpreter
+ocaml_kompiled:=$(ocaml_dir)/driver-kompiled/interpreter
 
 java_dir:=$(defn_dir)/java
 java_defn:=$(patsubst %, $(java_dir)/%, $(ewasm_files))
-java_kompiled:=$(java_dir)/ewasm-kompiled/compiled.txt
+java_kompiled:=$(java_dir)/driver-kompiled/compiled.txt
 
 haskell_dir:=$(defn_dir)/haskell
 haskell_defn:=$(patsubst %, $(haskell_dir)/%, $(ewasm_files))
-haskell_kompiled:=$(haskell_dir)/ewasm-kompiled/definition.kore
+haskell_kompiled:=$(haskell_dir)/driver-kompiled/definition.kore
 
 # Tangle definition from *.md files
 
