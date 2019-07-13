@@ -130,6 +130,60 @@ Load the caller address (20 bytes) into memory at the spcified location.
          <eeiK> #result(ADDR) => . ... </eeiK>
 ```
 
+### World state methods
+
+#### `storageStore`
+
+In the executing account's storage, store the 32 bytes at `VALUEPTR` to the storage location specified by the 32 bytes at `INDEXPTR`.
+
+```k
+    syntax HostCall ::= "eei.storageStore"
+ // --------------------------------------
+    rule <k> eei.storageStore => #waiting(eei.storageStore) ... </k>
+         <locals>
+           0 |-> <i32> INDEXPTR
+           1 |-> <i32> VALUEPTR
+         </locals>
+         <curModIdx> CUR </curModIdx>
+         <moduleInst>
+           <modIdx> CUR </modIdx>
+           <memAddrs> 0 |-> ADDR </memAddrs>
+           ...
+         </moduleInst>
+         <memInst>
+           <mAddr> ADDR </mAddr>
+           <msize> SIZE </msize>
+           <mdata> DATA </mdata>
+           ...
+         </memInst>
+         <eeiK> . => EEI.setAccountStorage #range(DATA, INDEXPTR, 32) #range(DATA, VALUEPTR, 32) ... </eeiK>
+       requires INDEXPTR +Int 32 <Int SIZE *Int #pageSize()
+        andBool VALUEPTR +Int 32 <Int SIZE *Int #pageSize()
+
+    rule <k> eei.storageStore => trap ... </k>
+         <locals>
+           0 |-> <i32> INDEXPTR
+           1 |-> <i32> VALUEPTR
+         </locals>
+         <curModIdx> CUR </curModIdx>
+         <moduleInst>
+           <modIdx> CUR </modIdx>
+           <memAddrs> 0 |-> ADDR </memAddrs>
+           ...
+         </moduleInst>
+         <memInst>
+           <mAddr> ADDR </mAddr>
+           <msize> SIZE </msize>
+           ...
+         </memInst>
+       requires INDEXPTR +Int 32 >=Int SIZE *Int #pageSize()
+         orBool VALUEPTR +Int 32 >=Int SIZE *Int #pageSize()
+
+    rule <k> #waiting(eei.storageStore) => . ... </k>
+         <statusCode> STATUSCODE </statusCode>
+      requires isEndStatusCode(STATUSCODE)
+```
+
 ```k
 endmodule
 ```
