@@ -90,6 +90,24 @@ An exception in the EEI translates into a `trap` in Wasm.
                  orBool isEndStatusCode(STATUSCODE)
                        )
 ```
+
+The "ethereum" host module
+--------------------------
+
+The "ethereum" module is a module of host functions.
+It doesn't exist as a Wasm modules, so we need to treat it specially.
+An Ewasm contract interacts with the "ethereum" host module by importing its functions.
+
+```k
+    rule <k> ( import "ethereum" FNAME (func OID:OptionalId TUSE:TypeUse) )
+          => ( func OID TUSE .LocalDecls #eeiFunction(FNAME) .Instrs )
+         ...
+         </k>
+
+    syntax Instr ::= #eeiFunction(String) [function]
+ // ------------------------------------------------
+    rule #eeiFunction("getCaller")    => eei.getCaller
+    rule #eeiFunction("storageStore") => eei.storageStore
 ```
 
 EEI calls
