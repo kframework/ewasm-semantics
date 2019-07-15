@@ -19,8 +19,11 @@ The configuration composes both the top level cells of the Wasm and EEI semantic
 
 ```k
     configuration
-      <eei/>
-      <wasm/>
+      <ewasm>
+        <eei/>
+        <wasm/>
+        <paramstack> .ParamStack </paramstack>
+      </ewasm>
 ```
 
 Conventions
@@ -50,6 +53,61 @@ Extending the Wasm instruction set with host calls
 
 Helper instructions
 -------------------
+
+Values which exceed 8 bytes are passed to EEI in the linear memory.
+To abstract this common pattern, we use the `#gatherParams` instruction.
+It takes a list of parameters to gather from memory, and pushes them to a separate stack of integers.
+
+```k
+    syntax ParamStack ::= List{Int, ":"}
+ // ----------------------------------------
+```
+
+If any parameter causes an out-of-bounds access, a trap occurs.
+After all parameters have been gathered on the stack, the continuation (as a `HostCall`) remains in the `#gatheredCall` instruction.
+Each such call is handled differently, and so the rules for them are specified in their respective sections.
+
+```k
+    syntax MemoryVariable  ::= "(" Int "," Int ")"
+    syntax MemoryVariables ::= List {MemoryVariable, ""}
+ // ----------------------------------------------------
+
+    syntax Instrs ::= "#gatherParams" "(" HostCall "," MemoryVariables ")"
+ // --------------------------------------------------
+    rule <k> #gatherParams(HC,            .MemoryVariables) => #gatheredCall(HC)     ... </k>
+    rule <k> #gatherParams(HC, (IDX, LEN) MS              ) => #gatherParams(HC, MS) ... </k>
+         <paramstack> PSTACK => #range(DATA , IDX, LEN) : PSTACK </paramstack>
+         <curModIdx> CUR </curModIdx>
+         <moduleInst>
+           <modIdx> CUR </modIdx>
+           <memAddrs> 0 |-> ADDR </memAddrs>
+           ...
+         </moduleInst>
+         <memInst>
+           <mAddr> ADDR </mAddr>
+           <msize> SIZE </msize>
+           <mdata> DATA </mdata>
+           ...
+         </memInst>
+       requires IDX +Int LEN <Int SIZE *Int #pageSize()
+
+    rule <k> #gatherParams(HC, (IDX, LEN) MS) => trap ... </k>
+         <curModIdx> CUR </curModIdx>
+         <moduleInst>
+           <modIdx> CUR </modIdx>
+           <memAddrs> 0 |-> ADDR </memAddrs>
+           ...
+         </moduleInst>
+         <memInst>
+           <mAddr> ADDR </mAddr>
+           <msize> SIZE </msize>
+           ...
+         </memInst>
+       requires IDX +Int LEN >=Int SIZE *Int #pageSize()
+
+    syntax Instr  ::= "#gatheredCall" "(" HostCall ")"
+ // --------------------------------------------------
+```
 
 The Wasm semantics will sometimes produce instructions for the EEI to execute, and then waits to consume the result.
 The EEI produces results, and waits for instructions from the Wasm engine.
@@ -113,8 +171,6 @@ An Ewasm contract interacts with the "ethereum" host module by importing its fun
 EEI calls
 ---------
 
-*TODO*: The call pattern of taking a ceratin number of bytes of memory, making it an int and giving it as a parameter to the EEI is extremely common. Can we abstract it somehow?
-
 ### Call state methods
 
 #### `getCaller`
@@ -136,54 +192,23 @@ Load the caller address (20 bytes) into memory at the spcified location.
 
 #### `storageStore`
 
-In the executing account's storage, store the 32 bytes at `VALUEPTR` to the storage location specified by the 32 bytes at `INDEXPTR`.
+In the executing account's storage, store the 32 bytes at `VALUEPTR` in linear memory to the storage location specified by the 32 bytes at `INDEXPTR` in linear memory.
 
 ```k
     syntax HostCall ::= "eei.storageStore"
  // --------------------------------------
-    rule <k> eei.storageStore => #waiting(eei.storageStore) ... </k>
+    rule <k> eei.storageStore => #gatherParams(eei.storageStore, (INDEXPTR, 32) (VALUEPTR, 32)) ... </k>
          <locals>
            0 |-> <i32> INDEXPTR
            1 |-> <i32> VALUEPTR
          </locals>
-         <curModIdx> CUR </curModIdx>
-         <moduleInst>
-           <modIdx> CUR </modIdx>
-           <memAddrs> 0 |-> ADDR </memAddrs>
-           ...
-         </moduleInst>
-         <memInst>
-           <mAddr> ADDR </mAddr>
-           <msize> SIZE </msize>
-           <mdata> DATA </mdata>
-           ...
-         </memInst>
-         <eeiK> . => EEI.setAccountStorage #range(DATA, INDEXPTR, 32) #range(DATA, VALUEPTR, 32) ... </eeiK>
-       requires INDEXPTR +Int 32 <Int SIZE *Int #pageSize()
-        andBool VALUEPTR +Int 32 <Int SIZE *Int #pageSize()
 
-    rule <k> eei.storageStore => trap ... </k>
-         <locals>
-           0 |-> <i32> INDEXPTR
-           1 |-> <i32> VALUEPTR
-         </locals>
-         <curModIdx> CUR </curModIdx>
-         <moduleInst>
-           <modIdx> CUR </modIdx>
-           <memAddrs> 0 |-> ADDR </memAddrs>
-           ...
-         </moduleInst>
-         <memInst>
-           <mAddr> ADDR </mAddr>
-           <msize> SIZE </msize>
-           ...
-         </memInst>
-       requires INDEXPTR +Int 32 >=Int SIZE *Int #pageSize()
-         orBool VALUEPTR +Int 32 >=Int SIZE *Int #pageSize()
+    rule <k> #gatheredCall(eei.storageStore) => #waiting(eei.storageStore) ... </k>
+         <paramstack> VALUE : INDEX : .ParamStack => .ParamStack </paramstack>
+         <eeiK> . => EEI.setAccountStorage INDEX VALUE ... </eeiK>
 
     rule <k> #waiting(eei.storageStore) => . ... </k>
-         <statusCode> STATUSCODE </statusCode>
-      requires isEndStatusCode(STATUSCODE)
+         <statusCode> EVM_SUCCESS </statusCode>
 ```
 
 ```k
