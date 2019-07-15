@@ -25,7 +25,7 @@ To test and query the blockchain state, we also allow direct client calls in the
     syntax EthereumCommand ::= "#invokeContract" Int Int List
  // ---------------------------------------------------------
     rule <k> #invokeContract ACCTFROM ACCTTO CALLDATA => (invoke FADDR) ... </k>
-         <acct> _ => ACCTFROM </acct>
+         <acct> _ => ACCTTO </acct>
          <caller> _ => ACCTFROM </caller>
          <account>
            <id> ACCTTO </id>
@@ -62,8 +62,6 @@ Setting up the blockchain state
            )
            ...
          </accounts>
-        
-    
 ```
 
 ```k
