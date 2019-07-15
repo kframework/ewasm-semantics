@@ -113,6 +113,8 @@ An Ewasm contract interacts with the "ethereum" host module by importing its fun
 EEI calls
 ---------
 
+*TODO*: The call pattern of taking a ceratin number of bytes of memory, making it an int and giving it as a parameter to the EEI is extremely common. Can we abstract it somehow?
+
 ### Call state methods
 
 #### `getCaller`
