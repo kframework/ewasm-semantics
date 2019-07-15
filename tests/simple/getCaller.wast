@@ -7,4 +7,7 @@
     )
   )
 
-#invokeContract 1 42 .List
+#invokeContract 256 42 .List
+
+#assertMemoryData (1, 1) "Store getCaller is little endian"
+#clearEwasmConfig

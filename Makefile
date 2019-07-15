@@ -50,19 +50,19 @@ ocaml-deps:
 
 wasm_files:=$(patsubst %, $(wasm_submodule)/%, test.k wasm.k data.k)
 eei_files:=$(eei_submodule)/eei.k
-ewasm_files:=driver.k ewasm.k $(wasm_files) $(eei_files)
+ewasm_files:=test.k driver.k ewasm.k $(wasm_files) $(eei_files)
 
 ocaml_dir:=$(defn_dir)/ocaml
 ocaml_defn:=$(patsubst %, $(ocaml_dir)/%, $(ewasm_files))
-ocaml_kompiled:=$(ocaml_dir)/driver-kompiled/interpreter
+ocaml_kompiled:=$(ocaml_dir)/test-kompiled/interpreter
 
 java_dir:=$(defn_dir)/java
 java_defn:=$(patsubst %, $(java_dir)/%, $(ewasm_files))
-java_kompiled:=$(java_dir)/driver-kompiled/compiled.txt
+java_kompiled:=$(java_dir)/test-kompiled/compiled.txt
 
 haskell_dir:=$(defn_dir)/haskell
 haskell_defn:=$(patsubst %, $(haskell_dir)/%, $(ewasm_files))
-haskell_kompiled:=$(haskell_dir)/driver-kompiled/definition.kore
+haskell_kompiled:=$(haskell_dir)/test-kompiled/definition.kore
 
 # Tangle definition from *.md files
 
@@ -98,19 +98,73 @@ $(ocaml_kompiled): $(ocaml_defn)
 	eval $$(opam config env)                              \
 	    $(k_bin)/kompile -O3 --non-strict --backend ocaml \
 	    --directory $(ocaml_dir) -I $(ocaml_dir)          \
-	    --main-module   ETHEREUM-SIMULATION               \
-      --syntax-module ETHEREUM-SIMULATION $<
+	    --main-module   EWASM-TEST               \
+      --syntax-module EWASM-TEST $<
 
 $(java_kompiled): $(java_defn)
 	@echo "== kompile: $@"
 	$(k_bin)/kompile --backend java            \
 	    --directory $(java_dir) -I $(java_dir) \
-	    --main-module   ETHEREUM-SIMULATION    \
-      --syntax-module ETHEREUM-SIMULATION $<
+	    --main-module   EWASM-TEST    \
+      --syntax-module EWASM-TEST $<
 
 $(haskell_kompiled): $(haskell_defn)
 	@echo "== kompile: $@"
 	$(k_bin)/kompile --backend haskell               \
 	    --directory $(haskell_dir) -I $(haskell_dir) \
-	    --main-module   ETHEREUM-SIMULATION          \
-      --syntax-module ETHEREUM-SIMULATION $<
+	    --main-module   EWASM-TEST          \
+      --syntax-module EWASM-TEST $<
+
+# Testing
+# -------
+
+TEST_CONCRETE_BACKEND:=ocaml
+TEST_SYMBOLIC_BACKEND:=java
+TEST:=./kewasm
+KPROVE_MODULE:=KWASM-LEMMAS
+CHECK:=git --no-pager diff --no-index --ignore-all-space
+
+tests/%/make.timestamp:
+	@echo "== submodule: $@"
+	git submodule update --init -- tests/$*
+	touch $@
+
+test: test-execution test-prove
+
+# Generic Test Harnesses
+
+tests/%.run: tests/%
+	$(TEST) run --backend $(TEST_CONCRETE_BACKEND) $< > tests/$*.$(TEST_CONCRETE_BACKEND)-out
+	$(CHECK) tests/success-$(TEST_CONCRETE_BACKEND).out tests/$*.$(TEST_CONCRETE_BACKEND)-out
+	rm -rf tests/$*.$(TEST_CONCRETE_BACKEND)-out
+
+tests/%.parse: tests/%
+	$(TEST) kast --backend $(TEST_CONCRETE_BACKEND) $< kast > $@-out
+	$(CHECK) $@-expected $@-out
+	rm -rf $@-out
+
+tests/%.prove: tests/%
+	$(TEST) prove --backend $(TEST_SYMBOLIC_BACKEND) $< --format-failures --def-module $(KPROVE_MODULE)
+
+tests/%.klab-prove: tests/%
+	$(TEST) klab-prove --backend $(TEST_SYMBOLIC_BACKEND) $< --format-failures --def-module $(KPROVE_MODULE)
+
+### Execution Tests
+
+test-execution: test-simple
+
+simple_tests:=$(wildcard tests/simple/*.wast)
+
+test-simple: $(simple_tests:=.run)
+
+### Proof Tests
+
+proof_tests:=$(wildcard tests/proofs/*-spec.k)
+slow_proof_tests:=tests/proofs/loops-spec.k
+quick_proof_tests:=$(filter-out $(slow_proof_tests), $(proof_tests))
+
+test-prove: $(proof_tests:=.prove)
+
+### KLab interactive
+
+test-klab-prove: $(quick_proof_tests:=.klab-prove)
