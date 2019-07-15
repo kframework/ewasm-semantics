@@ -1,7 +1,7 @@
 <ewasm>
   <eei>
     <eeiK>
-      .EEIMethods
+      .
     </eeiK>
     <statusCode>
       .StatusCode
@@ -145,6 +145,6 @@
     </nextFreshId>
   </wasm>
   <paramstack>
-    .ParameterStack
+    .ParamStack
   </paramstack>
 </ewasm>
