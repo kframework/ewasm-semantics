@@ -166,6 +166,7 @@ An Ewasm contract interacts with the "ethereum" host module by importing its fun
  // ------------------------------------------------
     rule #eeiFunction("getCaller")    => eei.getCaller
     rule #eeiFunction("storageStore") => eei.storageStore
+    rule #eeiFunction("storageLoad")  => eei.storageLoad
 ```
 
 EEI calls
@@ -190,6 +191,26 @@ Load the caller address (20 bytes) into memory at the spcified location.
 ```
 
 ### World state methods
+
+#### `storageLoad`
+
+From the executing account's storage, load the 32 bytes stored at the index specified by the 32 bytes at `INDEXPTR` in linear memory into the.
+
+```k
+    syntax HostCall ::= "eei.storageLoad"
+ // -------------------------------------
+    rule <k> eei.storageLoad => #gatherParams(eei.storageLoad, (INDEXPTR, 32)) ... </k>
+         <locals> ... 0 |-> <i32> INDEXPTR ... </locals>
+
+    rule <k> #gatheredCall(eei.storageLoad) => #waiting(eei.storageLoad) ... </k>
+         <paramstack> INDEX : .ParamStack => .ParamStack </paramstack>
+         <eeiK> . => EEI.getAccountStorage INDEX </eeiK>
+
+    rule <k> #waiting(eei.storageLoad) => #storeEeiResult(RESULTPTR, 32, VALUE) ... </k>
+         <locals> ... 1 |-> <i32> RESULTPTR ... </locals>
+         <eeiK> #result(VALUE) => . </eeiK>
+         <statusCode> EVM_SUCCESS => .StatusCode </statusCode>
+```
 
 #### `storageStore`
 
