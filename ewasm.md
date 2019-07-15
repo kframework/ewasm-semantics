@@ -181,11 +181,12 @@ Load the caller address (20 bytes) into memory at the spcified location.
     syntax HostCall ::= "eei.getCaller"
  // -----------------------------------
     rule <k> eei.getCaller => #waiting(eei.getCaller) ... </k>
-         <eeiK> . => EEI.getCaller ... </eeiK>
+         <eeiK> . => EEI.getCaller </eeiK>
 
-    rule <k> #waiting(eei.getCaller) => #storeEeiResult(PTR, 20, ADDR) ... </k>
-         <locals> 0 |-> <i32> PTR </locals>
-         <eeiK> #result(ADDR) => . ... </eeiK>
+    rule <k> #waiting(eei.getCaller) => #storeEeiResult(RESULTPTR, 20, ADDR) ... </k>
+         <locals> 0 |-> <i32> RESULTPTR </locals>
+         <eeiK> #result(ADDR) => . </eeiK>
+         <statusCode> EVM_SUCCESS => .StatusCode </statusCode>
 ```
 
 ### World state methods
@@ -205,10 +206,10 @@ In the executing account's storage, store the 32 bytes at `VALUEPTR` in linear m
 
     rule <k> #gatheredCall(eei.storageStore) => #waiting(eei.storageStore) ... </k>
          <paramstack> VALUE : INDEX : .ParamStack => .ParamStack </paramstack>
-         <eeiK> . => EEI.setAccountStorage INDEX VALUE ... </eeiK>
+         <eeiK> . => EEI.setAccountStorage INDEX VALUE </eeiK>
 
     rule <k> #waiting(eei.storageStore) => . ... </k>
-         <statusCode> EVM_SUCCESS </statusCode>
+         <statusCode> EVM_SUCCESS => .StatusCode </statusCode>
 ```
 
 ```k
