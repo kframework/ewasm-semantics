@@ -8,7 +8,7 @@ module ETHEREUM-SIMULATION
     imports EWASM
 ```
 
-An EWasm program is the invocation of an Ethereum contract containing EWasm code.
+An Ewasm program is the invocation of an Ethereum contract containing Ewasm code.
 
 Running smart contracts
 -----------------------

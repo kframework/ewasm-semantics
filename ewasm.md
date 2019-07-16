@@ -1,4 +1,4 @@
-EWasm specification
+Ewasm specification
 =================
 
 ```k
@@ -8,7 +8,7 @@ require "deps/eei-semantics/eei.k"
 module EWASM
 ```
 
-EWasm consists of a WebAssembly (Wasm) semantics, and an Ethereum Environment Interface (EEI) semantics, and rules to pass calls and data between them.
+Ewasm consists of a WebAssembly (Wasm) semantics, and an Ethereum Environment Interface (EEI) semantics, and rules to pass calls and data between them.
 
 ```k
     imports EEI
