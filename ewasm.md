@@ -1,4 +1,4 @@
-Ewasm specification
+Ewasm Specification
 =================
 
 ```k
@@ -32,18 +32,19 @@ Conventions
 Instructions for calling into the EEI from Wasm are prefixed with *lowercase* `eei.`, e.g. `eei.getCaller`.
 EEI methods are prefixed with *uppercase* `EEI`, e.g. `EEI.getCaller`.
 
-Storing code in contracts
+Storing Code in Contracts
 -------------------------
 
-Make a wasm program storable in contract code.
-The code will point to the module instance of the contract.
+We want to make a Wasm program storable in contract code.
+We do this by extending the `Code` production with a Wasm module representation.
+We do this through an indirection, by letting the code in a contract be a pointer into the store of modules.
 
 ```k
     syntax Code ::= Int
  // -------------------
 ```
 
-Extending the Wasm instruction set with host calls
+Extending the Wasm Instruction Set With Host Calls
 --------------------------------------------------
 
 We encode host calls into the EEI by a set of special instructions.
@@ -53,7 +54,7 @@ We encode host calls into the EEI by a set of special instructions.
  // -------------------------
 ```
 
-### The "ethereum" host module
+### The "ethereum" Host Module
 
 The "ethereum" module is a module of host functions.
 It doesn't exist as a Wasm module, so we need to treat it specially.
@@ -76,7 +77,7 @@ Then, when a `HostCall` instruction is encountered, parameters are gathered from
 ```
 
 
-### Helper instructions
+### Helper Methods
 
 Values which exceed 8 bytes are passed to EEI in the linear memory.
 To abstract this common pattern, we use the `#gatherParams` instruction.
@@ -155,7 +156,7 @@ The `#waiting` means Wasm is waiting for the EEI, and when the EEI has completed
  // --------------------------------------------
 ```
 
-Exceptional halting
+Exceptional Halting
 -------------------
 
 An exception in the EEI translates into a `trap` in Wasm.
@@ -172,7 +173,7 @@ An exception in the EEI translates into a `trap` in Wasm.
 `HostCall`s
 -----------
 
-### Call state methods
+### Call State Methods
 
 #### `getCaller`
 
@@ -190,7 +191,7 @@ Load the caller address (20 bytes) into memory at the spcified location.
          <statusCode> EVM_SUCCESS => .StatusCode </statusCode>
 ```
 
-### World state methods
+### World State Methods
 
 #### `storageLoad`
 
