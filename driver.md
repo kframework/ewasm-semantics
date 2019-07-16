@@ -33,6 +33,7 @@ To test and query the blockchain state, we also allow direct client calls in the
            ...
          </account>
          <moduleInst>
+           <modIdx> MODADDR </modIdx>
            <exports> ... "main" |-> TFIDX ... </exports>
            <funcIds> FIDS </funcIds>
            <funcAddrs> ... #ContextLookup(FIDS, TFIDX) |-> FADDR ... </funcAddrs>
