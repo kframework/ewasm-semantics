@@ -46,6 +46,12 @@ The code will point to the module instance of the contract.
 Extending the Wasm instruction set with host calls
 --------------------------------------------------
 
+We encode host calls into the EEI by a set of special instructions.
+The host functions are imported as usual in the Wasm module.
+When calling such a function, parameters are made into local variables as usual, and results need to be returned on the stack, as usual.
+However, the body of the host functions consist of a single `HostCall` instruction.
+When a `HostCall` instruction is encountered, parameters are gathered from memory and local variables, the EEI is invoked, and the Wasm execution waits for the EEI execution to finish.
+
 ```k
     syntax Instr ::= HostCall
  // -------------------------
@@ -58,16 +64,15 @@ Values which exceed 8 bytes are passed to EEI in the linear memory.
 To abstract this common pattern, we use the `#gatherParams` instruction.
 It takes a list of parameters to gather from memory, and pushes them to a separate stack of integers.
 
+If any parameter causes an out-of-bounds access, a trap occurs.
+After all parameters have been gathered on the stack, the continuation (as a `HostCall`) remains in the `#gatheredCall` instruction.
+From the `#gatheredCall`, the parameters on the stack can be consumed and passed to the EEI.
+`#gatherParams` takes `MemoryVariables`, which is a list of memory offsets and number of bytes, specifying from where to load the appropriate integer value.
+
 ```k
     syntax ParamStack ::= List{Int, ":"}
  // ----------------------------------------
-```
 
-If any parameter causes an out-of-bounds access, a trap occurs.
-After all parameters have been gathered on the stack, the continuation (as a `HostCall`) remains in the `#gatheredCall` instruction.
-Each such call is handled differently, and so the rules for them are specified in their respective sections.
-
-```k
     syntax MemoryVariable  ::= "(" Int "," Int ")"
     syntax MemoryVariables ::= List {MemoryVariable, ""}
  // ----------------------------------------------------
@@ -109,21 +114,10 @@ Each such call is handled differently, and so the rules for them are specified i
  // --------------------------------------------------
 ```
 
-The Wasm semantics will sometimes produce instructions for the EEI to execute, and then waits to consume the result.
-The EEI produces results, and waits for instructions from the Wasm engine.
-The Wasm engine needs to not make any further progress while waiting for the EEI.
-The EEI signals end of execution by setting an appropriate status code.
-The token `#waiting` dosen't have associated rules in either transition system, and so will only be processed by rules in this embedder.
-
-```k
-    syntax Instr ::= "#waiting" "(" HostCall ")"
- // --------------------------------------------
-```
-
-Many instructions return a value, a certain number of bytes in length, that needs to be stored to Wasm linear memory.
+Just like many host calls requires passing parameters in memory, many host calls return a value in Wasm linear memory.
 The trapping conditions for these stores is the same as for regular Wasm stores.
 The following function helps with this task.
-All data that gets passed is a number of bytes divisible by 4, the same number of bytes as an i32, so storage will happen in increments of 4 bytes.
+All byte values in Ewasm are a number of bytes divisible by 4, the same number of bytes as an i32, so storage will happen in increments of 4 bytes.
 
 ```k
     syntax Instrs ::= #storeEeiResult(Int, Int, Int) [function]
@@ -133,6 +127,14 @@ All data that gets passed is a number of bytes divisible by 4, the same number o
          #storeEeiResult(STARTIDX +Int 4, LENGTHBYTES -Int 4, VALUE /Int #pow(i32))
       requires LENGTHBYTES >Int 0
     rule #storeEeiResult(_, 0, _) => .Instrs
+```
+
+The Wasm engine needs to not make any further progress while waiting for the EEI, since they are not meant to execute concurrently.
+The `#waiting` means Wasm is waiting for the EEI, and when the EEI has completed its execution, Wasm can consume the result and proceed.
+
+```k
+    syntax Instr ::= "#waiting" "(" HostCall ")"
+ // --------------------------------------------
 ```
 
 Exceptional halting

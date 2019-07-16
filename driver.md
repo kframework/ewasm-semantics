@@ -13,8 +13,8 @@ An Ewasm program is the invocation of an Ethereum contract containing Ewasm code
 Running smart contracts
 -----------------------
 
-Execution of Ethereum code is always triggered by a sinlge transaction.
-To test and query the blockchain state, we also allow direct client calls in the fomr of EEIMethods.
+Execution of Ethereum code is always triggered by a single transaction.
+To test and query the blockchain state, we also allow direct client calls in the form of EEIMethods.
 
 ```k
     syntax Stmt ::= EthereumCommand
