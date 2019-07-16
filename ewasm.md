@@ -47,18 +47,36 @@ Extending the Wasm instruction set with host calls
 --------------------------------------------------
 
 We encode host calls into the EEI by a set of special instructions.
-The host functions are imported as usual in the Wasm module.
-When calling such a function, parameters are made into local variables as usual, and results need to be returned on the stack, as usual.
-However, the body of the host functions consist of a single `HostCall` instruction.
-When a `HostCall` instruction is encountered, parameters are gathered from memory and local variables, the EEI is invoked, and the Wasm execution waits for the EEI execution to finish.
 
 ```k
     syntax Instr ::= HostCall
  // -------------------------
 ```
 
-Helper instructions
--------------------
+### The "ethereum" host module
+
+The "ethereum" module is a module of host functions.
+It doesn't exist as a Wasm module, so we need to treat it specially.
+An Ewasm contract interacts with the "ethereum" host module by importing its functions.
+The host module functions consist of a single `HostCall` instruction.
+When calling such a function, parameters are made into local variables as usual, and results need to be returned on the stack, as usual.
+Then, when a `HostCall` instruction is encountered, parameters are gathered from memory and local variables, the EEI is invoked, and the Wasm execution waits for the EEI execution to finish.
+
+```k
+    rule <k> ( import "ethereum" FNAME (func OID:OptionalId TUSE:TypeUse) )
+          => ( func OID TUSE .LocalDecls #eeiFunction(FNAME) .Instrs )
+         ...
+         </k>
+
+    syntax Instr ::= #eeiFunction(String) [function]
+ // ------------------------------------------------
+    rule #eeiFunction("getCaller")    => eei.getCaller
+    rule #eeiFunction("storageStore") => eei.storageStore
+    rule #eeiFunction("storageLoad")  => eei.storageLoad
+```
+
+
+### Helper instructions
 
 Values which exceed 8 bytes are passed to EEI in the linear memory.
 To abstract this common pattern, we use the `#gatherParams` instruction.
@@ -151,28 +169,8 @@ An exception in the EEI translates into a `trap` in Wasm.
                        )
 ```
 
-The "ethereum" host module
---------------------------
-
-The "ethereum" module is a module of host functions.
-It doesn't exist as a Wasm modules, so we need to treat it specially.
-An Ewasm contract interacts with the "ethereum" host module by importing its functions.
-
-```k
-    rule <k> ( import "ethereum" FNAME (func OID:OptionalId TUSE:TypeUse) )
-          => ( func OID TUSE .LocalDecls #eeiFunction(FNAME) .Instrs )
-         ...
-         </k>
-
-    syntax Instr ::= #eeiFunction(String) [function]
- // ------------------------------------------------
-    rule #eeiFunction("getCaller")    => eei.getCaller
-    rule #eeiFunction("storageStore") => eei.storageStore
-    rule #eeiFunction("storageLoad")  => eei.storageLoad
-```
-
-EEI calls
----------
+`HostCall`s
+-----------
 
 ### Call state methods
 
