@@ -13,6 +13,8 @@ Ewasm consists of a WebAssembly (Wasm) semantics, and an Ethereum Environment In
 ```k
     imports EEI
     imports WASM
+    imports BYTES
+    imports LIST
 ```
 
 The configuration composes both the top level cells of the Wasm and EEI semantics.
@@ -140,12 +142,16 @@ All byte values in Ewasm are a number of bytes divisible by 4, the same number o
 
 ```k
     syntax Instrs ::= #storeEeiResult(Int, Int, Int) [function]
+                    | #storeEeiResult(Int, Bytes)    [function, klabel(storeEeiResultsBytes)]
  // -----------------------------------------------------------
     rule #storeEeiResult(STARTIDX, LENGTHBYTES, VALUE)
       => (i32.store (i32.const STARTIDX) (i32.const VALUE))
          #storeEeiResult(STARTIDX +Int 4, LENGTHBYTES -Int 4, VALUE /Int #pow(i32))
       requires LENGTHBYTES >Int 0
     rule #storeEeiResult(_, 0, _) => .Instrs
+
+    rule #storeEeiResult(STARTIDX, BS:Bytes)
+      => #storeEeiResult(STARTIDX, lengthBytes(BS), Bytes2Int(BS, LE, Unsigned))
 ```
 
 The Wasm engine needs to not make any further progress while waiting for the EEI, since they are not meant to execute concurrently.
