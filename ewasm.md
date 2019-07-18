@@ -73,9 +73,10 @@ Then, when a `HostCall` instruction is encountered, parameters are gathered from
 
     syntax Instr ::= #eeiFunction(String) [function]
  // ------------------------------------------------
-    rule #eeiFunction("getCaller")    => eei.getCaller
-    rule #eeiFunction("storageStore") => eei.storageStore
-    rule #eeiFunction("storageLoad")  => eei.storageLoad
+    rule #eeiFunction("getCaller")     => eei.getCaller
+    rule #eeiFunction("storageStore")  => eei.storageStore
+    rule #eeiFunction("storageLoad")   => eei.storageLoad
+    rule #eeiFunction("callDataCopy")  => eei.callDataCopy
 ```
 
 
@@ -193,6 +194,25 @@ Load the caller address (20 bytes) into memory at the spcified location.
          <locals> 0 |-> <i32> RESULTPTR </locals>
          <eeiK> #result(ADDR) => . </eeiK>
          <statusCode> EVM_SUCCESS </statusCode>
+```
+
+### `callDataCopy`
+
+Copy a number of bytes (`LENGTH`) from an offset (`DATAOFFSET`) from the bytes in the call data into a location in memory (`RESULTPTR`).
+
+```k
+    syntax HostCall ::= "eei.callDataCopy"
+ // -------------------------------------
+    rule <k> eei.callDataCopy => #waiting(eei.callDataCopy) ... </k>
+         <eeiK> . => EEI.getCallData </eeiK>
+
+    rule <k> #waiting(eei.callDataCopy) => #storeEeiResult(RESULTPTR, {range(CALLDATA, DATAOFFSET, LENGTH)}:>Bytes) ... </k>
+         <locals>
+           0 |-> <i32> RESULTPTR
+           1 |-> <i32> DATAOFFSET
+           2 |-> <i32> LENGTH
+         </locals>
+         <eeiK> #result(CALLDATA) => . </eeiK>
 ```
 
 ### World State Methods
