@@ -1,15 +1,20 @@
 # Settings
 # --------
 
-build_dir:=.build
 deps_dir:=deps
-defn_dir:=$(build_dir)/defn
-k_submodule:=$(deps_dir)/k
-pandoc_tangle_submodule:=$(deps_dir)/pandoc-tangle
-k_bin:=$(k_submodule)/k-distribution/target/release/k/bin
-tangler:=$(pandoc_tangle_submodule)/tangle.lua
 wasm_submodule:=$(deps_dir)/wasm-semantics
 eei_submodule:=$(deps_dir)/eei-semantics
+k_submodule:=$(wasm_submodule)/deps/k
+pandoc_tangle_submodule:=$(wasm_submodule)/deps/pandoc-tangle
+k_bin:=$(k_submodule)/k-distribution/target/release/k/bin
+tangler:=$(pandoc_tangle_submodule)/tangle.lua
+build_dir:=.build
+defn_dir:=$(build_dir)/defn
+kompiled_dir_name:=ewasm-test
+wasm_make:=make --directory $(wasm_submodule) defn_dir=../../$(defn_dir)
+wasm_clean:=make --directory $(wasm_submodule) clean
+eei_make:=make --directory $(eei_submodule) DEFN_DIR=../../$(defn_dir)
+eei_clean:=make --directory $(eei_submodule) clean
 
 LUA_PATH=$(pandoc_tangle_submodule)/?.lua;;
 export LUA_PATH
@@ -25,21 +30,29 @@ all: build
 
 clean:
 	rm -rf $(build_dir)
+	rm -f $(wasm_submodule)/make.timestamp
+	rm -f $(eei_submodule)/make.timestamp
 	git submodule update --init --recursive
 
 # Build Dependencies (K Submodule)
 # --------------------------------
 
-deps: $(k_submodule)/make.timestamp $(pandoc_tangle_submodule)/make.timestamp ocaml-deps definition-deps
+deps: $(wasm_submodule)/make.timestamp $(eei_submodule)/make.timestamp ocaml-deps definition-deps
 
-$(k_submodule)/make.timestamp:
+$(wasm_submodule)/make.timestamp:
 	git submodule update --init --recursive
-	cd $(k_submodule) && mvn package -DskipTests -Dllvm.backend.skip
-	touch $(k_submodule)/make.timestamp
+	$(wasm_make) deps
+	$(wasm_make) defn-java
+	$(wasm_make) defn-ocaml
+	$(wasm_make) defn-haskell
+	touch $(wasm_submodule)/make.timestamp
 
-$(pandoc_tangle_submodule)/make.timestamp:
-	git submodule update --init -- $(pandoc_tangle_submodule)
-	touch $(pandoc_tangle_submodule)/make.timestamp
+$(eei_submodule)/make.timestamp:
+	git submodule update --init --recursive
+	$(eei_make) defn-java
+	$(eei_make) defn-ocaml
+	$(eei_make) defn-haskell
+	touch $(eei_submodule)/make.timestamp
 
 ocaml-deps:
 	eval $$(opam config env) \
@@ -50,7 +63,7 @@ ocaml-deps:
 
 wasm_files:=$(patsubst %, $(wasm_submodule)/%, test.k wasm.k data.k)
 eei_files:=$(eei_submodule)/eei.k
-ewasm_files:=test.k driver.k ewasm.k $(wasm_files) $(eei_files)
+ewasm_files:=ewasm-test.k driver.k ewasm.k
 
 ocaml_dir:=$(defn_dir)/ocaml
 ocaml_defn:=$(patsubst %, $(ocaml_dir)/%, $(ewasm_files))

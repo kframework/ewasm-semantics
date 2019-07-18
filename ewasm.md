@@ -2,8 +2,8 @@ Ewasm Specification
 =================
 
 ```k
-require "deps/wasm-semantics/wasm.k"
-require "deps/eei-semantics/eei.k"
+require "wasm.k"
+require "eei.k"
 
 module EWASM
 ```
