@@ -165,9 +165,7 @@ An exception in the EEI translates into a `trap` in Wasm.
     rule <k> #waiting(_) => trap ... </k>
          <eeiK> . </eeiK>
          <statusCode> STATUSCODE </statusCode>
-      requires notBool (STATUSCODE ==K .StatusCode
-                 orBool isEndStatusCode(STATUSCODE)
-                       )
+      requires notBool (STATUSCODE ==K EVMC_SUCCESS)
 ```
 
 `HostCall`s
@@ -188,7 +186,7 @@ Load the caller address (20 bytes) into memory at the spcified location.
     rule <k> #waiting(eei.getCaller) => #storeEeiResult(RESULTPTR, 20, ADDR) ... </k>
          <locals> 0 |-> <i32> RESULTPTR </locals>
          <eeiK> #result(ADDR) => . </eeiK>
-         <statusCode> EVM_SUCCESS => .StatusCode </statusCode>
+         <statusCode> EVM_SUCCESS </statusCode>
 ```
 
 ### World State Methods
@@ -210,7 +208,7 @@ From the executing account's storage, load the 32 bytes stored at the index spec
     rule <k> #waiting(eei.storageLoad) => #storeEeiResult(RESULTPTR, 32, VALUE) ... </k>
          <locals> ... 1 |-> <i32> RESULTPTR ... </locals>
          <eeiK> #result(VALUE) => . </eeiK>
-         <statusCode> EVM_SUCCESS => .StatusCode </statusCode>
+         <statusCode> EVM_SUCCESS </statusCode>
 ```
 
 #### `storageStore`
@@ -231,7 +229,7 @@ In the executing account's storage, store the 32 bytes at `VALUEPTR` in linear m
          <eeiK> . => EEI.setAccountStorage INDEX VALUE </eeiK>
 
     rule <k> #waiting(eei.storageStore) => . ... </k>
-         <statusCode> EVM_SUCCESS => .StatusCode </statusCode>
+         <statusCode> EVM_SUCCESS </statusCode>
 ```
 
 ```k
