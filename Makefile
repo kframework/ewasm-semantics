@@ -37,9 +37,15 @@ clean:
 # Build Dependencies (K Submodule)
 # --------------------------------
 
+wasm_files=test.k wasm.k data.k
+wasm_source_files:=$(patsubst %, $(wasm_submodule)/%, $(patsubst %.k, %.md, $(wasm_files)))
+eei_files:=eei.k
+eei_source_files:=$(patsubst %, $(eei_submodule)/%, $(patsubst %.k, %.md, $(eei_files)))
+ewasm_files:=ewasm-test.k driver.k ewasm.k
+
 deps: $(wasm_submodule)/make.timestamp $(eei_submodule)/make.timestamp ocaml-deps definition-deps
 
-$(wasm_submodule)/make.timestamp:
+$(wasm_submodule)/make.timestamp: $(wasm_source_files)
 	git submodule update --init --recursive
 	$(wasm_make) deps
 	$(wasm_make) defn-java
@@ -47,7 +53,7 @@ $(wasm_submodule)/make.timestamp:
 	$(wasm_make) defn-haskell
 	touch $(wasm_submodule)/make.timestamp
 
-$(eei_submodule)/make.timestamp:
+$(eei_submodule)/make.timestamp: $(eei_source_files)
 	git submodule update --init --recursive
 	$(eei_make) defn-java
 	$(eei_make) defn-ocaml
@@ -60,10 +66,6 @@ ocaml-deps:
 
 # Building Definition
 # -------------------
-
-wasm_files:=$(patsubst %, $(wasm_submodule)/%, test.k wasm.k data.k)
-eei_files:=$(eei_submodule)/eei.k
-ewasm_files:=ewasm-test.k driver.k ewasm.k
 
 ocaml_dir:=$(defn_dir)/ocaml
 ocaml_defn:=$(patsubst %, $(ocaml_dir)/%, $(ewasm_files))
