@@ -73,10 +73,11 @@ Then, when a `HostCall` instruction is encountered, parameters are gathered from
 
     syntax Instr ::= #eeiFunction(String) [function]
  // ------------------------------------------------
-    rule #eeiFunction("getCaller")     => eei.getCaller
-    rule #eeiFunction("storageStore")  => eei.storageStore
-    rule #eeiFunction("storageLoad")   => eei.storageLoad
-    rule #eeiFunction("callDataCopy")  => eei.callDataCopy
+    rule #eeiFunction("getCaller")       => eei.getCaller
+    rule #eeiFunction("storageStore")    => eei.storageStore
+    rule #eeiFunction("storageLoad")     => eei.storageLoad
+    rule #eeiFunction("callDataCopy")    => eei.callDataCopy
+    rule #eeiFunction("getCallDataSize") => eei.getCallDataSize
 ```
 
 ### Helper Methods
@@ -192,6 +193,21 @@ Load the caller address (20 bytes) into memory at the spcified location.
     rule <k> #waiting(eei.getCaller) => #storeEeiResult(RESULTPTR, 20, ADDR) ... </k>
          <locals> 0 |-> <i32> RESULTPTR </locals>
          <eeiK> #result(ADDR) => . </eeiK>
+         <statusCode> EVM_SUCCESS </statusCode>
+```
+
+### `getCallDataSize`
+
+Get the size of the call data, returned as a regular Wasm result.
+
+```k
+    syntax HostCall ::= "eei.getCallDataSize"
+ // -----------------------------------------
+    rule <k> eei.getCallDataSize => #waiting(eei.getCallDataSize) ... </k>
+         <eeiK> . => EEI.getCallData </eeiK>
+
+    rule <k> #waiting(eei.getCallDataSize) => i32.const lengthBytes(CALLDATA) ... </k>
+         <eeiK> #result(CALLDATA) => . </eeiK>
          <statusCode> EVM_SUCCESS </statusCode>
 ```
 
