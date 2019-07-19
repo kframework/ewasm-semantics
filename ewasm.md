@@ -145,8 +145,8 @@ All byte values in Ewasm are a number of bytes divisible by 4, the same number o
                     | #storeEeiResult(Int, Bytes)    [function, klabel(storeEeiResultsBytes)]
  // -----------------------------------------------------------
     rule #storeEeiResult(STARTIDX, LENGTHBYTES, VALUE)
-      => (i32.store (i32.const STARTIDX) (i32.const VALUE))
-         #storeEeiResult(STARTIDX +Int 4, LENGTHBYTES -Int 4, VALUE /Int #pow(i32))
+      => (i32.store8 (i32.const STARTIDX) (i32.const VALUE))
+         #storeEeiResult(STARTIDX +Int 1, LENGTHBYTES -Int 1, VALUE /Int 256)
       requires LENGTHBYTES >Int 0
     rule #storeEeiResult(_, 0, _) => .Instrs
 

@@ -4,11 +4,12 @@
     (memory (export "memory") 1)
     (func (export "main")
       (call $callDataCopy (i32.const 0) (i32.const 0) (i32.const 8))
-      (call $callDataCopy (i32.const 16) (i32.const 32) (i32.const 4))
+      (call $callDataCopy (i32.const 32) (i32.const 16) (i32.const 4))
+      (call $callDataCopy (i32.const 100) (i32.const 0) (i32.const 3))
     )
   )
 
-#invokeContract 256 42 String2Bytes("abcdefgh________01234") ;; TODO: use datastrings when available.
+#invokeContract 256 42 String2Bytes("abcdefgh________0123__") ;; TODO: use datastrings when available.
 
 #assertMemoryData (0,  97) "Get call data first 8 bytes"
 #assertMemoryData (1,  98) "Get call data first 8 bytes"
@@ -28,6 +29,14 @@
 #assertMemoryData (19, 51) "Get call data at 16, 4 bytes"
 
 #assertMemoryData (20, 0) "Get call data does not store too much."
+
+#assertMemoryData (99, 0) "Get odd number bytes, does not store too much"
+
+#assertMemoryData (100, 97) "Get odd number bytes"
+#assertMemoryData (101, 98) "Get odd number bytes"
+#assertMemoryData (102, 99) "Get odd number bytes"
+
+#assertMemoryData (103, 0) "Get odd number bytes, does not store too much"
 
 #createContract 43
   (module
