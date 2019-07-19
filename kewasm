@@ -4,10 +4,11 @@ set -euo pipefail
 shopt -s extglob
 
 ewasm_dir="${EWASM_DIR:-$(dirname $0)}"
+wasm_dir="${WASM_DIR:-$ewasm_dir/deps/wasm-semantics}"
 build_dir="$ewasm_dir/.build"
 defn_dir="$build_dir/defn"
 lib_dir="$build_dir/local/lib"
-k_release_dir="${K_RELEASE:-$ewasm_dir/deps/k/k-distribution/target/release/k}"
+k_release_dir="${K_RELEASE:-$wasm_dir/deps/k/k-distribution/target/release/k}"
 
 export PATH="$k_release_dir/lib/native/linux:$k_release_dir/lib/native/linux64:$k_release_dir/bin/:$PATH"
 export LD_LIBRARY_PATH="$k_release_dir/lib/native/linux64:$lib_dir:${LD_LIBRARY_PATH:-}"
