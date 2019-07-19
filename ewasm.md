@@ -199,6 +199,7 @@ Load the caller address (20 bytes) into memory at the spcified location.
 ### `callDataCopy`
 
 Copy a number of bytes (`LENGTH`) from an offset (`DATAOFFSET`) from the bytes in the call data into a location in memory (`RESULTPTR`).
+Traps if `DATAOFFSET` + `LENGTH` exceeds the length of the call data.
 
 ```k
     syntax HostCall ::= "eei.callDataCopy"
@@ -213,6 +214,16 @@ Copy a number of bytes (`LENGTH`) from an offset (`DATAOFFSET`) from the bytes i
            2 |-> <i32> LENGTH
          </locals>
          <eeiK> #result(CALLDATA) => . </eeiK>
+      requires DATAOFFSET +Int LENGTH <Int size(CALLDATA)
+
+    rule <k> #waiting(eei.callDataCopy) => trap ... </k>
+         <locals>
+           0 |-> <i32> _
+           1 |-> <i32> DATAOFFSET
+           2 |-> <i32> LENGTH
+         </locals>
+         <eeiK> #result(CALLDATA) => . </eeiK>
+      requires DATAOFFSET +Int LENGTH >=Int size(CALLDATA)
 ```
 
 ### World State Methods
