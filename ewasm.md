@@ -79,7 +79,6 @@ Then, when a `HostCall` instruction is encountered, parameters are gathered from
     rule #eeiFunction("callDataCopy")  => eei.callDataCopy
 ```
 
-
 ### Helper Methods
 
 Values which exceed 8 bytes are passed to EEI in the linear memory.
