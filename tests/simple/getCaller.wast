@@ -7,7 +7,7 @@
     )
   )
 
-#invokeContract 256 42 .List
+#invokeContract 256 42 .Bytes
 
 #assertMemoryData (11, 1) "Store getCaller is little endian"
 
@@ -20,7 +20,7 @@
     )
   )
 
-#invokeContract #pow(i64) -Int 1 43 .List
+#invokeContract #pow(i64) -Int 1 43 .Bytes
 
 #assertMemoryData (10, 255) "getCaller loads all the bytes"
 #assertMemoryData (11, 255) "getCaller loads all the bytes"

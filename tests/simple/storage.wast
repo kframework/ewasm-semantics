@@ -20,7 +20,7 @@
     )
   )
 
-#invokeContract 256 42 .List
+#invokeContract 256 42 .Bytes
 
 #assertMemoryData (256, 1) "Value was correctly loaded"
 #assertMemoryData (264, 2) "Value was correctly loaded"
