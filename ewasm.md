@@ -260,7 +260,7 @@ From the executing account's storage, load the 32 bytes stored at the index spec
     rule <k> #waiting(eei.storageLoad) => #storeEeiResult(RESULTPTR, 32, VALUE) ... </k>
          <locals> ... 1 |-> <i32> RESULTPTR ... </locals>
          <eeiK> #result(VALUE) => . </eeiK>
-         <statusCode> EVM_SUCCESS </statusCode>
+         <statusCode> EVMC_SUCCESS </statusCode>
 ```
 
 #### `storageStore`
@@ -281,7 +281,7 @@ In the executing account's storage, store the 32 bytes at `VALUEPTR` in linear m
          <eeiK> . => EEI.setAccountStorage INDEX VALUE </eeiK>
 
     rule <k> #waiting(eei.storageStore) => . ... </k>
-         <statusCode> EVM_SUCCESS </statusCode>
+         <statusCode> EVMC_SUCCESS </statusCode>
 ```
 
 ```k
