@@ -7,7 +7,7 @@
       .StatusCode
     </statusCode>
     <returnData>
-      .List
+      b""
     </returnData>
     <callState>
       <callDepth>
@@ -23,7 +23,7 @@
         0
       </caller>
       <callData>
-        .List
+        b""
       </callData>
       <callValue>
         0
