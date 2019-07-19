@@ -79,6 +79,7 @@ Then, when a `HostCall` instruction is encountered, parameters are gathered from
     rule #eeiFunction("callDataCopy")    => eei.callDataCopy
     rule #eeiFunction("getCallDataSize") => eei.getCallDataSize
     rule #eeiFunction("revert")          => eei.revert
+    rule #eeiFunction("finish")          => eei.finish
 ```
 
 ### Helper Methods
@@ -285,12 +286,32 @@ In the executing account's storage, store the 32 bytes at `VALUEPTR` in linear m
          <statusCode> EVMC_SUCCESS </statusCode>
 ```
 
-### Calling and call-like methods
+### Halting methods
+
+These methods do not return control to Wasm, so there is no rule for the `#waiting` cases.
+
+#### `finish`
+
+Immediately halt execution, tell the EVM to finish up and commit changes, and set the return data from memory bytes.
+
+```k
+    syntax HostCall ::= "eei.finish"
+ // --------------------------------
+    rule <k> eei.finish => #gatherParams(eei.finish, (DATAOFFSET, DATALENGTH)) ... </k>
+         <locals>
+           0 |-> <i32> DATAOFFSET
+           1 |-> <i32> DATALENGTH
+         </locals>
+
+    rule <k> #gatheredCall(eei.finish) => #waiting(eei.finish) ... </k>
+         <paramstack> OUTPUTDATA : .ParamStack => .ParamStack </paramstack>
+         <locals> ... 1 |-> <i32> DATALENGTH ... </locals>
+         <eeiK> . => EEI.return Int2Bytes(OUTPUTDATA, DATALENGTH, LE) </eeiK>
+```
 
 #### `revert`
 
 Immediately halt execution, tell the EVM to revert, and set return data from memory bytes.
-This function does not return control to Wasm, so there is no rule for the `#waiting` case.
 
 ```k
     syntax HostCall ::= "eei.revert"
