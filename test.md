@@ -4,7 +4,7 @@ Testing
 We make use of the testing module for Wasm, which will let us make assertions about the Wasm runtime state.
 
 ```k
-requires "deps/wasm-semantics/test.k"
+requires "test.k"
 requires "driver.k"
 
 module EWASM-TEST

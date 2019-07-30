@@ -66,21 +66,14 @@ When calling such a function, parameters are made into local variables as usual,
 Then, when a `HostCall` instruction is encountered, parameters are gathered from memory and local variables, the EEI is invoked, and the Wasm execution waits for the EEI execution to finish.
 
 ```k
-    rule <k> ( import MODNAME FNAME (func OID:OptionalId TUSE:TypeUse) )
-          => ( func OID TUSE .LocalDecls #eeiFunction(FNAME) .Instrs )
+    syntax ImportDefn ::= "(" "import" HostModule HostExport ImportDesc ")"
+    syntax HostModule ::= "\"ethereum\""
+    syntax HostExport ::= "\"getCaller\""
+ // ----------------------------------------------------
+    rule <k> ( import "ethereum":HostModule "getCaller":HostExport ( func OID:OptionalId TUSE:TypeUse ) )
+          => ( func OID TUSE .LocalDecls eei.getCaller .Instrs )
          ...
          </k>
-      requires #parseWasmString(MODNAME) ==String "ethereum"
-
-    syntax Instr ::= #eeiFunction(String) [function]
- // ------------------------------------------------
-    rule #eeiFunction("getCaller")       => eei.getCaller
-    rule #eeiFunction("storageStore")    => eei.storageStore
-    rule #eeiFunction("storageLoad")     => eei.storageLoad
-    rule #eeiFunction("callDataCopy")    => eei.callDataCopy
-    rule #eeiFunction("getCallDataSize") => eei.getCallDataSize
-    rule #eeiFunction("revert")          => eei.revert
-    rule #eeiFunction("finish")          => eei.finish
 ```
 
 ### Helper Methods
