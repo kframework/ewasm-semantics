@@ -66,10 +66,11 @@ When calling such a function, parameters are made into local variables as usual,
 Then, when a `HostCall` instruction is encountered, parameters are gathered from memory and local variables, the EEI is invoked, and the Wasm execution waits for the EEI execution to finish.
 
 ```k
-    rule <k> ( import "ethereum" FNAME (func OID:OptionalId TUSE:TypeUse) )
+    rule <k> ( import MODNAME FNAME (func OID:OptionalId TUSE:TypeUse) )
           => ( func OID TUSE .LocalDecls #eeiFunction(FNAME) .Instrs )
          ...
          </k>
+      requires #parseWasmString(MODNAME) ==String "ethereum"
 
     syntax Instr ::= #eeiFunction(String) [function]
  // ------------------------------------------------
