@@ -12,7 +12,7 @@
     )
   )
 
-#invokeContract 256 42 String2Bytes("abcdefgh________0123__") ;; TODO: use datastrings when available.
+#invokeContract 256 42 "abcdefgh________0123__"
 
 #assertMemoryData (0,  97) "Get call data first 8 bytes"
 #assertMemoryData (1,  98) "Get call data first 8 bytes"
@@ -52,7 +52,7 @@
     )
   )
 
-#invokeContract #pow(i64) -Int 1 43 String2Bytes("abc")
+#invokeContract #pow(i64) -Int 1 43 "abc"
 
 #assertTrap "Access outside of calldata"
 

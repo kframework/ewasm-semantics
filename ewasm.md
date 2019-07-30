@@ -13,6 +13,7 @@ Ewasm consists of a WebAssembly (Wasm) semantics, and an Ethereum Environment In
 ```k
     imports EEI
     imports WASM
+    imports WASM-SYNTAX
     imports BYTES
     imports LIST
 ```
@@ -66,14 +67,21 @@ When calling such a function, parameters are made into local variables as usual,
 Then, when a `HostCall` instruction is encountered, parameters are gathered from memory and local variables, the EEI is invoked, and the Wasm execution waits for the EEI execution to finish.
 
 ```k
-    syntax ImportDefn ::= "(" "import" HostModule HostExport ImportDesc ")"
-    syntax HostModule ::= "\"ethereum\""
-    syntax HostExport ::= "\"getCaller\""
- // ----------------------------------------------------
-    rule <k> ( import "ethereum":HostModule "getCaller":HostExport ( func OID:OptionalId TUSE:TypeUse ) )
-          => ( func OID TUSE .LocalDecls eei.getCaller .Instrs )
+    rule <k> ( import MODNAME FNAME (func OID:OptionalId TUSE:TypeUse) )
+          => ( func OID TUSE .LocalDecls #eeiFunction(FNAME) .Instrs )
          ...
          </k>
+      requires MODNAME ==K "ethereum"
+
+    syntax Instr ::= #eeiFunction(WasmString) [function]
+ // ----------------------------------------------------
+    rule #eeiFunction(NAME) => eei.getCaller       requires NAME ==K "getCaller"
+    rule #eeiFunction(NAME) => eei.storageStore    requires NAME ==K "storageStore"
+    rule #eeiFunction(NAME) => eei.storageLoad     requires NAME ==K "storageLoad"
+    rule #eeiFunction(NAME) => eei.callDataCopy    requires NAME ==K "callDataCopy"
+    rule #eeiFunction(NAME) => eei.getCallDataSize requires NAME ==K "getCallDataSize"
+    rule #eeiFunction(NAME) => eei.revert          requires NAME ==K "revert"
+    rule #eeiFunction(NAME) => eei.finish          requires NAME ==K "finish"
 ```
 
 ### Helper Methods

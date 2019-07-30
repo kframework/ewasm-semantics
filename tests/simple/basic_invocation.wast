@@ -6,7 +6,7 @@
     )
   )
 
-#invokeContract 1 42 .Bytes
+#invokeContract 1 42 ""
 
 #assertMemoryData (1, 255) "Store"
 #assertMemoryData (2, 255) "Store"
