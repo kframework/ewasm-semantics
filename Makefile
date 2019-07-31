@@ -33,6 +33,8 @@ clean:
 	rm -f $(wasm_submodule)/make.timestamp
 	rm -f $(eei_submodule)/make.timestamp
 	git submodule update --init --recursive
+	$(MAKE) clean -C $(wasm_submodule)
+	$(MAKE) clean -C $(eei_submodule)
 
 # Build Dependencies (K Submodule)
 # --------------------------------
