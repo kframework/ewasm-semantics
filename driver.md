@@ -37,8 +37,8 @@ To test and query the blockchain state, we also allow direct client calls in the
 ```
 
 ```k
-    syntax EthereumCommand ::= "#invokeContract" Address Address DataString
- // -----------------------------------------------------------------------
+    syntax EthereumCommand ::= "#invokeContract" Address Address Bytes
+ // ------------------------------------------------------------------
     rule <k> #invokeContract ACCTFROM:HexAddress ACCTTO CALLDATA
           => #invokeContract #parseAddress(ACCTFROM) ACCTTO CALLDATA ... </k>
     rule <k> #invokeContract ACCTFROM:Int ACCTTO:HexAddress CALLDATA
@@ -46,7 +46,7 @@ To test and query the blockchain state, we also allow direct client calls in the
     rule <k> #invokeContract ACCTFROM:Int ACCTTO:Int CALLDATA => (invoke FADDR) ... </k>
          <acct> _ => ACCTTO </acct>
          <caller> _ => ACCTFROM </caller>
-         <callData> _ => #DS2Bytes(CALLDATA) </callData>
+         <callData> _ => CALLDATA </callData>
          <account>
            <id> ACCTTO </id>
            <code> MODADDR </code>
