@@ -6,24 +6,10 @@ require "ewasm.k"
 
 module ETHEREUM-SIMULATION
     imports EWASM
+    imports WASM-TOKEN-SYNTAX
 ```
 
 An Ewasm program is the invocation of an Ethereum contract containing Ewasm code.
-
-Helper functions
-----------------
-
-Ethereum addresses are most often given in hexadecimal form.
-To facilitate using addresses directly, we introduce `HexAddress`.
-
-```k
-    syntax HexAddress ::= r"0x[0-9a-fA-F]{40}"           [token, avoid]
-    syntax Address    ::= Int | HexAddress
-    syntax String     ::= #Address2String ( HexAddress ) [function, functional, hook(STRING.token2string)]
-    syntax Int        ::= #parseAddress( HexAddress )      [function]
- // -----------------------------------------------------------------
-    rule #parseAddress(EA) => String2Base(replaceFirst(#Address2String(EA), #parseWasmString("0x"), #parseWasmString("")), 16)
-```
 
 Running smart contracts
 -----------------------
@@ -36,26 +22,12 @@ To test and query the blockchain state, we also allow direct client calls in the
  // -------------------------------
 ```
 
-Calldata can be given as bytes, or as a hex string of bytes.
-
 ```k
-    syntax HexData ::= r"[0-9a-f]+" [token, avoid]
-    syntax String  ::= #Hex2String ( HexData )  [function, functional, hook(STRING.token2string)]
-    syntax Bytes   ::= #parseHexData( HexData ) [function]
- // -------------------------------------------------------
-    rule #parseHexData(HEX) => Int2Bytes(String2Base(#Hex2String(HEX), 16), LE, Unsigned)
-```
-
-```k
-    syntax CallData ::= Bytes | HexData
+    syntax Address ::= Int | WasmInt
+    syntax CallData ::= Bytes | WasmInt | Int
     syntax EthereumCommand ::= "#invokeContract" Address Address CallData
  // ---------------------------------------------------------------------
-    rule <k> #invokeContract ACCTFROM:HexAddress ACCTTO CALLDATA
-          => #invokeContract #parseAddress(ACCTFROM) ACCTTO CALLDATA ... </k>
-    rule <k> #invokeContract ACCTFROM:Int ACCTTO:HexAddress CALLDATA
-          => #invokeContract ACCTFROM #parseAddress(ACCTTO) CALLDATA ... </k>
-    rule <k> #invokeContract ACCTFROM:Int ACCTTO:Int CALLDATA:HexData
-          => #invokeContract ACCTFROM ACCTTO #parseHexData(CALLDATA) ... </k>
+    rule <k> #invokeContract ACCTFROM:Int ACCTTO:Int CALLDATA:Int => #invokeContract ACCTFROM ACCTTO Int2Bytes(CALLDATA, LE, Unsigned) ... </k>
     rule <k> #invokeContract ACCTFROM:Int ACCTTO:Int CALLDATA:Bytes => (invoke FADDR) ... </k>
          <acct> _ => ACCTTO </acct>
          <caller> _ => ACCTFROM </caller>
@@ -79,25 +51,26 @@ Setting up the blockchain state
 -------------------------------
 
 ```k
-    syntax EthereumCommand ::= "#setBalance" Address Int
- // ----------------------------------------------------
-    rule <k> #setBalance ADDRESS:HexAddress BAL => #setBalance #parseAddress(ADDRESS) BAL ... </k>
-    rule <k> #setBalance ADDRESS:Int BAL => . ... </k>
-         <account>
-           <id> ADDRESS </id>
-           <balance> _ => BAL </balance>
+    syntax EthereumCommand ::= "#createAccount" Address Int
+ // -------------------------------------------------------
+    rule <k> #createAccount ADDRESS:Int BAL => . ... </k>
+         <accounts>
+           ( .Bag
+          => <account>
+               <id> ADDRESS </id>
+               <balance> BAL </balance>
+               ...
+             </account>
+           )
            ...
-         </account>
-
+         </accounts>
 
     syntax EthereumCommand ::= "#createContract" Address ModuleDecl
  // ---------------------------------------------------------------
-    rule <k> #createContract ADDRESS:HexAddress CODE => #createContract #parseAddress(ADDRESS) CODE ... </k>
     rule <k> #createContract ADDRESS:Int        CODE => CODE ~> #storeModuleAt ADDRESS              ... </k>
 
     syntax EthereumCommand ::= "#storeModuleAt" Address
  // ---------------------------------------------------
-    rule <k> #storeModuleAt ADDRESS:HexAddress => #storeModuleAt #parseAddress(ADDRESS) ... </k>
     rule <k> #storeModuleAt ADDRESS:Int => . ... </k>
          <curModIdx> CUR </curModIdx>
          <accounts>
