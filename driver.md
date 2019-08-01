@@ -66,6 +66,17 @@ Setting up the blockchain state
 -------------------------------
 
 ```k
+    syntax EthereumCommand ::= "#setBalance" Address Int
+ // ----------------------------------------------------
+    rule <k> #setBalance ADDRESS:HexAddress BAL => #setBalance #parseAddress(ADDRESS) BAL ... </k>
+    rule <k> #setBalance ADDRESS:Int BAL => . ... </k>
+         <account>
+           <id> ADDRESS </id>
+           <balance> _ => BAL </balance>
+           ...
+         </account>
+
+
     syntax EthereumCommand ::= "#createContract" Address ModuleDecl
  // ---------------------------------------------------------------
     rule <k> #createContract ADDRESS:HexAddress CODE => #createContract #parseAddress(ADDRESS) CODE ... </k>
