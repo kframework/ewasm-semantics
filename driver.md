@@ -36,14 +36,27 @@ To test and query the blockchain state, we also allow direct client calls in the
  // -------------------------------
 ```
 
+Calldata can be given as bytes, or as a hex string of bytes.
+
 ```k
-    syntax EthereumCommand ::= "#invokeContract" Address Address Bytes
- // ------------------------------------------------------------------
+    syntax HexData ::= r"[0-9a-f]+" [token, avoid]
+    syntax String  ::= #Hex2String ( HexData )  [function, functional, hook(STRING.token2string)]
+    syntax Bytes   ::= #parseHexData( HexData ) [function]
+ // -------------------------------------------------------
+    rule #parseHexData(HEX) => Int2Bytes(String2Base(#Hex2String(HEX), 16), LE, Unsigned)
+```
+
+```k
+    syntax CallData ::= Bytes | HexData
+    syntax EthereumCommand ::= "#invokeContract" Address Address CallData
+ // ---------------------------------------------------------------------
     rule <k> #invokeContract ACCTFROM:HexAddress ACCTTO CALLDATA
           => #invokeContract #parseAddress(ACCTFROM) ACCTTO CALLDATA ... </k>
     rule <k> #invokeContract ACCTFROM:Int ACCTTO:HexAddress CALLDATA
           => #invokeContract ACCTFROM #parseAddress(ACCTTO) CALLDATA ... </k>
-    rule <k> #invokeContract ACCTFROM:Int ACCTTO:Int CALLDATA => (invoke FADDR) ... </k>
+    rule <k> #invokeContract ACCTFROM:Int ACCTTO:Int CALLDATA:HexData
+          => #invokeContract ACCTFROM ACCTTO #parseHexData(CALLDATA) ... </k>
+    rule <k> #invokeContract ACCTFROM:Int ACCTTO:Int CALLDATA:Bytes => (invoke FADDR) ... </k>
          <acct> _ => ACCTTO </acct>
          <caller> _ => ACCTFROM </caller>
          <callData> _ => CALLDATA </callData>
