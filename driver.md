@@ -20,8 +20,8 @@ To facilitate using addresses directly, we introduce `HexAddress`.
     syntax HexAddress ::= r"0x[0-9a-fA-F]{40}"           [token, avoid]
     syntax Address    ::= Int | HexAddress
     syntax String     ::= #Address2String ( HexAddress ) [function, functional, hook(STRING.token2string)]
-    syntax Int        ::= #parseAddress(HexAddress)      [function]
- // ---------------------------------------------------------
+    syntax Int        ::= #parseAddress( HexAddress )      [function]
+ // -----------------------------------------------------------------
     rule #parseAddress(EA) => String2Base(replaceFirst(#Address2String(EA), #parseWasmString("0x"), #parseWasmString("")), 16)
 ```
 
@@ -29,7 +29,7 @@ Running smart contracts
 -----------------------
 
 Execution of Ethereum code is always triggered by a single transaction.
-To test and query the blockchain state, we also allow direct client calls in the form of EEIMethods. 
+To test and query the blockchain state, we also allow direct client calls in the form of EEIMethods.
 
 ```k
     syntax Stmt ::= EthereumCommand
