@@ -14,7 +14,7 @@ We can't give concrete `WasmString`s in the main modules, since the definition o
 We introduce two placeholders for the export names we need in the main module, and and give their values here in the syntax module.
 
 ```k
-    rule #ethereumModule() => "ethereum"
+    rule #ethereumModule => "ethereum" [macro]
 
     rule #eeiFunction(NAME) => eei.getCaller       requires NAME ==K "getCaller"
     rule #eeiFunction(NAME) => eei.storageStore    requires NAME ==K "storageStore"
@@ -24,8 +24,8 @@ We introduce two placeholders for the export names we need in the main module, a
     rule #eeiFunction(NAME) => eei.revert          requires NAME ==K "revert"
     rule #eeiFunction(NAME) => eei.finish          requires NAME ==K "finish"
 
-    rule #mainName()   => "main"
-    rule #memoryName() => "memory"
+    rule #mainName   => "main"   [macro]
+    rule #memoryName => "memory" [macro]
 
 endmodule
 ```
@@ -94,9 +94,9 @@ Then, when a `HostCall` instruction is encountered, parameters are gathered from
           => ( func OID TUSE .LocalDecls #eeiFunction(FNAME) .Instrs )
          ...
          </k>
-      requires MODNAME ==K #ethereumModule()
+      requires MODNAME ==K #ethereumModule
 
-    syntax WasmString ::= #ethereumModule() [function]
+    syntax WasmString ::= "#ethereumModule"
     syntax Instr ::= #eeiFunction(WasmString) [function]
  // ----------------------------------------------------
 ```
@@ -104,9 +104,9 @@ Then, when a `HostCall` instruction is encountered, parameters are gathered from
 ### The module API
 
 ```k
-    syntax WasmString ::= #mainName()   [function]
-    syntax WasmString ::= #memoryName() [function]
- // ----------------------------------------------
+    syntax WasmString ::= "#mainName"
+    syntax WasmString ::= "#memoryName"
+ // -------------------------------------
 ```
 
 ### Helper Methods

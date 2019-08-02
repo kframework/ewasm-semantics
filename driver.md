@@ -53,11 +53,12 @@ To test and query the blockchain state, we also allow direct client calls in the
          </account>
          <moduleInst>
            <modIdx> MODADDR </modIdx>
-           <exports> ... #mainName() |-> TFIDX ... </exports>
+           <exports> ... MNAME |-> TFIDX ... </exports>
            <funcIds> FIDS </funcIds>
            <funcAddrs> ... #ContextLookup(FIDS, TFIDX) |-> FADDR ... </funcAddrs>
            ...
          </moduleInst>
+      requires MNAME ==K #mainName
 ```
 
 Setting up the blockchain state
