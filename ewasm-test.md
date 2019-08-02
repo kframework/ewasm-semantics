@@ -26,6 +26,17 @@ module EWASM-TEST
          <eeiK> . => EEI.clearConfig ... </eeiK>
 ```
 
+Assertions
+----------
+
+```// TODO:reintroduce
+    syntax Assertion ::= "#assertCallData" CallData WasmString
+ // ----------------------------------------------------------
+    rule <k> #assertCallData CALLDATA MSG => . ... </k>
+         <callData> CALLDATA' </callData>
+      requires CallData2Bytes(CALLDATA) ==K CALLDATA'
+```
+
 ```k
 endmodule
 ```
