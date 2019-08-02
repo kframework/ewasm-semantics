@@ -5,6 +5,32 @@ Ewasm Specification
 require "wasm.k"
 require "eei.k"
 
+module EWASM-SYNTAX
+    imports WASM-SYNTAX
+    import EWASM
+```
+
+We can't give concrete `WasmString`s in the main modules, since the definition of `WasmString`s exists purely in the syntax modules.
+We introduce two placeholders for the export names we need in the main module, and and give their values here in the syntax module.
+
+```k
+    rule #ethereumModule() => "ethereum"
+
+    rule #eeiFunction(NAME) => eei.getCaller       requires NAME ==K "getCaller"
+    rule #eeiFunction(NAME) => eei.storageStore    requires NAME ==K "storageStore"
+    rule #eeiFunction(NAME) => eei.storageLoad     requires NAME ==K "storageLoad"
+    rule #eeiFunction(NAME) => eei.callDataCopy    requires NAME ==K "callDataCopy"
+    rule #eeiFunction(NAME) => eei.getCallDataSize requires NAME ==K "getCallDataSize"
+    rule #eeiFunction(NAME) => eei.revert          requires NAME ==K "revert"
+    rule #eeiFunction(NAME) => eei.finish          requires NAME ==K "finish"
+
+    rule #mainName()   => "main"
+    rule #memoryName() => "memory"
+
+endmodule
+```
+
+```k
 module EWASM
 ```
 
@@ -70,17 +96,19 @@ Then, when a `HostCall` instruction is encountered, parameters are gathered from
           => ( func OID TUSE .LocalDecls #eeiFunction(FNAME) .Instrs )
          ...
          </k>
-      requires MODNAME ==K "ethereum"
+      requires MODNAME ==K #ethereumModule()
 
+    syntax WasmString ::= #ethereumModule() [function]
     syntax Instr ::= #eeiFunction(WasmString) [function]
  // ----------------------------------------------------
-    rule #eeiFunction(NAME) => eei.getCaller       requires NAME ==K "getCaller"
-    rule #eeiFunction(NAME) => eei.storageStore    requires NAME ==K "storageStore"
-    rule #eeiFunction(NAME) => eei.storageLoad     requires NAME ==K "storageLoad"
-    rule #eeiFunction(NAME) => eei.callDataCopy    requires NAME ==K "callDataCopy"
-    rule #eeiFunction(NAME) => eei.getCallDataSize requires NAME ==K "getCallDataSize"
-    rule #eeiFunction(NAME) => eei.revert          requires NAME ==K "revert"
-    rule #eeiFunction(NAME) => eei.finish          requires NAME ==K "finish"
+```
+
+### The module API
+
+```k
+    syntax WasmString ::= #mainName()   [function]
+    syntax WasmString ::= #memoryName() [function]
+ // ----------------------------------------------
 ```
 
 ### Helper Methods
