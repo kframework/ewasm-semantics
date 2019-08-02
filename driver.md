@@ -30,9 +30,10 @@ To test and query the blockchain state, we also allow direct client calls in the
 ```k
     syntax WasmInt
     syntax Address ::= Int | WasmInt
-    syntax CallData ::= Bytes | WasmInt | Int
+    syntax CallData ::= Bytes | WasmInt | Int | DataString
     syntax EthereumCommand ::= "#invokeContract" Address Address CallData
  // ---------------------------------------------------------------------
+    rule <k> #invokeContract ACCTFROM:Int ACCTTO:Int CALLDATA:DataString => #invokeContract ACCTFROM ACCTTO #DS2Bytes(CALLDATA) ... </k>
     rule <k> #invokeContract ACCTFROM:Int ACCTTO:Int CALLDATA:Int => #invokeContract ACCTFROM ACCTTO Int2Bytes(CALLDATA, LE, Unsigned) ... </k>
     rule <k> #invokeContract ACCTFROM:Int ACCTTO:Int CALLDATA:Bytes => (invoke FADDR) ... </k>
          <acct> _ => ACCTTO </acct>
