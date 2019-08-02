@@ -16,7 +16,7 @@ endmodule
 ```k
 module EWASM-TEST
   imports WASM-TEST
-  imports DRIVER-SYNTAX
+  imports DRIVER
 ```
 
 ```k

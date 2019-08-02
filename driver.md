@@ -7,6 +7,7 @@ require "data.k"
 
 module DRIVER-SYNTAX
     imports EWASM-SYNTAX
+    imports WASM-SYNTAX
     imports DRIVER
 endmodule
 

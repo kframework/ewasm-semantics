@@ -6,8 +6,8 @@ require "wasm.k"
 require "eei.k"
 
 module EWASM-SYNTAX
-    imports WASM-SYNTAX
-    import EWASM
+    imports WASM-TOKEN-SYNTAX
+    imports EWASM
 ```
 
 We can't give concrete `WasmString`s in the main modules, since the definition of `WasmString`s exists purely in the syntax modules.
@@ -39,8 +39,6 @@ Ewasm consists of a WebAssembly (Wasm) semantics, and an Ethereum Environment In
 ```k
     imports EEI
     imports WASM
-    imports BYTES
-    imports LIST
 ```
 
 The configuration composes both the top level cells of the Wasm and EEI semantics.
