@@ -3,6 +3,16 @@ Ethereum Simulation
 
 ```k
 require "ewasm.k"
+require "data.k"
+
+module DRIVER-SYNTAX
+    imports WASM-SYNTAX
+    imports DRIVER
+
+    rule #mainName()   => "main"
+    rule #memoryName() => "memory"
+
+endmodule
 
 module DRIVER
     imports EWASM
@@ -39,12 +49,20 @@ To test and query the blockchain state, we also allow direct client calls in the
          </account>
          <moduleInst>
            <modIdx> MODADDR </modIdx>
-           <exports> ... MAINNAME |-> TFIDX ... </exports>
+           <exports> ... #mainName() |-> TFIDX ... </exports>
            <funcIds> FIDS </funcIds>
            <funcAddrs> ... #ContextLookup(FIDS, TFIDX) |-> FADDR ... </funcAddrs>
            ...
          </moduleInst>
-       requires #parseWasmString(MAINNAME) ==K "main"
+```
+
+We can't give concrete WasmStrings in this module, since the definition exists purely in the syntax modules.
+We introduce two placeholders for the export names we need, and give their values in the syntax module.
+
+```k
+    syntax WasmString ::= #mainName()   [function]
+    syntax WasmString ::= #memoryName() [function]
+ // ----------------------------------------------
 ```
 
 Setting up the blockchain state
