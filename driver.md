@@ -29,17 +29,23 @@ To test and query the blockchain state, we also allow direct client calls in the
 ```
 
 ```k
+    syntax CallData ::= Bytes | WasmInt | Int | DataString
+    syntax Bytes ::= CallData2Bytes(CallData) [function]
+ // ----------------------------------------------------
+    rule CallData2Bytes(CD:Bytes)      => CD
+    rule CallData2Bytes(CD:Int)        => Int2Bytes(CD, LE, Unsigned)
+    rule CallData2Bytes(CD:DataString) => #DS2Bytes(CD)
+```
+
+```k
     syntax WasmInt
     syntax Address ::= Int | WasmInt
-    syntax CallData ::= Bytes | WasmInt | Int | DataString
     syntax EthereumCommand ::= "#invokeContract" Address Address CallData
  // ---------------------------------------------------------------------
-    rule <k> #invokeContract ACCTFROM:Int ACCTTO:Int CALLDATA:DataString => #invokeContract ACCTFROM ACCTTO #DS2Bytes(CALLDATA) ... </k>
-    rule <k> #invokeContract ACCTFROM:Int ACCTTO:Int CALLDATA:Int => #invokeContract ACCTFROM ACCTTO Int2Bytes(CALLDATA, LE, Unsigned) ... </k>
-    rule <k> #invokeContract ACCTFROM:Int ACCTTO:Int CALLDATA:Bytes => (invoke FADDR) ... </k>
+    rule <k> #invokeContract ACCTFROM:Int ACCTTO:Int CALLDATA => (invoke FADDR) ... </k>
          <acct> _ => ACCTTO </acct>
          <caller> _ => ACCTFROM </caller>
-         <callData> _ => CALLDATA </callData>
+         <callData> _ => CallData2Bytes(CALLDATA) </callData>
          <account>
            <id> ACCTTO </id>
            <code> MODADDR </code>
