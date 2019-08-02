@@ -22,6 +22,7 @@ To test and query the blockchain state, we also allow direct client calls in the
 ```
 
 ```k
+    syntax WasmInt
     syntax Address ::= Int | WasmInt
     syntax CallData ::= Bytes | WasmInt | Int
     syntax EthereumCommand ::= "#invokeContract" Address Address CallData
@@ -43,7 +44,7 @@ To test and query the blockchain state, we also allow direct client calls in the
            <funcAddrs> ... #ContextLookup(FIDS, TFIDX) |-> FADDR ... </funcAddrs>
            ...
          </moduleInst>
-       requires MAINNAME ==K "main":WasmString
+       requires #parseWasmString(MAINNAME) ==K "main"
 ```
 
 Setting up the blockchain state
