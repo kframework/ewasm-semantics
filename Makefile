@@ -81,6 +81,9 @@ haskell_dir:=$(defn_dir)/haskell
 haskell_defn:=$(patsubst %, $(haskell_dir)/%, $(ewasm_files))
 haskell_kompiled:=$(haskell_dir)/ewasm-test-kompiled/definition.kore
 
+main_module=EWASM-TEST
+syntax_module=EWASM-TEST-SYNTAX
+
 # Tangle definition from *.md files
 
 defn: defn-ocaml defn-java defn-haskell
@@ -115,22 +118,22 @@ $(ocaml_kompiled): $(ocaml_defn)
 	eval $$(opam config env)                              \
 	    $(k_bin)/kompile -O3 --non-strict --backend ocaml \
 	    --directory $(ocaml_dir) -I $(ocaml_dir)          \
-	    --main-module   EWASM-TEST               \
-      --syntax-module EWASM-TEST $<
+	    --main-module   $(main_module)                    \
+      --syntax-module $(syntax_module) $<
 
 $(java_kompiled): $(java_defn)
 	@echo "== kompile: $@"
 	$(k_bin)/kompile --backend java            \
 	    --directory $(java_dir) -I $(java_dir) \
-	    --main-module   EWASM-TEST    \
-      --syntax-module EWASM-TEST $<
+	    --main-module   $(main_module)         \
+      --syntax-module $(syntax_module) $<
 
 $(haskell_kompiled): $(haskell_defn)
 	@echo "== kompile: $@"
 	$(k_bin)/kompile --backend haskell               \
 	    --directory $(haskell_dir) -I $(haskell_dir) \
-	    --main-module   EWASM-TEST          \
-      --syntax-module EWASM-TEST $<
+	    --main-module   $(main_module)               \
+      --syntax-module $(syntax_module) $<
 
 # Testing
 # -------

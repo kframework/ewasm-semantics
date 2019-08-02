@@ -13,7 +13,6 @@ Ewasm consists of a WebAssembly (Wasm) semantics, and an Ethereum Environment In
 ```k
     imports EEI
     imports WASM
-    imports WASM-SYNTAX
     imports BYTES
     imports LIST
 ```

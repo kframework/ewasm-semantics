@@ -4,9 +4,8 @@ Ethereum Simulation
 ```k
 require "ewasm.k"
 
-module ETHEREUM-SIMULATION
+module DRIVER
     imports EWASM
-    imports WASM-TOKEN-SYNTAX
 ```
 
 An Ewasm program is the invocation of an Ethereum contract containing Ewasm code.

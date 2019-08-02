@@ -7,9 +7,16 @@ We make use of the testing module for Wasm, which will let us make assertions ab
 requires "test.k" // WASM-TEST
 requires "driver.k"
 
+module EWASM-TEST-SYNTAX
+   imports WASM-TEST-SYNTAX
+   imports EWASM-TEST
+endmodule
+```
+
+```k
 module EWASM-TEST
   imports WASM-TEST
-  imports ETHEREUM-SIMULATION
+  imports DRIVER
 ```
 
 ```k
