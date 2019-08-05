@@ -108,7 +108,7 @@ $(haskell_dir)/%.k: %.md $(pandoc_tangle_submodule)/make.timestamp
 
 # Build definitions
 
-build: build-java build-haskell
+build: build-ocaml build-java build-haskell
 build-ocaml: $(ocaml_kompiled)
 build-java: $(java_kompiled)
 build-haskell: $(haskell_kompiled)
@@ -138,7 +138,7 @@ $(haskell_kompiled): $(haskell_defn)
 # Testing
 # -------
 
-TEST_CONCRETE_BACKEND:=java
+TEST_CONCRETE_BACKEND:=ocaml
 TEST_SYMBOLIC_BACKEND:=java
 TEST:=./kewasm
 KPROVE_MODULE:=KWASM-LEMMAS
