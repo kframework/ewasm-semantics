@@ -8,25 +8,6 @@ require "eei.k"
 module EWASM-SYNTAX
     imports WASM-TOKEN-SYNTAX
     imports EWASM
-```
-
-We can't give concrete `WasmString`s in the main modules, since the definition of `WasmString`s exists purely in the syntax modules.
-We introduce two placeholders for the export names we need in the main module, and and give their values here in the syntax module.
-
-```k
-    rule #ethereumModule => "ethereum" [macro]
-
-    rule #eeiFunction(NAME) => eei.getCaller       requires NAME ==K "getCaller"
-    rule #eeiFunction(NAME) => eei.storageStore    requires NAME ==K "storageStore"
-    rule #eeiFunction(NAME) => eei.storageLoad     requires NAME ==K "storageLoad"
-    rule #eeiFunction(NAME) => eei.callDataCopy    requires NAME ==K "callDataCopy"
-    rule #eeiFunction(NAME) => eei.getCallDataSize requires NAME ==K "getCallDataSize"
-    rule #eeiFunction(NAME) => eei.revert          requires NAME ==K "revert"
-    rule #eeiFunction(NAME) => eei.finish          requires NAME ==K "finish"
-
-    rule #mainName   => "main"   [macro]
-    rule #memoryName => "memory" [macro]
-
 endmodule
 ```
 
@@ -99,6 +80,14 @@ Then, when a `HostCall` instruction is encountered, parameters are gathered from
     syntax WasmString ::= "#ethereumModule"
     syntax Instr ::= #eeiFunction(WasmString) [function]
  // ----------------------------------------------------
+    rule #ethereumModule => #unparseWasmString("\"ethereum\"") [macro]
+    rule #eeiFunction(NAME) => eei.getCaller       requires NAME ==K #unparseWasmString("\"getCaller\"")
+    rule #eeiFunction(NAME) => eei.storageStore    requires NAME ==K #unparseWasmString("\"storageStore\"")
+    rule #eeiFunction(NAME) => eei.storageLoad     requires NAME ==K #unparseWasmString("\"storageLoad\"")
+    rule #eeiFunction(NAME) => eei.callDataCopy    requires NAME ==K #unparseWasmString("\"callDataCopy\"")
+    rule #eeiFunction(NAME) => eei.getCallDataSize requires NAME ==K #unparseWasmString("\"getCallDataSize\"")
+    rule #eeiFunction(NAME) => eei.revert          requires NAME ==K #unparseWasmString("\"revert\"")
+    rule #eeiFunction(NAME) => eei.finish          requires NAME ==K #unparseWasmString("\"finish\"")
 ```
 
 ### The module API
@@ -107,6 +96,8 @@ Then, when a `HostCall` instruction is encountered, parameters are gathered from
     syntax WasmString ::= "#mainName"
     syntax WasmString ::= "#memoryName"
  // -------------------------------------
+    rule #mainName       => #unparseWasmString("\"main\"")     [macro]
+    rule #memoryName     => #unparseWasmString("\"memory\"")   [macro]
 ```
 
 ### Helper Methods
