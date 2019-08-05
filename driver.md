@@ -33,7 +33,7 @@ To test and query the blockchain state, we also allow direct client calls in the
     syntax Bytes ::= CallData2Bytes(CallData) [function]
  // ----------------------------------------------------
     rule CallData2Bytes(CD:Bytes)      => CD
-    rule CallData2Bytes(CD:Int)        => Int2Bytes(CD, LE, Unsigned)
+    rule CallData2Bytes(CD:Int)        => Int2Bytes(CD, BE, Unsigned)
     rule CallData2Bytes(CD:DataString) => #DS2Bytes(CD)
 ```
 

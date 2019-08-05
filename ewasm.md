@@ -248,7 +248,7 @@ Traps if `DATAOFFSET` + `LENGTH` exceeds the length of the call data.
            2 |-> <i32> LENGTH
          </locals>
          <eeiK> #result(CALLDATA:Bytes) => . </eeiK>
-      requires DATAPTR +Int LENGTH <Int lengthBytes(CALLDATA)
+      requires DATAPTR +Int LENGTH <=Int lengthBytes(CALLDATA)
 
     rule <k> #waiting(eei.callDataCopy) => trap ... </k>
          <locals>
@@ -257,7 +257,7 @@ Traps if `DATAOFFSET` + `LENGTH` exceeds the length of the call data.
            2 |-> <i32> LENGTH
          </locals>
          <eeiK> #result(CALLDATA:Bytes) => . </eeiK>
-      requires DATAPTR +Int LENGTH >=Int lengthBytes(CALLDATA)
+      requires DATAPTR +Int LENGTH >Int lengthBytes(CALLDATA)
 ```
 
 ### World State Methods
