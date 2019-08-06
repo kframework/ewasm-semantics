@@ -160,6 +160,7 @@ Just like many host calls requires passing parameters in memory, many host calls
 The trapping conditions for these stores is the same as for regular Wasm stores.
 The following function helps with this task.
 All byte values in Ewasm are a number of bytes divisible by 4, the same number of bytes as an i32, so storage will happen in increments of 4 bytes.
+Numbers are stored little-endian in Wasm, so that's the convention that's used when converting bytes to an integer, to ensure the bytes end up as given in memory.
 
 ```k
     syntax Instrs ::= #storeEeiResult(Int, Int, Int) [function]
@@ -309,6 +310,7 @@ These methods never return control to Wasm, so there is no need for a rule for t
 #### `finish`
 
 Immediately halt execution, tell the EVM to finish up and commit changes, and set the return data from memory bytes.
+EEI uses big-endian calldata, so that's when we use when converting to return-data bytes.
 
 ```k
     syntax HostCall ::= "eei.finish"
@@ -322,7 +324,7 @@ Immediately halt execution, tell the EVM to finish up and commit changes, and se
     rule <k> #gatheredCall(eei.finish) => #waiting(eei.finish) ... </k>
          <paramstack> OUTPUTDATA : .ParamStack => .ParamStack </paramstack>
          <locals> ... 1 |-> <i32> DATALENGTH ... </locals>
-         <eeiK> . => EEI.return Int2Bytes(OUTPUTDATA, DATALENGTH, LE) </eeiK>
+         <eeiK> . => EEI.return Int2Bytes(OUTPUTDATA, DATALENGTH, BE) </eeiK>
 ```
 
 #### `revert`
@@ -341,7 +343,7 @@ Immediately halt execution, tell the EVM to revert, and set return data from mem
     rule <k> #gatheredCall(eei.revert) => #waiting(eei.revert) ... </k>
          <paramstack> OUTPUTDATA : .ParamStack => .ParamStack </paramstack>
          <locals> ... 1 |-> <i32> DATALENGTH ... </locals>
-         <eeiK> . => EEI.revert Int2Bytes(OUTPUTDATA, DATALENGTH, LE) </eeiK>
+         <eeiK> . => EEI.revert Int2Bytes(OUTPUTDATA, DATALENGTH, BE) </eeiK>
 ```
 
 ```k
