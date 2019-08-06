@@ -28,12 +28,14 @@ To test and query the blockchain state, we also allow direct client calls in the
  // -------------------------------
 ```
 
+Depending on context, it may make sense to give call data either as bytes (the canonical representation in this implementation), as a Wasm data string, or as an integer.
+In the case of an integer, the number of desired bytes needs to be specified to avoid zero bytes getting removed.
+
 ```k
-    syntax CallData ::= Bytes | WasmInt | Int | DataString
+    syntax CallData ::= Bytes | DataString
     syntax Bytes ::= CallData2Bytes(CallData) [function]
  // ----------------------------------------------------
     rule CallData2Bytes(CD:Bytes)      => CD
-    rule CallData2Bytes(CD:Int)        => Int2Bytes(CD, BE, Unsigned)
     rule CallData2Bytes(CD:DataString) => #DS2Bytes(CD)
 ```
 
