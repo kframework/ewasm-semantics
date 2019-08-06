@@ -30,7 +30,15 @@ The configuration composes both the top level cells of the Wasm and EEI semantic
         <eei/>
         <wasm/>
         <paramstack> .ParamStack </paramstack>
+        <debug> "" </debug>
       </ewasm>
+```
+
+Print debugging
+---------------
+
+```k
+syntax Instr ::= "#trap" String
 ```
 
 Conventions
@@ -152,7 +160,7 @@ From the `#gatheredCall`, the parameters on the stack can be consumed and passed
          </memInst>
        requires IDX +Int LEN <Int SIZE *Int #pageSize()
 
-    rule <k> #gatherParams(HC, (IDX, LEN) MS) => trap ... </k>
+    rule <k> #gatherParams(HC, (IDX, LEN) MS) => #trap "Failed to gather" ... </k>
          <curModIdx> CUR </curModIdx>
          <moduleInst>
            <modIdx> CUR </modIdx>
@@ -204,7 +212,7 @@ Exceptional Halting
 An exception in the EEI translates into a `trap` in Wasm.
 
 ```k
-    rule <k> #waiting(_) => trap ... </k>
+    rule <k> #waiting(_) => #trap "EEI reverted" ... </k>
          <eeiK> . </eeiK>
          <statusCode> STATUSCODE </statusCode>
       requires STATUSCODE =/=K EVMC_SUCCESS
@@ -265,7 +273,7 @@ Traps if `DATAOFFSET` + `LENGTH` exceeds the length of the call data.
          <eeiK> #result(CALLDATA:Bytes) => . </eeiK>
       requires DATAPTR +Int LENGTH <=Int lengthBytes(CALLDATA)
 
-    rule <k> #waiting(eei.callDataCopy) => trap ... </k>
+    rule <k> #waiting(eei.callDataCopy) => #trap "CallDataCopy out of bounds: " +String (Int2String(lengthBytes(CALLDATA))) ... </k>
          <locals>
            0 |-> <i32> _
            1 |-> <i32> DATAPTR
@@ -290,10 +298,12 @@ From the executing account's storage, load the 32 bytes stored at the index spec
     rule <k> #gatheredCall(eei.storageLoad) => #waiting(eei.storageLoad) ... </k>
          <paramstack> INDEX : .ParamStack => .ParamStack </paramstack>
          <eeiK> . => EEI.getAccountStorage INDEX </eeiK>
+         <debug> S => S +String "\nstorageLoad: " +String Int2String(INDEX) </debug>
 
     rule <k> #waiting(eei.storageLoad) => #storeEeiResult(RESULTPTR, 32, VALUE) ... </k>
          <locals> ... 1 |-> <i32> RESULTPTR ... </locals>
          <eeiK> #result(VALUE) => . </eeiK>
+         <debug> S => S +String "\nstorageLoad result: " +String Int2String(VALUE) </debug>
 ```
 
 #### `storageStore`
