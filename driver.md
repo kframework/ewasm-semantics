@@ -65,27 +65,47 @@ In the case of an integer, the number of desired bytes needs to be specified to 
          </moduleInst>
 ```
 
+### End of execution
+
+An Ewasm execution ends in either a call to `finish` or `revert` (controlled exit), or with a trap (exceptional exit).
+In the case of a controlled exit, we want to clean up the execution state.
+This works essentially as a `trap`, ending all execution in the `<k>` cell, but keeping things like assertions and ethereum commands.
+
+```k
+    rule <k> #waiting(EEIMETHOD) => #cleanup ... </k>
+      requires EEIMETHOD ==K eei.revert
+        orBool EEIMETHOD ==K eei.finish
+
+    syntax EthereumCommand ::= "#cleanup"
+ // -----------------------------------------
+    rule <k> #cleanup ~> (L:Label   => .) ... </k>
+    rule <k> #cleanup ~> (F:Frame   => .) ... </k>
+    rule <k> #cleanup ~> (I:Instr   => .) ... </k>
+    rule <k> #cleanup ~> (IS:Instrs => .) ... </k>
+    rule <k> #cleanup ~> (D:Defn    => .) ... </k>
+    rule <k> #cleanup ~> (DS:Defns  => .) ... </k>
+
+    rule <k> #cleanup ~> (S:Stmt SS:Stmts => S ~> SS) ... </k>
+
+    rule <k> (#cleanup ~> E:EthereumCommand) => E ... </k>
+```
+
 Setting up the blockchain state
 -------------------------------
 
 ```k
-    syntax EthereumCommand ::= "#createAccount" Address Int
- // -------------------------------------------------------
-    rule <k> #createAccount ADDRESS:Int BAL => . ... </k>
-         <accounts>
-           ( .Bag
-          => <account>
-               <id> ADDRESS </id>
-               <balance> BAL </balance>
-               ...
-             </account>
-           )
-           ...
-         </accounts>
-
     syntax EthereumCommand ::= "#createContract" Address ModuleDecl
  // ---------------------------------------------------------------
     rule <k> #createContract ADDRESS:Int        CODE => CODE ~> #storeModuleAt ADDRESS              ... </k>
+
+    syntax EhtereumCommand ::= "#setStorage" Address Address Address
+ // ----------------------------------------------------------------
+    rule <k> #setStorage ADDRESS:Int LOC:Int VAL:Int => . ... </k>
+         <account>
+           <id> ADDRESS </id>
+           <storage> STORAGE => STORAGE[LOC <- VAL] </storage>
+           ...
+         </account>
 
     syntax EthereumCommand ::= "#storeModuleAt" Address
  // ---------------------------------------------------
