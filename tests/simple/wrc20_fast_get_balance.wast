@@ -205,5 +205,8 @@
   )
 )
 
-#createAccount 0xeD09375DC6B20050d242d1611af97eE4A6E93CAd 1000000
-#invokeContract 1337 42 0x9993021aed09375dc6b20050d242d1611af97ee4a6e93cad
+#setStorage 42 0xeD09375DC6B20050d242d1611af97eE4A6E93CAd 1000000
+#invokeContract 1337 42 "\99" "\93" "\02" "\1a" "\ed" "\09" "\37" "\5d" "\c6" "\b2" "\00" "\50" "\d2" "\42" "\d1" "\61" "\1a" "\f9" "\7e" "\e4" "\a6" "\e9" "\3c" "\ad"
+#assertReturnData "\00" "\00" "\00" "\00" "\00" "\0f" "\42" "\40" "Test case 1"
+
+#clearEwasmConfig
