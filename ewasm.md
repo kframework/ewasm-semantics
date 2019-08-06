@@ -103,6 +103,9 @@ Then, when a `HostCall` instruction is encountered, parameters are gathered from
 ### Helper Methods
 
 Values which exceed 8 bytes are passed to EEI in the linear memory.
+The values are, unlike in Wasm treated as big-endian.
+For big-endian conversion, we introduce the `rangeEndianness` function.
+
 To abstract this common pattern, we use the `#gatherParams` instruction.
 It takes a list of parameters to gather from memory, and pushes them to a separate stack of integers.
 
@@ -119,11 +122,22 @@ From the `#gatheredCall`, the parameters on the stack can be consumed and passed
     syntax MemoryVariables ::= List {MemoryVariable, ""}
  // ----------------------------------------------------
 
+    syntax Int ::= #range ( Map , Int , Int, Endianness ) [function, klabel(rangeEndianness)]
+    syntax Int ::= #rangeBE ( Map , Int , Int, Int) [function]
+ // ----------------------------------------------------------
+    rule #range(BM, START, WIDTH, LE) => #range(BM, START, WIDTH)
+    rule #range(BM, START, WIDTH, BE) => #rangeBE(BM, START, WIDTH, 0)
+
+    rule #rangeBE(BM:Map, START, WIDTH, ACC) => ACC
+      requires WIDTH ==Int 0
+    rule #rangeBE(BM:Map, START, WIDTH, ACC) => #rangeBE(BM, START +Int 1, WIDTH -Int 1, ACC *Int 256 +Int #lookup(BM, START))
+      requires WIDTH >Int 0 [concrete]
+
     syntax Instrs ::= "#gatherParams" "(" HostCall "," MemoryVariables ")"
  // --------------------------------------------------
     rule <k> #gatherParams(HC,            .MemoryVariables) => #gatheredCall(HC)     ... </k>
     rule <k> #gatherParams(HC, (IDX, LEN) MS              ) => #gatherParams(HC, MS) ... </k>
-         <paramstack> PSTACK => #range(DATA , IDX, LEN) : PSTACK </paramstack>
+         <paramstack> PSTACK => #range(DATA , IDX, LEN, BE) : PSTACK </paramstack>
          <curModIdx> CUR </curModIdx>
          <moduleInst>
            <modIdx> CUR </modIdx>
