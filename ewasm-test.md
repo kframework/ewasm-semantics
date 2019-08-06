@@ -19,6 +19,13 @@ module EWASM-TEST
   imports DRIVER
 ```
 
+Grouping sorts.
+
+```k
+    syntax EthereumCommand ::= Assertion | Action
+ // ---------------------------------------------
+```
+
 ```k
     syntax Action ::= "#clearEwasmConfig"
  // -------------------------------------
