@@ -29,12 +29,12 @@ module EWASM-TEST
 Assertions
 ----------
 
-```// TODO:reintroduce
-    syntax Assertion ::= "#assertCallData" CallData WasmString
- // ----------------------------------------------------------
-    rule <k> #assertCallData CALLDATA MSG => . ... </k>
-         <callData> CALLDATA' </callData>
-      requires CallData2Bytes(CALLDATA) ==K CALLDATA'
+```k
+    syntax Assertion ::= "#assertReturnData" CallData WasmString
+ // ------------------------------------------------------------
+    rule <k> #assertReturnData DATA MSG => . ... </k>
+         <returnData> BYTES </returnData>
+      requires CallData2Bytes(DATA) ==K BYTES
 ```
 
 ```k
