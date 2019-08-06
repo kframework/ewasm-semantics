@@ -21,6 +21,8 @@
 ;; Edits:
 ;; * (set|get)_local => local.(set|get)
 
+;; TODO(hjort): Go over and change to little-endian.
+
   (func $revert (import "ethereum" "revert") (param i32 i32))
   (func $finish (import "ethereum" "finish") (param i32 i32))
   (func $getCallDataSize (import "ethereum" "getCallDataSize") (result i32))
@@ -206,7 +208,9 @@
 )
 
 #setStorage 42 0xeD09375DC6B20050d242d1611af97eE4A6E93CAd 1000000
-#invokeContract 1337 42 "\99" "\93" "\02" "\1a" "\ed" "\09" "\37" "\5d" "\c6" "\b2" "\00" "\50" "\d2" "\42" "\d1" "\61" "\1a" "\f9" "\7e" "\e4" "\a6" "\e9" "\3c" "\ad"
+#invokeContract 1337 42
+(; selector ;) "\99" "\93" "\02" "\1a"
+(; address  ;) "\ed" "\09" "\37" "\5d" "\c6" "\b2" "\00" "\50" "\d2" "\42" "\d1" "\61" "\1a" "\f9" "\7e" "\e4" "\a6" "\e9" "\3c" "\ad"
 #assertReturnData "\00" "\00" "\00" "\00" "\00" "\0f" "\42" "\40" "Test case 1"
 
 #clearEwasmConfig
