@@ -42,7 +42,12 @@ run_krun() {
 run_kast() {
     local output_mode
 
-    output_mode="${1:-kast}" ; shift
+    if [ -z ${1+x} ]; then
+        output_mode="kast"
+    else
+        output_mode=$1
+        shift
+    fi
     kast --directory "$backend_dir" "$run_file" --output "$output_mode" "$@"
 }
 
