@@ -98,7 +98,7 @@ Setting up the blockchain state
  // ---------------------------------------------------------------
     rule <k> #createContract ADDRESS:Int        CODE => CODE ~> #storeModuleAt ADDRESS              ... </k>
 
-    syntax EhtereumCommand ::= "#setStorage" Address Address Address
+    syntax EthereumCommand ::= "#setStorage" Address Address Address
  // ----------------------------------------------------------------
     rule <k> #setStorage ADDRESS:Int LOC:Int VAL:Int => . ... </k>
          <account>
