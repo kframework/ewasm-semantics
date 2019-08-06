@@ -304,7 +304,7 @@ In the executing account's storage, store the 32 bytes at `VALUEPTR` in linear m
 
 ### Halting methods
 
-These methods do not return control to Wasm, so there is no rule for the `#waiting` cases.
+These methods never return control to Wasm, so there is no need for a rule for the `#waiting` cases.
 
 #### `finish`
 
