@@ -72,9 +72,10 @@ In the case of a controlled exit, we want to clean up the execution state.
 This works essentially as a `trap`, ending all execution in the `<k>` cell, but keeping things like assertions and ethereum commands.
 
 ```k
-    rule <k> #waiting(EEIMETHOD) => #cleanup ... </k>
-      requires EEIMETHOD ==K eei.revert
-        orBool EEIMETHOD ==K eei.finish
+    rule <k> #waiting(eei.revert) => #cleanup ... </k>
+         <statusCode> EVMC_REVERT  </statusCode>
+    rule <k> #waiting(eei.finish) => #cleanup ... </k>
+         <statusCode> EVMC_SUCCESS </statusCode>
 
     syntax EthereumCommand ::= "#cleanup"
  // -----------------------------------------
