@@ -348,7 +348,7 @@ EEI uses big-endian calldata, so that's when we use when converting to return-da
     rule <k> #gatheredCall(eei.finish) => #waiting(eei.finish) ... </k>
          <paramstack> OUTPUTDATA : .ParamStack => .ParamStack </paramstack>
          <locals> ... 1 |-> <i32> DATALENGTH ... </locals>
-         <eeiK> . => EEI.return Int2Bytes(OUTPUTDATA, DATALENGTH, BE) </eeiK>
+         <eeiK> . => EEI.return Int2Bytes(DATALENGTH, OUTPUTDATA,  BE) </eeiK>
 ```
 
 #### `revert`
@@ -367,7 +367,7 @@ Immediately halt execution, tell the EVM to revert, and set return data from mem
     rule <k> #gatheredCall(eei.revert) => #waiting(eei.revert) ... </k>
          <paramstack> OUTPUTDATA : .ParamStack => .ParamStack </paramstack>
          <locals> ... 1 |-> <i32> DATALENGTH ... </locals>
-         <eeiK> . => EEI.revert Int2Bytes(OUTPUTDATA, DATALENGTH, BE) </eeiK>
+         <eeiK> . => EEI.revert Int2Bytes(DATALENGTH, OUTPUTDATA, BE) </eeiK>
 ```
 
 ```k
