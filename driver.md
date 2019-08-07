@@ -57,6 +57,7 @@ TODO: Allow using calldata for addresses.
          <acct> _ => CallData2Int(ACCTTO) </acct>
          <caller> _ => CallData2Int(ACCTFROM) </caller>
          <callData> _ => CallData2Bytes(CALLDATA) </callData>
+         <returnData> _ => .Bytes </returnData>
          <account>
            <id> ACCTTO </id>
            <code> MODADDR </code>
