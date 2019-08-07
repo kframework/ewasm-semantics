@@ -32,11 +32,17 @@ Depending on context, it may make sense to give call data either as bytes (the c
 In the case of an integer, the number of desired bytes needs to be specified to avoid zero bytes getting removed.
 
 ```k
-    syntax CallData ::= Bytes | DataString
+    syntax CallData ::= Bytes | DataString | Int
     syntax Bytes ::= CallData2Bytes(CallData) [function]
+    syntax Int   ::= CallData2Int  (CallData) [function]
  // ----------------------------------------------------
     rule CallData2Bytes(CD:Bytes)      => CD
     rule CallData2Bytes(CD:DataString) => #DS2Bytes(CD)
+    rule CallData2Bytes(CD:Int)        => Int2Bytes(CD, LE, Unsigned)
+
+    rule CallData2Int(CD:Bytes)      => Bytes2Int(CD, LE, Unsigned)
+    rule CallData2Int(CD:DataString) => Bytes2Int(#DS2Bytes(CD), LE, Unsigned)
+    rule CallData2Int(CD:Int)        => CD
 ```
 
 TODO: Don't call it "Address"
@@ -44,13 +50,12 @@ TODO: Allow using calldata for addresses.
 
 ```k
     syntax WasmInt
-    syntax Address ::= Int | WasmInt
-    syntax EthereumCommand ::= "#invokeContract" Address Address CallData
+    syntax EthereumCommand ::= "#invokeContract" CallData CallData CallData
     syntax EthereumCommand ::= "#invoke" Int WasmString
- // ---------------------------------------------------------------------
-    rule <k> #invokeContract ACCTFROM:Int ACCTTO:Int CALLDATA => #invoke MODADDR #mainName ... </k>
-         <acct> _ => ACCTTO </acct>
-         <caller> _ => ACCTFROM </caller>
+ // ---------------------------------------------------
+    rule <k> #invokeContract ACCTFROM ACCTTO CALLDATA => #invoke MODADDR #mainName ... </k>
+         <acct> _ => CallData2Int(ACCTTO) </acct>
+         <caller> _ => CallData2Int(ACCTFROM) </caller>
          <callData> _ => CallData2Bytes(CALLDATA) </callData>
          <account>
            <id> ACCTTO </id>
@@ -98,27 +103,29 @@ Setting up the blockchain state
 -------------------------------
 
 ```k
-    syntax EthereumCommand ::= "#createContract" Address ModuleDecl
- // ---------------------------------------------------------------
-    rule <k> #createContract ADDRESS:Int        CODE => CODE ~> #storeModuleAt ADDRESS              ... </k>
-
-    syntax EthereumCommand ::= "#setStorage" Address Address Address
+    syntax EthereumCommand ::= "#createContract" CallData ModuleDecl
  // ----------------------------------------------------------------
-    rule <k> #setStorage ADDRESS:Int LOC:Int VAL:Int => . ... </k>
+    rule <k> #createContract ADDRESS CODE => CODE ~> #storeModuleAt CallData2Int(ADDRESS) ... </k>
+
+    syntax EthereumCommand ::= "#setStorage"    CallData CallData CallData
+                             | "#setStorageAux" Int      Int      Int
+ // -----------------------------------------------------------------
+    rule <k> #setStorage ADDRESS LOC VAL => #setStorageAux CallData2Int(ADDRESS) CallData2Int(LOC) CallData2Int(VAL) ... </k>
+    rule <k> #setStorageAux ADDRESS LOC VAL => . ... </k>
          <account>
            <id> ADDRESS </id>
-           <storage> STORAGE => STORAGE[LOC <- VAL] </storage>
+           <storage> STORAGE => STORAGE[CallData2Int(LOC) <- CallData2Int(VAL)] </storage>
            ...
          </account>
 
-    syntax EthereumCommand ::= "#storeModuleAt" Address
- // ---------------------------------------------------
-    rule <k> #storeModuleAt ADDRESS:Int => . ... </k>
+    syntax EthereumCommand ::= "#storeModuleAt" CallData
+ // ----------------------------------------------------
+    rule <k> #storeModuleAt ADDRESS => . ... </k>
          <curModIdx> CUR </curModIdx>
          <accounts>
            (.Bag
          => <account>
-              <id> ADDRESS </id>
+              <id> CallData2Int(ADDRESS) </id>
               <code> CUR </code>
               ...
             </account>
