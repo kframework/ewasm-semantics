@@ -276,7 +276,7 @@ Traps if `DATAOFFSET` + `LENGTH` exceeds the length of the call data.
 
 #### `storageLoad`
 
-From the executing account's storage, load the 32 bytes stored at the index specified by the 32 bytes at `INDEXPTR` in linear memory into the.
+From the executing account's storage, load the 32 bytes stored at the index specified by the 32 bytes at `INDEXPTR` in linear memory into linear memory at `RESULTPTR`.
 
 ```k
     syntax HostCall ::= "eei.storageLoad"
