@@ -39,6 +39,9 @@ In the case of an integer, the number of desired bytes needs to be specified to 
     rule CallData2Bytes(CD:DataString) => #DS2Bytes(CD)
 ```
 
+TODO: Don't call it "Address"
+TODO: Allow using calldata for addresses.
+
 ```k
     syntax WasmInt
     syntax Address ::= Int | WasmInt
