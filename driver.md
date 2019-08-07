@@ -29,7 +29,8 @@ To test and query the blockchain state, we also allow direct client calls in the
 ```
 
 Depending on context, it may make sense to give call data either as bytes (the canonical representation in this implementation), as a Wasm data string, or as an integer.
-In the case of an integer, the number of desired bytes needs to be specified to avoid zero bytes getting removed.
+When the call data represents bytes or a data string, the conversion is straight-forward.
+However, when the call data is a representation, it is interpreted as big-endian; this is the convention of giving Ethereum call data, addresses and values.
 
 ```k
     syntax CallData ::= Bytes | DataString | Int
@@ -40,7 +41,7 @@ In the case of an integer, the number of desired bytes needs to be specified to 
     rule CallData2Bytes(CD:DataString) => #DS2Bytes(CD)
     rule CallData2Bytes(CD:Int)        => Int2Bytes(CD, LE, Unsigned)
 
-    rule CallData2Int(CD:Bytes)      => Bytes2Int(CD, LE, Unsigned)
+    rule CallData2Int(CD:Bytes)      => Bytes2Int(CD, BE, Unsigned)
     rule CallData2Int(CD:DataString) => Bytes2Int(#DS2Bytes(CD), LE, Unsigned)
     rule CallData2Int(CD:Int)        => CD
 ```
@@ -76,6 +77,8 @@ TODO: Allow using calldata for addresses.
 
 ### End of execution
 
+TODO: Move to Ewasm.
+
 An Ewasm execution ends in either a call to `finish` or `revert` (controlled exit), or with a trap (exceptional exit).
 In the case of a controlled exit, we want to clean up the execution state.
 This works essentially as a `trap`, ending all execution in the `<k>` cell, but keeping things like assertions and ethereum commands.
@@ -103,21 +106,12 @@ This works essentially as a `trap`, ending all execution in the `<k>` cell, but 
 Setting up the blockchain state
 -------------------------------
 
+### Creating accounts
+
 ```k
     syntax EthereumCommand ::= "#createContract" CallData ModuleDecl
  // ----------------------------------------------------------------
     rule <k> #createContract ADDRESS CODE => CODE ~> #storeModuleAt CallData2Int(ADDRESS) ... </k>
-
-    syntax EthereumCommand ::= "#setStorage"    CallData CallData CallData
-                             | "#setStorageAux" Int      Int      Int
- // -----------------------------------------------------------------
-    rule <k> #setStorage ADDRESS LOC VAL => #setStorageAux CallData2Int(ADDRESS) CallData2Int(LOC) CallData2Int(VAL) ... </k>
-    rule <k> #setStorageAux ADDRESS LOC VAL => . ... </k>
-         <account>
-           <id> ADDRESS </id>
-           <storage> STORAGE => STORAGE[CallData2Int(LOC) <- CallData2Int(VAL)] </storage>
-           ...
-         </account>
 
     syntax EthereumCommand ::= "#storeModuleAt" CallData
  // ----------------------------------------------------
@@ -133,6 +127,22 @@ Setting up the blockchain state
            )
            ...
          </accounts>
+```
+
+### Initializing storage.
+
+```k
+    syntax EthereumCommand ::= "#setStorage"    CallData ":" CallData "|->" CallData
+                             | "#setStorageAux" Int          Int            Int
+ // ---------------------------------------------------------------------------
+    rule <k> #setStorage ADDRESS : LOC |-> VAL => #setStorageAux CallData2Int(ADDRESS) CallData2Int(LOC) CallData2Int(VAL) ... </k>
+    rule <k> #setStorageAux ADDRESS LOC VAL => . ... </k>
+         <account>
+           <id> ADDRESS </id>
+           <storage> STORAGE => STORAGE[LOC <- VAL] </storage>
+           ...
+         </account>
+
 ```
 
 ```k
