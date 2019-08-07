@@ -147,4 +147,7 @@
   <paramstack>
     .ParamStack
   </paramstack>
+  <ewasmLog>
+    ""
+  </ewasmLog>
 </ewasm>
