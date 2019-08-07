@@ -30,7 +30,6 @@ The configuration composes both the top level cells of the Wasm and EEI semantic
         <eei/>
         <wasm/>
         <paramstack> .ParamStack </paramstack>
-        <ewasmLog> "" </ewasmLog>
       </ewasm>
 ```
 
@@ -39,16 +38,6 @@ Conventions
 
 Instructions for calling into the EEI from Wasm are prefixed with *lowercase* `eei.`, e.g. `eei.getCaller`.
 EEI methods are prefixed with *uppercase* `EEI`, e.g. `EEI.getCaller`.
-
-Logging events
---------------
-
-```k
-    syntax String ::= LogAppend(String)
- // -----------------------------------
-    rule <k> LogAppend(S') => . ... </k>
-         <ewasmLog> S => S +String S' +String "\n" </ewasmLog>
-```
 
 Storing Code in Contracts
 -------------------------
@@ -151,11 +140,7 @@ From the `#gatheredCall`, the parameters on the stack can be consumed and passed
          </memInst>
        requires IDX +Int LEN <Int SIZE *Int #pageSize()
 
-    rule <k> #gatherParams(HC, (IDX, LEN) MS)
-          => LogAppend("Failed to gather params due to memory out-of-bounds access")
-          ~> trap
-          ...
-         </k>
+    rule <k> #gatherParams(HC, (IDX, LEN) MS) => trap ... </k>
          <curModIdx> CUR </curModIdx>
          <moduleInst>
            <modIdx> CUR </modIdx>
@@ -207,11 +192,7 @@ Exceptional Halting
 An exception in the EEI translates into a `trap` in Wasm.
 
 ```k
-    rule <k> #waiting(_)
-          => LogAppend("trap due to EEI halting with exceptional or reverting status code")
-          ~> trap
-          ...
-         </k>
+    rule <k> #waiting(_) => trap ... </k>
          <eeiK> . </eeiK>
          <statusCode> STATUSCODE </statusCode>
       requires STATUSCODE =/=K EVMC_SUCCESS
@@ -249,11 +230,7 @@ Get the size of the call data, returned as a regular Wasm result.
     rule <k> eei.getCallDataSize => #waiting(eei.getCallDataSize) ... </k>
          <eeiK> . => EEI.getCallData </eeiK>
 
-    rule <k> #waiting(eei.getCallDataSize)
-          => LogAppend("getCallDataSize: " +String Int2String(lengthBytes(CALLDATA)))
-          ~> i32.const lengthBytes(CALLDATA)
-          ...
-         </k>
+    rule <k> #waiting(eei.getCallDataSize) => i32.const lengthBytes(CALLDATA) ... </k>
          <eeiK> #result(CALLDATA) => . </eeiK>
 ```
 
@@ -277,11 +254,7 @@ Traps if `DATAOFFSET` + `LENGTH` exceeds the length of the call data.
          <eeiK> #result(CALLDATA:Bytes) => . </eeiK>
       requires DATAPTR +Int LENGTH <=Int lengthBytes(CALLDATA)
 
-    rule <k> #waiting(eei.callDataCopy)
-          => LogAppend("CallDataCopy out of bounds: " +String (Int2String(lengthBytes(CALLDATA))))
-          ~> trap
-          ...
-         </k>
+    rule <k> #waiting(eei.callDataCopy) => trap ... </k>
          <locals>
            0 |-> <i32> _
            1 |-> <i32> DATAPTR
@@ -303,19 +276,11 @@ From the executing account's storage, load the 32 bytes stored at the index spec
     rule <k> eei.storageLoad => #gatherParams(eei.storageLoad, (INDEXPTR, 32)) ... </k>
          <locals> ... 0 |-> <i32> INDEXPTR ... </locals>
 
-    rule <k> #gatheredCall(eei.storageLoad)
-          => LogAppend("storageLoad: " +String Int2String(INDEX))
-          ~> #waiting(eei.storageLoad)
-          ...
-         </k>
+    rule <k> #gatheredCall(eei.storageLoad) => #waiting(eei.storageLoad) ... </k>
          <paramstack> INDEX : .ParamStack => .ParamStack </paramstack>
          <eeiK> . => EEI.getAccountStorage INDEX </eeiK>
 
-    rule <k> #waiting(eei.storageLoad)
-          => LogAppend("storageLoad result: " +String Int2String(VALUE))
-          ~> #storeEeiResult(RESULTPTR, 32, VALUE)
-          ...
-         </k>
+    rule <k> #waiting(eei.storageLoad) => #storeEeiResult(RESULTPTR, 32, VALUE) ... </k>
          <locals> ... 1 |-> <i32> RESULTPTR ... </locals>
          <eeiK> #result(VALUE) => . </eeiK>
 ```

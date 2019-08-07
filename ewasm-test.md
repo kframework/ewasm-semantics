@@ -31,7 +31,6 @@ Grouping sorts.
  // -------------------------------------
     rule <k> #clearEwasmConfig => #clearConfig ... </k>
          <eeiK> . => EEI.clearConfig ... </eeiK>
-         <ewasmLog> _ => "" </ewasmLog>
 ```
 
 Assertions
