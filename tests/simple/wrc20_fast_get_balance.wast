@@ -1,5 +1,3 @@
-;;
-
 #createContract 42
 (module
 
@@ -20,8 +18,6 @@
 ;; Edited with permission by Rikard Hjort, 2019.
 ;; Edits:
 ;; * (set|get)_local => local.(set|get)
-
-;; TODO(hjort): Go over and change to little-endian.
 
   (func $revert (import "ethereum" "revert") (param i32 i32))
   (func $finish (import "ethereum" "finish") (param i32 i32))
@@ -207,7 +203,16 @@
   )
 )
 
-#setStorage 42 "\eD" "\09" "\37" "\5D" "\C6" "\B2" "\00" "\50" "\d2" "\42" "\d1" "\61" "\1a" "\f9" "\7e" "\E4" "\A6" "\E9" "\3C" "\Ad" 1000000
+
+;; SETUP
+;; This version does fast balance checking by storing the token balances in the first 8 bytes of storage entries.
+;; That means that the initial balance doesn't show up as 1000000 in storage, but rahter the little-endian interpretation of \x00\x00\x00\x00\x00\x0f\x42\x40, which is the hex encoding of 1000000 in 8 bytes.
+
+#setStorage 42 :
+            "\eD" "\09" "\37" "\5D" "\C6" "\B2" "\00" "\50" "\d2" "\42" "\d1" "\61" "\1a" "\f9" "\7e" "\E4" "\A6" "\E9" "\3C" "\Ad" "\00" "\00" "\00" "\00" "\00" "\00" "\00" "\00" "\00" "\00" "\00" "\00" |->
+            "\00" "\00" "\00" "\00" "\00" "\0f" "\42" "\40"
+
+;; TESTS
 
 #invokeContract 1337 42
   (; selector "balance" ;) "\99" "\93" "\02" "\1a"
@@ -221,5 +226,15 @@
     (; recipient ;) "\e9" "\29" "\cf" "\25" "\44" "\36" "\3b" "\dc" "\ee" "\4a" "\97" "\65" "\15" "\d5" "\f9" "\77" "\58" "\ef" "\47" "\6c" "\00" "\00" "\00" "\00" "\00"
     (; amount ;) "\07" "\a1" "\20"
 #assertReturnData "" "Test case 2"
+
+#invokeContract 666 42
+  (; selector "balance" ;) "\99" "\93" "\02" "\1a"
+  (; address ;) "\ed" "\09" "\37" "\5d" "\c6" "\b2" "\00" "\50" "\d2" "\42" "\d1" "\61" "\1a" "\f9" "\7e" "\e4" "\a6" "\e9" "\3c" "\ad"
+#assertReturnData "\00" "\00" "\00" "\00" "\00"  "\07" "\a1" "\20" "Test case 3"
+
+#invokeContract 1234567890 42
+  (; selector "balance" ;) "\99" "\93" "\02" "\1a"
+  (; address ;) "\e9" "\29" "\cf" "\25" "\44" "\36" "\3b" "\dc" "\ee" "\4a" "\97" "\65" "\15" "\d5" "\f9" "\77" "\58" "\ef" "\47" "\6c"
+#assertReturnData "\00" "\00" "\00" "\00" "\00"  "\07" "\a1" "\20" "Test case 4"
 
 #clearEwasmConfig
