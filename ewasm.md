@@ -111,11 +111,10 @@ Then, when a `HostCall` instruction is encountered, parameters are gathered from
 ### Helper Methods
 
 Values which exceed 8 bytes are passed to EEI in the linear memory.
-The values are, unlike in Wasm treated as big-endian.
-For big-endian conversion, we introduce the `rangeEndianness` function.
 
 To abstract this common pattern, we use the `#gatherParams` instruction.
 It takes a list of parameters to gather from memory, and pushes them to a separate stack of integers.
+As usual in Wasm, when these bytes represent integers they are little-endian.
 
 If any parameter causes an out-of-bounds access, a trap occurs.
 After all parameters have been gathered on the stack, the continuation (as a `HostCall`) remains in the `#gatheredCall` instruction.
@@ -130,22 +129,11 @@ From the `#gatheredCall`, the parameters on the stack can be consumed and passed
     syntax MemoryVariables ::= List {MemoryVariable, ""}
  // ----------------------------------------------------
 
-    syntax Int ::= #range ( Map , Int , Int, Endianness ) [function, klabel(rangeEndianness)]
-    syntax Int ::= #rangeBE ( Map , Int , Int, Int) [function]
- // ----------------------------------------------------------
-    rule #range(BM, START, WIDTH, LE) => #range(BM, START, WIDTH)
-    rule #range(BM, START, WIDTH, BE) => #rangeBE(BM, START, WIDTH, 0)
-
-    rule #rangeBE(BM:Map, START, WIDTH, ACC) => ACC
-      requires WIDTH ==Int 0
-    rule #rangeBE(BM:Map, START, WIDTH, ACC) => #rangeBE(BM, START +Int 1, WIDTH -Int 1, ACC *Int 256 +Int #lookup(BM, START))
-      requires WIDTH >Int 0 [concrete]
-
     syntax Instrs ::= "#gatherParams" "(" HostCall "," MemoryVariables ")"
  // --------------------------------------------------
     rule <k> #gatherParams(HC,            .MemoryVariables) => #gatheredCall(HC)     ... </k>
     rule <k> #gatherParams(HC, (IDX, LEN) MS              ) => #gatherParams(HC, MS) ... </k>
-         <paramstack> PSTACK => #range(DATA , IDX, LEN, BE) : PSTACK </paramstack>
+         <paramstack> PSTACK => #range(DATA , IDX, LEN) : PSTACK </paramstack>
          <curModIdx> CUR </curModIdx>
          <moduleInst>
            <modIdx> CUR </modIdx>
@@ -227,6 +215,7 @@ An exception in the EEI translates into a `trap` in Wasm.
 #### `getCaller`
 
 Load the caller address (20 bytes) into memory at the spcified location.
+Adresses are integer value numbers, and are stored little-endian in memory.
 
 ```k
     syntax HostCall ::= "eei.getCaller"
@@ -348,7 +337,7 @@ EEI uses big-endian calldata, so that's when we use when converting to return-da
     rule <k> #gatheredCall(eei.finish) => #waiting(eei.finish) ... </k>
          <paramstack> OUTPUTDATA : .ParamStack => .ParamStack </paramstack>
          <locals> ... 1 |-> <i32> DATALENGTH ... </locals>
-         <eeiK> . => EEI.return Int2Bytes(DATALENGTH, OUTPUTDATA,  BE) </eeiK>
+         <eeiK> . => EEI.return Int2Bytes(DATALENGTH, OUTPUTDATA, BE) </eeiK>
 ```
 
 #### `revert`
