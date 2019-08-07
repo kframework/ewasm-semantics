@@ -249,7 +249,11 @@ Get the size of the call data, returned as a regular Wasm result.
     rule <k> eei.getCallDataSize => #waiting(eei.getCallDataSize) ... </k>
          <eeiK> . => EEI.getCallData </eeiK>
 
-    rule <k> #waiting(eei.getCallDataSize) => i32.const lengthBytes(CALLDATA) ... </k>
+    rule <k> #waiting(eei.getCallDataSize)
+          => LogAppend("getCallDataSize: " +String Int2String(lengthBytes(CALLDATA)))
+          ~> i32.const lengthBytes(CALLDATA)
+          ...
+         </k>
          <eeiK> #result(CALLDATA) => . </eeiK>
 ```
 
@@ -300,7 +304,7 @@ From the executing account's storage, load the 32 bytes stored at the index spec
          <locals> ... 0 |-> <i32> INDEXPTR ... </locals>
 
     rule <k> #gatheredCall(eei.storageLoad)
-          => LogAppend("storageLoag: " +String Int2String(INDEX))
+          => LogAppend("storageLoad: " +String Int2String(INDEX))
           ~> #waiting(eei.storageLoad)
           ...
          </k>
