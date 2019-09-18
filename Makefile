@@ -20,9 +20,9 @@ LUA_PATH=$(pandoc_tangle_submodule)/?.lua;;
 export LUA_PATH
 
 .PHONY: all clean \
-        deps ocaml-deps haskell-deps \
-        defn defn-ocaml defn-java defn-haskell \
-        build build-ocaml defn-haskell build-haskell \
+        deps haskell-deps \
+        defn defn-llvm defn-java defn-haskell \
+        build build-llvm defn-haskell build-haskell \
         test test-execution test-simple test-prove test-klab-prove \
         media presentations reports definition-deps
 
@@ -45,33 +45,29 @@ eei_files:=eei.k
 eei_source_files:=$(patsubst %, $(eei_submodule)/%, $(patsubst %.k, %.md, $(eei_files)))
 ewasm_files:=ewasm-test.k driver.k ewasm.k
 
-deps: $(wasm_submodule)/make.timestamp $(eei_submodule)/make.timestamp ocaml-deps definition-deps
+deps: $(wasm_submodule)/make.timestamp $(eei_submodule)/make.timestamp definition-deps
 
 $(wasm_submodule)/make.timestamp: $(wasm_source_files)
 	git submodule update --init --recursive
 	$(wasm_make) deps
 	$(wasm_make) defn-java
-	$(wasm_make) defn-ocaml
+	$(wasm_make) defn-llvm
 	$(wasm_make) defn-haskell
 	touch $(wasm_submodule)/make.timestamp
 
 $(eei_submodule)/make.timestamp: $(eei_source_files)
 	git submodule update --init --recursive
 	$(eei_make) defn-java
-	$(eei_make) defn-ocaml
+	$(eei_make) defn-llvm
 	$(eei_make) defn-haskell
 	touch $(eei_submodule)/make.timestamp
-
-ocaml-deps:
-	eval $$(opam config env) \
-	    opam install --yes mlgmp zarith uuidm
 
 # Building Definition
 # -------------------
 
-ocaml_dir:=$(defn_dir)/ocaml
-ocaml_defn:=$(patsubst %, $(ocaml_dir)/%, $(ewasm_files))
-ocaml_kompiled:=$(ocaml_dir)/ewasm-test-kompiled/interpreter
+llvm_dir:=$(defn_dir)/llvm
+llvm_defn:=$(patsubst %, $(llvm_dir)/%, $(ewasm_files))
+llvm_kompiled:=$(llvm_dir)/ewasm-test-kompiled/interpreter
 
 java_dir:=$(defn_dir)/java
 java_defn:=$(patsubst %, $(java_dir)/%, $(ewasm_files))
@@ -86,12 +82,12 @@ syntax_module=EWASM-TEST-SYNTAX
 
 # Tangle definition from *.md files
 
-defn: defn-ocaml defn-java defn-haskell
-defn-ocaml: $(ocaml_defn)
+defn: defn-llvm defn-java defn-haskell
+defn-llvm: $(llvm_defn)
 defn-java: $(java_defn)
 defn-haskell: $(haskell_defn)
 
-$(ocaml_dir)/%.k: %.md $(pandoc_tangle_submodule)/make.timestamp
+$(llvm_dir)/%.k: %.md $(pandoc_tangle_submodule)/make.timestamp
 	@echo "==  tangle: $@"
 	mkdir -p $(dir $@)
 	pandoc --from markdown --to $(tangler) --metadata=code:.k $< > $@
@@ -108,16 +104,16 @@ $(haskell_dir)/%.k: %.md $(pandoc_tangle_submodule)/make.timestamp
 
 # Build definitions
 
-build: build-ocaml build-java build-haskell
-build-ocaml: $(ocaml_kompiled)
+build: build-llvm build-java build-haskell
+build-llvm: $(llvm_kompiled)
 build-java: $(java_kompiled)
 build-haskell: $(haskell_kompiled)
 
-$(ocaml_kompiled): $(ocaml_defn)
+$(llvm_kompiled): $(llvm_defn)
 	@echo "== kompile: $@"
 	eval $$(opam config env)                              \
-	    $(k_bin)/kompile -O3 --non-strict --backend ocaml \
-	    --directory $(ocaml_dir) -I $(ocaml_dir)          \
+	    $(k_bin)/kompile -O3 --non-strict --backend llvm  \
+	    --directory $(llvm_dir) -I $(llvm_dir)            \
 	    --main-module   $(main_module)                    \
       --syntax-module $(syntax_module) $<
 
@@ -138,7 +134,7 @@ $(haskell_kompiled): $(haskell_defn)
 # Testing
 # -------
 
-TEST_CONCRETE_BACKEND:=ocaml
+TEST_CONCRETE_BACKEND:=llvm
 TEST_SYMBOLIC_BACKEND:=java
 TEST:=./kewasm
 KPROVE_MODULE:=KWASM-LEMMAS
