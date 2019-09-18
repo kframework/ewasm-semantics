@@ -1,0 +1,8 @@
+[submodule "deps/wasm-semantics"]
+	path = deps/wasm-semantics
+	url = https://github.com/kframework/wasm-semantics
+	ignore = untracked
+[submodule "deps/eei-semantics"]
+	path = deps/eei-semantics
+	url = git@github.com:kframework/eei-semantics.git
+	ignore = untracked
