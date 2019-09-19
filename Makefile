@@ -111,25 +111,24 @@ build-haskell: $(haskell_kompiled)
 
 $(llvm_kompiled): $(llvm_defn)
 	@echo "== kompile: $@"
-	eval $$(opam config env)                              \
-	    $(k_bin)/kompile -O3 --non-strict --backend llvm  \
-	    --directory $(llvm_dir) -I $(llvm_dir)            \
-	    --main-module   $(main_module)                    \
-      --syntax-module $(syntax_module) $<
+	$(k_bin)/kompile -O3 --non-strict --backend llvm \
+	    --directory $(llvm_dir) -I $(llvm_dir)       \
+	    --main-module   $(main_module)               \
+	    --syntax-module $(syntax_module) $<
 
 $(java_kompiled): $(java_defn)
 	@echo "== kompile: $@"
 	$(k_bin)/kompile --backend java            \
 	    --directory $(java_dir) -I $(java_dir) \
 	    --main-module   $(main_module)         \
-      --syntax-module $(syntax_module) $<
+	    --syntax-module $(syntax_module) $<
 
 $(haskell_kompiled): $(haskell_defn)
 	@echo "== kompile: $@"
 	$(k_bin)/kompile --backend haskell               \
 	    --directory $(haskell_dir) -I $(haskell_dir) \
 	    --main-module   $(main_module)               \
-      --syntax-module $(syntax_module) $<
+	    --syntax-module $(syntax_module) $<
 
 # Testing
 # -------
