@@ -118,9 +118,9 @@ build-haskell: $(haskell_kompiled)
 
 $(llvm_kompiled): $(llvm_defn)
 	@echo "== kompile: $@"
-	$(k_bin)/kompile -O3 --non-strict --backend llvm \
-	    --directory $(llvm_dir) -I $(llvm_dir)       \
-	    --main-module   $(main_module)               \
+	$(k_bin)/kompile --backend llvm                     \
+	    --directory $(llvm_dir) -I $(llvm_dir) \
+	    --main-module $(main_module)           \
 	    --syntax-module $(syntax_module) $<
 
 $(java_kompiled): $(java_defn)
