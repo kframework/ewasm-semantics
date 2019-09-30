@@ -125,7 +125,7 @@ From the `#gatheredCall`, the parameters on the stack can be consumed and passed
  // --------------------------------------------------
     rule <k> #gatherParams(HC,            .MemoryVariables) => #gatheredCall(HC)     ... </k>
     rule <k> #gatherParams(HC, (IDX, LEN) MS              ) => #gatherParams(HC, MS) ... </k>
-         <paramstack> PSTACK => #range(DATA , IDX, LEN) : PSTACK </paramstack>
+         <paramstack> PSTACK => #getRange(DATA , IDX, LEN) : PSTACK </paramstack>
          <curModIdx> CUR </curModIdx>
          <moduleInst>
            <modIdx> CUR </modIdx>
