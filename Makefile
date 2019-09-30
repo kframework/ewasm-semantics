@@ -11,7 +11,7 @@ tangler:=$(pandoc_tangle_submodule)/tangle.lua
 build_dir:=.build
 defn_dir:=$(build_dir)/defn
 kompiled_dir_name:=ewasm-test
-wasm_make:=make --directory $(wasm_submodule) defn_dir=../../$(defn_dir)
+wasm_make:=make --directory $(wasm_submodule) DEFN_DIR=../../$(defn_dir)
 wasm_clean:=make --directory $(wasm_submodule) clean
 eei_make:=make --directory $(eei_submodule) DEFN_DIR=../../$(defn_dir)
 eei_clean:=make --directory $(eei_submodule) clean
