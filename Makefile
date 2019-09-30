@@ -45,6 +45,7 @@ wasm_source_files:=$(patsubst %, $(wasm_submodule)/%, $(patsubst %.k, %.md, $(wa
 eei_files:=eei.k
 eei_source_files:=$(patsubst %, $(eei_submodule)/%, $(patsubst %.k, %.md, $(eei_files)))
 ewasm_files:=ewasm-test.k driver.k ewasm.k
+all_k_files:=$(ewasm_files) $(wasm_files) $(eei_files)
 
 deps: $(wasm_submodule)/make.timestamp $(eei_submodule)/make.timestamp definition-deps
 
@@ -73,15 +74,15 @@ $(eei_submodule)/make.timestamp: $(eei_source_files)
 # -------------------
 
 llvm_dir:=$(defn_dir)/llvm
-llvm_defn:=$(patsubst %, $(llvm_dir)/%, $(ewasm_files))
+llvm_defn:=$(patsubst %, $(llvm_dir)/%, $(all_k_files))
 llvm_kompiled:=$(llvm_dir)/ewasm-test-kompiled/interpreter
 
 java_dir:=$(defn_dir)/java
-java_defn:=$(patsubst %, $(java_dir)/%, $(ewasm_files))
+java_defn:=$(patsubst %, $(java_dir)/%, $(all_k_files))
 java_kompiled:=$(java_dir)/ewasm-test-kompiled/compiled.txt
 
 haskell_dir:=$(defn_dir)/haskell
-haskell_defn:=$(patsubst %, $(haskell_dir)/%, $(ewasm_files))
+haskell_defn:=$(patsubst %, $(haskell_dir)/%, $(all_k_files))
 haskell_kompiled:=$(haskell_dir)/ewasm-test-kompiled/definition.kore
 
 main_module=EWASM-TEST
