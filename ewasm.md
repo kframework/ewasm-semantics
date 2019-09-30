@@ -167,7 +167,7 @@ Numbers are stored little-endian in Wasm, so that's the convention that's used w
 ```k
     syntax Instrs ::= #storeEeiResult(Int, Int, Int) [function]
                     | #storeEeiResult(Int, Bytes)    [function, klabel(storeEeiResultsBytes)]
- // -----------------------------------------------------------
+ // -----------------------------------------------------------------------------------------
     rule #storeEeiResult(STARTIDX, LENGTHBYTES, VALUE)
       => (i32.store8 (i32.const STARTIDX) (i32.const VALUE))
          #storeEeiResult(STARTIDX +Int 1, LENGTHBYTES -Int 1, VALUE /Int 256)
