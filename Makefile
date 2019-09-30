@@ -87,17 +87,17 @@ defn-llvm: $(llvm_defn)
 defn-java: $(java_defn)
 defn-haskell: $(haskell_defn)
 
-$(llvm_dir)/%.k: %.md $(pandoc_tangle_submodule)/make.timestamp
+$(llvm_dir)/%.k: %.md $(tangler)
 	@echo "==  tangle: $@"
 	mkdir -p $(dir $@)
 	pandoc --from markdown --to $(tangler) --metadata=code:.k $< > $@
 
-$(java_dir)/%.k: %.md $(pandoc_tangle_submodule)/make.timestamp
+$(java_dir)/%.k: %.md $(tangler)
 	@echo "==  tangle: $@"
 	mkdir -p $(dir $@)
 	pandoc --from markdown --to $(tangler) --metadata=code:.k $< > $@
 
-$(haskell_dir)/%.k: %.md $(pandoc_tangle_submodule)/make.timestamp
+$(haskell_dir)/%.k: %.md $(tangler)
 	@echo "==  tangle: $@"
 	mkdir -p $(dir $@)
 	pandoc --from markdown --to $(tangler) --metadata=code:.k $< > $@
