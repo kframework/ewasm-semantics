@@ -22,9 +22,10 @@ export LUA_PATH
 .PHONY: all clean \
         deps haskell-deps \
         defn defn-llvm defn-java defn-haskell \
+        definition-deps wasm-definitions eei-definitions \
         build build-llvm defn-haskell build-haskell \
         test test-execution test-simple test-prove test-klab-prove \
-        media presentations reports definition-deps
+        media presentations reports
 
 all: build
 
@@ -47,19 +48,25 @@ ewasm_files:=ewasm-test.k driver.k ewasm.k
 
 deps: $(wasm_submodule)/make.timestamp $(eei_submodule)/make.timestamp definition-deps
 
+definition-deps: wasm-definitions eei-definitions
+
+wasm-definitions:
+	$(wasm_make) -B defn-java
+	$(wasm_make) -B defn-llvm
+	$(wasm_make) -B defn-haskell
+
+eei-definitions: $(eei_source_files)
+	$(eei_make) -B defn-java
+	$(eei_make) -B defn-llvm
+	$(eei_make) -B defn-haskell
+
 $(wasm_submodule)/make.timestamp: $(wasm_source_files)
 	git submodule update --init --recursive
 	$(wasm_make) deps
-	$(wasm_make) defn-java
-	$(wasm_make) defn-llvm
-	$(wasm_make) defn-haskell
 	touch $(wasm_submodule)/make.timestamp
 
 $(eei_submodule)/make.timestamp: $(eei_source_files)
 	git submodule update --init --recursive
-	$(eei_make) defn-java
-	$(eei_make) defn-llvm
-	$(eei_make) defn-haskell
 	touch $(eei_submodule)/make.timestamp
 
 # Building Definition
