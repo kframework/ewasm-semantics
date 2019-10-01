@@ -23,7 +23,7 @@ export LUA_PATH
         deps haskell-deps \
         defn defn-llvm defn-java defn-haskell \
         definition-deps wasm-definitions eei-definitions \
-        build build-llvm defn-haskell build-haskell \
+        build build-llvm build-java build-haskell \
         test test-execution test-simple test-prove test-klab-prove \
         media presentations reports
 
