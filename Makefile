@@ -112,6 +112,8 @@ $(haskell_dir)/%.k: %.md $(tangler)
 
 # Build definitions
 
+KOMPILE_OPTS :=
+
 build: build-llvm build-java build-haskell
 build-llvm: $(llvm_kompiled)
 build-java: $(java_kompiled)
@@ -119,24 +121,27 @@ build-haskell: $(haskell_kompiled)
 
 $(llvm_kompiled): $(llvm_defn)
 	@echo "== kompile: $@"
-	$(k_bin)/kompile --backend llvm                     \
+	$(k_bin)/kompile --backend llvm            \
 	    --directory $(llvm_dir) -I $(llvm_dir) \
 	    --main-module $(main_module)           \
-	    --syntax-module $(syntax_module) $<
+	    --syntax-module $(syntax_module) $<    \
+	    $(KOMPILE_OPTS)
 
 $(java_kompiled): $(java_defn)
 	@echo "== kompile: $@"
 	$(k_bin)/kompile --backend java            \
 	    --directory $(java_dir) -I $(java_dir) \
 	    --main-module   $(main_module)         \
-	    --syntax-module $(syntax_module) $<
+	    --syntax-module $(syntax_module) $<    \
+	    $(KOMPILE_OPTS)
 
 $(haskell_kompiled): $(haskell_defn)
 	@echo "== kompile: $@"
 	$(k_bin)/kompile --backend haskell               \
 	    --directory $(haskell_dir) -I $(haskell_dir) \
 	    --main-module   $(main_module)               \
-	    --syntax-module $(syntax_module) $<
+	    --syntax-module $(syntax_module) $<          \
+	    $(KOMPILE_OPTS)
 
 # Testing
 # -------
