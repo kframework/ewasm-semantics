@@ -161,6 +161,9 @@ test: test-execution test-prove
 
 # Generic Test Harnesses
 
+tests/%.debug: tests/%
+	$(TEST) run --backend llvm $< --debugger
+
 tests/%.run: tests/%
 	$(TEST) run --backend $(TEST_CONCRETE_BACKEND) $< > tests/$*.$(TEST_CONCRETE_BACKEND)-out
 	$(CHECK) tests/success-$(TEST_CONCRETE_BACKEND).out tests/$*.$(TEST_CONCRETE_BACKEND)-out
