@@ -6,10 +6,9 @@
 #
 
 # path to a directory that contains .k.rev and .kevm.rev
-BUILD_DIR?=$(ROOT)/.build
+DEPS_DIR?=$(ROOT)/deps/wasm-semantics/deps
 
-K_REPO_URL?=https://github.com/kframework/k
-KEVM_REPO_URL?=https://github.com/kframework/evm-semantics
+KEWASM_REPO_DIR?=$(ROOT)
 
 ifndef SPEC_GROUP
 $(error SPEC_GROUP is not set)
@@ -40,17 +39,18 @@ endif
 THIS_FILE:=$(abspath $(lastword $(MAKEFILE_LIST)))
 # path to root directory
 ROOT:=$(abspath $(dir $(THIS_FILE))/../..)
+VERIFICATION:=$(ROOT)/verification
 
-RESOURCES:=$(ROOT)/verification/resources
+RESOURCES:=$(VERIFICATION)/resources
 LOCAL_LEMMAS?=verification.k
 
-SPECS_DIR:=$(ROOT)/specs
+SPECS_DIR:=$(VERIFICATION)/specs
 
-K_REPO_DIR:=$(abspath $(BUILD_DIR)/k)
+K_REPO_DIR:=$(abspath $(DEPS_DIR)/k)
 
 K_BIN:=$(abspath $(K_REPO_DIR)/k-distribution/target/release/k/bin)
 
-KPROVE:=$(K_BIN)/kprove -v --debug -d $(KEVM_REPO_DIR)/.build/defn/java -m VERIFICATION --z3-impl-timeout 500 \
+KPROVE:=$(K_BIN)/kprove -v --debug -d $(KEWASM_REPO_DIR)/.build/defn/java -m VERIFICATION --z3-impl-timeout 500 \
         --deterministic-functions --no-exc-wrap \
         --cache-func-optimized --no-alpha-renaming --format-failures --boundary-cells k,pc \
         --log-cells k,output,statusCode,localMem,pc,gas,wordStack,callData,accounts,memoryUsed,\#pc,\#result \
@@ -58,7 +58,7 @@ KPROVE:=$(K_BIN)/kprove -v --debug -d $(KEVM_REPO_DIR)/.build/defn/java -m VERIF
 
 SPEC_FILES:=$(patsubst %,$(SPECS_DIR)/$(SPEC_GROUP)/%-spec.k,$(SPEC_NAMES))
 
-PANDOC_TANGLE_SUBMODULE:=$(ROOT)/.build/pandoc-tangle
+PANDOC_TANGLE_SUBMODULE:=$(DEPS_DIR)/pandoc-tangle
 TANGLER:=$(PANDOC_TANGLE_SUBMODULE)/tangle.lua
 LUA_PATH:=$(PANDOC_TANGLE_SUBMODULE)/?.lua;;
 export LUA_PATH
@@ -106,5 +106,5 @@ $(SPECS_DIR)/$(SPEC_GROUP)/%-spec.k: $(TMPLS) $(SPEC_INI)
 
 test: $(addsuffix .test,$(SPEC_FILES))
 
-$(SPECS_DIR)/$(SPEC_GROUP)/%-spec.k.test: $(SPECS_DIR)/$(SPEC_GROUP)/%-spec.k
+%-spec.k.test: %-spec.k
 	$(KPROVE) $<
