@@ -125,7 +125,7 @@ From the `#gatheredCall`, the parameters on the stack can be consumed and passed
  // --------------------------------------------------
     rule <k> #gatherParams(HC,            .MemoryVariables) => #gatheredCall(HC)     ... </k>
     rule <k> #gatherParams(HC, (IDX, LEN) MS              ) => #gatherParams(HC, MS) ... </k>
-         <paramstack> PSTACK => #range(DATA , IDX, LEN) : PSTACK </paramstack>
+         <paramstack> PSTACK => #getRange(DATA , IDX, LEN) : PSTACK </paramstack>
          <curModIdx> CUR </curModIdx>
          <moduleInst>
            <modIdx> CUR </modIdx>
@@ -167,9 +167,9 @@ Numbers are stored little-endian in Wasm, so that's the convention that's used w
 ```k
     syntax Instrs ::= #storeEeiResult(Int, Int, Int) [function]
                     | #storeEeiResult(Int, Bytes)    [function, klabel(storeEeiResultsBytes)]
- // -----------------------------------------------------------
+ // -----------------------------------------------------------------------------------------
     rule #storeEeiResult(STARTIDX, LENGTHBYTES, VALUE)
-      => (i32.store8 (i32.const STARTIDX) (i32.const VALUE))
+      => (i32.const STARTIDX) (i32.const VALUE) (i32.store8)
          #storeEeiResult(STARTIDX +Int 1, LENGTHBYTES -Int 1, VALUE /Int 256)
       requires LENGTHBYTES >Int 0
     rule #storeEeiResult(_, 0, _) => .Instrs
