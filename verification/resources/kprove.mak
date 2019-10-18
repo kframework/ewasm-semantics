@@ -52,8 +52,8 @@ K_BIN:=$(abspath $(K_REPO_DIR)/k-distribution/target/release/k/bin)
 
 KPROVE:=$(K_BIN)/kprove -v --debug -d $(KEWASM_REPO_DIR)/.build/defn/java -m VERIFICATION --z3-impl-timeout 500 \
         --deterministic-functions --no-exc-wrap \
-        --cache-func-optimized --no-alpha-renaming --format-failures --boundary-cells k,pc \
-        --log-cells k,output,statusCode,localMem,pc,gas,wordStack,callData,accounts,memoryUsed,\#pc,\#result \
+        --cache-func-optimized --no-alpha-renaming --format-failures --boundary-cells k \
+        --log-cells k \
         $(KPROVE_OPTS)
 
 SPEC_FILES:=$(patsubst %,$(SPECS_DIR)/$(SPEC_GROUP)/%-spec.k,$(SPEC_NAMES))
