@@ -1,6 +1,5 @@
 BUILD_DIR:=../.build
 
-LOCAL_LEMMAS:=
 TMPLS:=../module-tmpl.k ../spec-tmpl.k
 
 SPEC_GROUP:=example

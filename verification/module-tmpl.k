@@ -1,9 +1,7 @@
-requires "lemmas.k"
-requires "ewasm.k"
+requires "verification.k"
 
 module {MODULE}-SPEC
-  imports EWASM
-  imports LEMMAS
+  imports VERIFICATION
 
 {RULES}
 

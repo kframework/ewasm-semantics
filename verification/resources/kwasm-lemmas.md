@@ -1,0 +1,1 @@
+../../deps/wasm-semantics/kwasm-lemmas.md

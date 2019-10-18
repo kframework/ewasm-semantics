@@ -42,7 +42,7 @@ ROOT:=$(abspath $(dir $(THIS_FILE))/../..)
 VERIFICATION:=$(ROOT)/verification
 
 RESOURCES:=$(VERIFICATION)/resources
-LOCAL_LEMMAS?=verification.k
+LOCAL_LEMMAS?=verification.k ../resources/kwasm-lemmas.md
 
 SPECS_DIR:=$(VERIFICATION)/specs
 
@@ -94,7 +94,7 @@ $(SPEC_INI): $(SPEC_INI:.ini=.md) $(TANGLER)
 	pandoc --from markdown --to "$(TANGLER)" --metadata=code:".ini" $< > $@
 endif
 
-$(SPECS_DIR)/lemmas.k: $(RESOURCES)/lemmas.md $(TANGLER)
+$(SPECS_DIR)/%.k: $(RESOURCES)/%.md $(TANGLER)
 	pandoc --from markdown --to "$(TANGLER)" --metadata=code:".k" $< > $@
 
 $(SPECS_DIR)/$(SPEC_GROUP)/%-spec.k: $(TMPLS) $(SPEC_INI)
