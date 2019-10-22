@@ -42,7 +42,7 @@ ROOT:=$(abspath $(dir $(THIS_FILE))/../..)
 VERIFICATION:=$(ROOT)/verification
 
 RESOURCES:=$(VERIFICATION)/resources
-LOCAL_LEMMAS?=verification.k ../resources/kwasm-lemmas.md
+LOCAL_LEMMAS?=verification.k
 
 SPECS_DIR:=$(VERIFICATION)/specs
 
@@ -81,7 +81,7 @@ $(TANGLER):
 # Specs
 #
 
-split-proof-tests: $(SPECS_DIR)/$(SPEC_GROUP) $(SPECS_DIR)/lemmas.k $(SPEC_FILES)
+split-proof-tests: $(SPECS_DIR)/$(SPEC_GROUP) $(SPECS_DIR)/lemmas.k $(SPECS_DIR)/kwasm-lemmas.k $(SPEC_FILES)
 
 $(SPECS_DIR)/$(SPEC_GROUP): $(LOCAL_LEMMAS)
 	mkdir -p $@
