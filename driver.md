@@ -20,6 +20,8 @@ An Ewasm program is the invocation of an Ethereum contract containing Ewasm code
 Running smart contracts
 -----------------------
 
+### Ethereum Commands
+
 Execution of Ethereum code is always triggered by a single transaction.
 To test and query the blockchain state, we also allow direct client calls in the form of EEIMethods.
 
@@ -45,9 +47,6 @@ However, when the call data is a representation, it is interpreted as big-endian
     rule CallData2Int(CD:DataString) => Bytes2Int(#DS2Bytes(CD), LE, Unsigned)
     rule CallData2Int(CD:Int)        => CD
 ```
-
-TODO: Don't call it "Address"
-TODO: Allow using calldata for addresses.
 
 ```k
     syntax WasmInt
