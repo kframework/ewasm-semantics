@@ -3,7 +3,7 @@ requires "kwasm-lemmas.k"
 
 module LEMMAS
   imports KWASM-LEMMAS
-  imports EWASM
+  imports DRIVER
 
 endmodule
 ```
