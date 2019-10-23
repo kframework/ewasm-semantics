@@ -8,3 +8,9 @@ SPEC_INI:=wrc20_fast_transfer.ini
 SPEC_NAMES:=nop
 
 include ../resources/kprove.mak
+
+KEWASM?=$(ROOT)/kewasm
+
+%.k: %.wast
+	$(KEWASM) kast $< pretty | python preprocessor.py > $@
+
