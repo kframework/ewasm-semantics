@@ -31,7 +31,7 @@ def main():
     prog = infile.read()
     infile.close()
 
-    output = ["#createContract", "CONTRACT_ADDDRESS:Int"]
+    output = []
 
     for word in prog.split():
         word = hex2dec(word)
