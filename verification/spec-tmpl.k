@@ -99,7 +99,7 @@
             .Map
           </localIds>
           <curModIdx>
-            .Int
+            _ => _
           </curModIdx>
           <labelDepth>
             0
@@ -115,42 +115,19 @@
           .Map
         </moduleIds>
         <moduleInstances>
-          _
+          .Bag => _
         </moduleInstances>
         <nextModuleIdx>
-          0
+          _ => _
         </nextModuleIdx>
         <mainStore>
-          <funcs>
-            _
-          </funcs>
-          <nextFuncAddr>
-            0
-          </nextFuncAddr>
-          <tabs>
-            _
-          </tabs>
-          <nextTabAddr>
-            0
-          </nextTabAddr>
-          <mems>
-            _
-          </mems>
-          <nextMemAddr>
-            0
-          </nextMemAddr>
-          <globals>
-            _
-          </globals>
-          <nextGlobAddr>
-            0
-          </nextGlobAddr>
+          _ => _
         </mainStore>
         <deterministicMemoryGrowth>
           true
         </deterministicMemoryGrowth>
         <nextFreshId>
-          0
+          _ => _
         </nextFreshId>
       </wasm>
       <paramstack>
