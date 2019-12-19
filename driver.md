@@ -51,25 +51,27 @@ However, when the call data is a representation, it is interpreted as big-endian
 ```k
     syntax WasmInt
     syntax EthereumCommand ::= "#invokeContract" CallData CallData CallData
-    syntax EthereumCommand ::= "#invoke" Int WasmString
+                             | "#prepareAndCall" Int      Int    Bytes
+                             | "#invoke" Int WasmString
  // ---------------------------------------------------
-    rule <k> #invokeContract ACCTFROM ACCTTO CALLDATA => #invoke MODADDR #mainName ... </k>
-         <acct> _ => CallData2Int(ACCTTO) </acct>
-         <caller> _ => CallData2Int(ACCTFROM) </caller>
-         <callData> _ => CallData2Bytes(CALLDATA) </callData>
-         <returnData> _ => .Bytes </returnData>
+    rule <k> #invokeContract ACCTFROM ACCTTO CALLDATA => #prepareAndCall CallData2Int(ACCTFROM) CallData2Int(ACCTTO) CallData2Bytes(CALLDATA) ... </k>
+
+    rule <k> #prepareAndCall ACCTFROM ACCTTO CALLDATA => #invoke MODADDR #mainName ... </k>
+         <acct>       _ => ACCTTO   </acct>
+         <caller>     _ => ACCTFROM </caller>
+         <callData>   _ => CALLDATA </callData>
+         <returnData> _ => .Bytes   </returnData>
          <account>
            <id> ACCTTO </id>
            <code> MODADDR </code>
            ...
          </account>
 
-    rule <k> #invoke MODADDR FNAME => ( invoke FADDR ) ... </k>
+    rule <k> #invoke MODADDR FNAME => call FINDEX ... </k>
+         <curModIdx> _ => MODADDR </curModIdx>
          <moduleInst>
            <modIdx> MODADDR </modIdx>
-           <exports> ... FNAME |-> TFIDX ... </exports>
-           <funcIds> FIDS </funcIds>
-           <funcAddrs> ... #ContextLookup(FIDS, TFIDX) |-> FADDR ... </funcAddrs>
+           <exports> ... FNAME |-> FINDEX ... </exports>
            ...
          </moduleInst>
 ```
