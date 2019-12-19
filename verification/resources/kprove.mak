@@ -10,6 +10,8 @@ DEPS_DIR?=$(ROOT)/deps/wasm-semantics/deps
 
 KEWASM_REPO_DIR?=$(ROOT)
 
+PROVER_BACKEND:=haskell
+
 ifndef SPEC_GROUP
 $(error SPEC_GROUP is not set)
 endif
@@ -50,7 +52,7 @@ K_REPO_DIR:=$(abspath $(DEPS_DIR)/k)
 
 K_BIN:=$(abspath $(K_REPO_DIR)/k-distribution/target/release/k/bin)
 
-KPROVE:=$(K_BIN)/kprove -v --debug -d $(KEWASM_REPO_DIR)/.build/defn/java -m VERIFICATION --z3-impl-timeout 500 \
+KPROVE:=$(K_BIN)/kprove -v --debug -d $(KEWASM_REPO_DIR)/.build/defn/$(PROVER_BACKEND) -m VERIFICATION --z3-impl-timeout 500 \
         --deterministic-functions --no-exc-wrap \
         --cache-func-optimized --no-alpha-renaming --format-failures --boundary-cells k \
         --log-cells k \
