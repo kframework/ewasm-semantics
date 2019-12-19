@@ -106,7 +106,7 @@ $(SPECS_DIR)/$(SPEC_GROUP)/%-spec.k: $(TMPLS) $(SPEC_INI)
 # Kprove
 #
 
-test: $(addsuffix .test,$(SPEC_FILES))
+test: split-proof-tests $(addsuffix .test,$(SPEC_FILES))
 
 %-spec.k.test: %-spec.k
 	$(KPROVE) $<
