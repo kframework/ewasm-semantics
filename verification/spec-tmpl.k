@@ -7,7 +7,7 @@
           .
         </eeiK>
         <statusCode>
-          .StatusCode
+          {STATUSCODE}
         </statusCode>
         <returnData>
           .Bytes
@@ -26,7 +26,7 @@
             0
           </caller>
           <callData>
-            .Bytes
+            {CALLDATA}
           </callData>
           <callValue>
             0
@@ -50,7 +50,7 @@
           </refund>
         </substate>
         <accounts>
-          _
+          {ACCOUNTS}
         </accounts>
         <accountsStack>
           .List
@@ -118,7 +118,7 @@
           .Bag => _
         </moduleInstances>
         <nextModuleIdx>
-          _ => _
+          {NEXTMODULEIDX}
         </nextModuleIdx>
         <mainStore>
           _ => _
@@ -127,10 +127,14 @@
           true
         </deterministicMemoryGrowth>
         <nextFreshId>
-          _ => _
+           {NEXTFRESHIDX}
         </nextFreshId>
       </wasm>
       <paramstack>
         .ParamStack
       </paramstack>
     </ewasm>
+    requires true
+      {REQUIRES}
+    ensures true
+      {ENSURES}
