@@ -4,5 +4,5 @@
 	ignore = untracked
 [submodule "deps/eei-semantics"]
 	path = deps/eei-semantics
-	url = git@github.com:kframework/eei-semantics.git
+	url = https://github.com/kframework/eei-semantics.git
 	ignore = untracked
