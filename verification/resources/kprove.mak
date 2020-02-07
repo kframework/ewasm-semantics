@@ -77,7 +77,7 @@ clean:
 	rm -rf $(SPECS_DIR)
 
 $(TANGLER):
-	git submodule update --init -- $(PANDOC_TANGLE_SUBMODULE)
+	cd $(DEPS_DIR) && git submodule update --init -- $(PANDOC_TANGLE_SUBMODULE)
 
 #
 # Specs
