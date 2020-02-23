@@ -1,0 +1,203 @@
+#createContract 0
+(module
+  (func $revert          ( import "ethereum" "revert" )          param i32 i32   )
+  (func $finish          ( import "ethereum" "finish" )          param i32 i32   )
+  (func $getCallDataSize ( import "ethereum" "getCallDataSize" ) result i32   )
+  (func $callDataCopy    ( import "ethereum" "callDataCopy" )    param i32 i32 i32   )
+  (func $storageLoad     ( import "ethereum" "storageLoad" )     param i32 i32   )
+  (func $storageStore    ( import "ethereum" "storageStore" )    param i32 i32   )
+  (func $getCaller       ( import "ethereum" "getCaller" )       param i32   )
+  ( memory ( export "memory")  1 )
+  (func ( export "main" )
+    block
+      block
+        call $getCallDataSize
+        i32.const 4
+        i32.ge_u
+        br_if 0
+        i32.const 0
+        i32.const 0
+        call $revert
+        br 1
+
+      end
+      i32.const 0
+      i32.const 0
+      i32.const 4
+      call $callDataCopy
+      block
+        i32.const 0
+        i32.load
+        i32.const 436376473
+        i32.eq
+        i32.eqz
+        br_if 0
+        call $do_balance
+        br 1
+
+      end
+      block
+        i32.const 0 i32.load
+        i32.const 3181327709
+        i32.eq
+        i32.eqz
+        br_if 0
+        call $do_transfer
+        br 1
+
+      end
+      i32.const 0
+      i32.const 0
+      call $revert
+
+    end
+
+  )
+
+  (func $do_balance
+    block
+      block
+        call $getCallDataSize
+        i32.const 24
+        i32.eq
+        br_if 0
+        i32.const 0
+        i32.const 0
+        call $revert
+        br 1
+
+      end
+      i32.const 0
+      i32.const 4
+      i32.const 20
+      call $callDataCopy
+      i32.const 0
+      i32.const 32
+      call $storageLoad
+      i32.const 32
+      i32.const 32
+      i64.load
+      call $i64.reverse_bytes
+      i64.store
+      i32.const 32
+      i32.const 8
+      call $finish
+
+    end
+     )
+
+  (func $do_transfer  local i64 i64 i64
+    block
+      block
+        call $getCallDataSize
+        i32.const 32
+        i32.eq
+        br_if 0
+        i32.const 0
+        i32.const 0
+        call $revert
+        br 1
+
+      end
+      i32.const 0
+      call $getCaller
+      i32.const 32
+      i32.const 4
+      i32.const 20
+      call $callDataCopy
+      i32.const 64
+      i32.const 24
+      i32.const 8
+      call $callDataCopy
+      i32.const 64
+      i64.load
+      call $i64.reverse_bytes
+      local.set 0
+      i32.const 0
+      i32.const 64
+      call $storageLoad
+      i32.const 64
+      i64.load
+      local.set 1
+      i32.const 32
+      i32.const 64
+      call $storageLoad
+      i32.const 64
+      i64.load
+      local.set 2
+      block
+        local.get 0
+        local.get 1
+        i64.le_u
+        br_if 0
+        i32.const 0
+        i32.const 0
+        call $revert
+        br 1
+
+      end
+      local.get 1
+      local.get 0
+      i64.sub
+      local.set 1
+      local.get 2
+      local.get 0
+      i64.add
+      local.set 2
+      i32.const 64
+      local.get 1
+      i64.store
+      i32.const 0
+      i32.const 64
+      call $storageStore
+      i32.const 64
+      local.get 2
+      i64.store
+      i32.const 32
+      i32.const 64
+      call $storageStore
+
+    end
+
+  )
+
+  (func $i64.reverse_bytes param i64  result i64   local i64 i64
+    block
+      loop
+        local.get 1
+        i64.const 8
+        i64.ge_u
+        br_if 1
+        local.get 0
+        i64.const 56
+        local.get 1
+        i64.const 8
+        i64.mul
+        i64.sub
+        i64.shl
+        i64.const 56
+        i64.shr_u
+        i64.const 56
+        i64.const 8
+        local.get 1
+        i64.mul
+        i64.sub
+        i64.shl
+        local.get 2
+        i64.add
+        local.set 2
+        local.get 1
+        i64.const 1
+        i64.add
+        local.set 1
+        br 0
+
+      end
+
+    end
+    local.get 2
+
+  )
+)
+#debugSetStorage 0 0 5000
+#invokeContract  0 0 "\99\93\02\1a\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00"
