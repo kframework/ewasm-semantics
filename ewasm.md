@@ -348,6 +348,21 @@ Immediately halt execution, tell the EVM to revert, and set return data from mem
          <eeiK> . => EEI.revert Int2Bytes(DATALENGTH, OUTPUTDATA, LE) </eeiK>
 ```
 
+### Debugging Functions
+
+TODO: figure out how to write VALUE as a binary string using WasmString
+
+```k
+  syntax Instr ::= "#debugSetStorage" Int Int Int
+
+  rule <k> (#debugSetStorage ACCT INDEX VALUE => .) ... </k>
+       <account>
+         <id> ACCT </id>
+	 <storage> STORAGE => STORAGE [ INDEX <- VALUE ] </storage>
+	 ...
+       </account>
+```
+
 ```k
 endmodule
 ```
