@@ -102,6 +102,8 @@ This works essentially as a `trap`, ending all execution in the `<k>` cell, but 
     rule <k> #cleanup ~> (S:Stmt SS:Stmts => S ~> SS) ... </k>
 
     rule <k> (#cleanup ~> E:EthereumCommand) => E ... </k>
+
+    rule <k> #cleanup => . </k>
 ```
 
 Setting up the blockchain state
