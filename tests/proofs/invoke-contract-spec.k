@@ -26,16 +26,16 @@ module INVOKE-CONTRACT-SPEC
             0
           </callDepth>
           <acct>
-            0
+            _ => ?_
           </acct>
           <program>
             .Code
           </program>
           <caller>
-            0
+            _ => ?_
           </caller>
           <callData>
-            .Bytes
+            _ => ?_
           </callData>
           <callValue>
             0
