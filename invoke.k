@@ -16,7 +16,7 @@ module INVOKE
           .
         </eeiK>
         <statusCode>
-          _ => _
+          _ => ?_
         </statusCode>
         <returnData>
           .Bytes
@@ -98,11 +98,7 @@ module INVOKE
     #createContract CONTRACT_ADDR:Int
     (module
       ( memory ( export #unparseWasmString("\"memory\"") ) 1 )
-      (func ( export #unparseWasmString("\"main\"") ) .TypeDecls .LocalDecls
-        block .TypeDecls
-          .EmptyStmts
-        end
-        .EmptyStmts
+      (func String2Identifier("$main") ( export #unparseWasmString("\"main\"") ) .TypeDecls .LocalDecls .Instrs
       )) ~> #invokeContract ACCTFROM:Int CONTRACT_ADDR:Int CALLDATA:Int => .
         </k>
         <valstack>
@@ -116,7 +112,7 @@ module INVOKE
             .Map
           </localIds>
           <curModIdx>
-            _ => _
+            _ => ?_
           </curModIdx>
           <labelDepth>
             0
@@ -132,19 +128,19 @@ module INVOKE
           .Map
         </moduleIds>
         <moduleInstances>
-          .Bag => _
+          .Bag => ?_
         </moduleInstances>
         <nextModuleIdx>
-          _ => _
+          _ => ?_
         </nextModuleIdx>
         <mainStore>
-          _ => _
+          _ => ?_
         </mainStore>
         <deterministicMemoryGrowth>
           true
         </deterministicMemoryGrowth>
         <nextFreshId>
-           _ => _
+           0 => ?_
         </nextFreshId>
       </wasm>
       <paramstack>
@@ -152,8 +148,6 @@ module INVOKE
       </paramstack>
     </ewasm>
     requires true
-      andBool 0 <=Int OWNER     andBool OWNER     <Int (2 ^Int 160)
-      andBool 0 <=Int BAL       andBool BAL       <Int (2 ^Int 256)
     ensures true
 endmodule
 
