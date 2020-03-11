@@ -59,7 +59,7 @@ module INVOKE-CONTRACT-SPEC
           </refund>
         </substate>
         <accounts>
-          ACCOUNTS
+          .Bag => ?_
         </accounts>
         <accountsStack>
           .List
@@ -99,7 +99,7 @@ module INVOKE-CONTRACT-SPEC
     (module
       ( memory ( export #unparseWasmString("\"memory\"") ) 1 )
       (func String2Identifier("$main") ( export #unparseWasmString("\"main\"") ) .TypeDecls .LocalDecls .Instrs
-      )) ~> #invokeContract ACCTFROM:Int CONTRACT_ADDR:Int CALLDATA:Int => .
+      )) ~> #invokeContract ACCTFROM:Int CONTRACT_ADDR:Int CALLDATA:Bytes => .
         </k>
         <valstack>
           .ValStack
@@ -134,14 +134,24 @@ module INVOKE-CONTRACT-SPEC
           _ => ?_
         </nextModuleIdx>
         <mainStore>
-          _ => ?_
+          <funcs>
+           .Bag => ?_
+          </funcs>
+          <nextFuncAddr>
+           _ => ?_
+          </nextFuncAddr>
+          <mems>
+           .Bag => ?_
+          </mems>
+          <nextMemAddr>
+           _ => ?_
+          </nextMemAddr>
+          ...
         </mainStore>
-        <deterministicMemoryGrowth>
-          true
-        </deterministicMemoryGrowth>
         <nextFreshId>
            0 => ?_
         </nextFreshId>
+        ...
       </wasm>
       <paramstack>
         .ParamStack
