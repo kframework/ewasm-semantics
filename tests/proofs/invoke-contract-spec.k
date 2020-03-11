@@ -6,7 +6,7 @@ module VERIFICATION
   imports KWASM-LEMMAS
 endmodule
 
-module INVOKE-IMPORTS-CONTRACT-SPEC
+module INVOKE-CONTRACT-SPEC
   imports VERIFICATION
 
   rule
@@ -97,16 +97,9 @@ module INVOKE-IMPORTS-CONTRACT-SPEC
         <k>
     #createContract CONTRACT_ADDR:Int
     (module
-      (func String2Identifier("$revert")          ( import #unparseWasmString("\"ethereum\"") #unparseWasmString("\"revert\"") )          param i32 i32 .ValTypes .TypeDecls )
-      (func String2Identifier("$finish")          ( import #unparseWasmString("\"ethereum\"") #unparseWasmString("\"finish\"") )          param i32 i32 .ValTypes .TypeDecls )
-      (func String2Identifier("$getCallDataSize") ( import #unparseWasmString("\"ethereum\"") #unparseWasmString("\"getCallDataSize\"") ) result i32 .ValTypes .TypeDecls )
-      (func String2Identifier("$callDataCopy")    ( import #unparseWasmString("\"ethereum\"") #unparseWasmString("\"callDataCopy\"") )    param i32 i32 i32 .ValTypes .TypeDecls )
-      (func String2Identifier("$storageLoad")     ( import #unparseWasmString("\"ethereum\"") #unparseWasmString("\"storageLoad\"") )     param i32 i32 .ValTypes .TypeDecls )
-      (func String2Identifier("$storageStore")    ( import #unparseWasmString("\"ethereum\"") #unparseWasmString("\"storageStore\"") )    param i32 i32 .ValTypes .TypeDecls )
-      (func String2Identifier("$getCaller")       ( import #unparseWasmString("\"ethereum\"") #unparseWasmString("\"getCaller\"") )       param i32 .ValTypes .TypeDecls )
       ( memory ( export #unparseWasmString("\"memory\"") ) 1 )
-      (func String2Identifier("$main") ( export #unparseWasmString("\"main\"") ) .TypeDecls .LocalDecls .Instrs)
-    ) ~> #invokeContract ACCTFROM:Int CONTRACT_ADDR:Int CALLDATA:Int => .
+      (func String2Identifier("$main") ( export #unparseWasmString("\"main\"") ) .TypeDecls .LocalDecls .Instrs
+      )) ~> #invokeContract ACCTFROM:Int CONTRACT_ADDR:Int CALLDATA:Int => .
         </k>
         <valstack>
           .ValStack
