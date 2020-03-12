@@ -1,13 +1,7 @@
-requires "ewasm-test.k"
-requires "kwasm-lemmas.k"
-
-module VERIFICATION
-  imports EWASM-TEST
-  imports KWASM-LEMMAS
-endmodule
+requires "kewasm-lemmas.k"
 
 module INVOKE-CONTRACT-SPEC
-  imports VERIFICATION
+  imports KEWASM-LEMMAS
 
   rule
     <ewasm>
