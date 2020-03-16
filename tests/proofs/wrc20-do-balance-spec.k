@@ -1,56 +1,54 @@
-Config at node 208 is:
-  #Not ( #Not ( {
-    lengthBytes ( ADDRESS )
-  #Equals
-    20
-  } ) )
-#And
-  #Not ( {
-    notBool 4 +Int lengthBytes ( ADDRESS ) >=Int 4
-  #Equals
-    true
-  } )
-#And
-  #True
-#And
+requires "kewasm-lemmas.k"
+
+module VERIFICATION
+  imports KEWASM-LEMMAS
+  imports WRC20-LEMMAS
+
+endmodule
+
+module WRC20-DO-BALANCE-SPEC
+  imports VERIFICATION
+
+  rule
   <ewasm>
     <eei>
       <eeiK>
         .
       </eeiK>
       <statusCode>
-        _0
+        _ => EVMC_SUCCESS
       </statusCode>
       <returnData>
-        b""
+      // b""
+        _ => ?_ // What should this be exactly?
       </returnData>
       <callState>
-        <callDepth>
+        <callDepth> // DELETE
           0
         </callDepth>
         <acct>
           CONTRACT_ADDR
         </acct>
-        <program>
+        <program> // DELETE
           .Code
         </program>
-        <caller>
+        <caller> // DELETE
           ACCTFROM
         </caller>
         <callData>
-          b"9993021a" +Bytes ADDRESS
+          Int2Bytes(4, 436376473, LE) +Bytes ADDRESS
         </callData>
-        <callValue>
+        <callValue>  // DELETE
           0
         </callValue>
-        <gas>
+        <gas> //DELETE
           0
         </gas>
       </callState>
-      <callStack>
+      <callStack> //DELETE
         .List
       </callStack>
-      <substate>
+      <substate> // DELETE
         <selfDestruct>
           .Set
         </selfDestruct>
@@ -70,20 +68,21 @@ Config at node 208 is:
             0
           </balance>
           <code>
-            _12:Int
+            CONTRACT_MODULE:Int
           </code>
           <storage>
-            .Map
+           WRC20_CONTRACT_STORAGE
           </storage>
           <nonce>
             0
           </nonce>
         </account>
+        // ADD ...
       </accounts>
-      <accountsStack>
+      <accountsStack> // DELETE
         .List
       </accountsStack>
-      <tx>
+      <tx> // DELETE
         <gasPrice>
           0
         </gasPrice>
@@ -91,7 +90,7 @@ Config at node 208 is:
           0
         </origin>
       </tx>
-      <block>
+      <block> // DELETE
         <hashes>
           .List
         </hashes>
@@ -114,47 +113,49 @@ Config at node 208 is:
     </eei>
     <wasm>
       <k>
-        call $do_balance ~> br 1  .EmptyStmts ~> label [ .ValTypes ] { .EmptyStmts } .ValStack ~> block .TypeDecls i32 . const 0  i32 . load  i32 . const 3181327709  i32 . eq  i32 . eqz  br_if 0  call $do_transfer  br 1  .EmptyStmts end  i32 . const 0  i32 . const 0  call $revert  .EmptyStmts ~> label [ .ValTypes ] { .EmptyStmts } .ValStack ~> label [ .ValTypes ] { .EmptyStmts } .ValStack ~> frame _12 .ValTypes .ValStack .Map 0 .Map
+        call String2Identifier("$do_balance") // ~> br 1  .EmptyStmts ~> label [ .ValTypes ] { .EmptyStmts } .ValStack ~> block .TypeDecls i32 . const 0  i32 . load  i32 . const 3181327709  i32 . eq  i32 . eqz  br_if 0  call $do_transfer  br 1  .EmptyStmts end  i32 . const 0  i32 . const 0  call $revert  .EmptyStmts ~> label [ .ValTypes ] { .EmptyStmts } .ValStack ~> label [ .ValTypes ] { .EmptyStmts } .ValStack ~> frame CONTRACT_MODULE .ValTypes .ValStack .Map 0 .Map
+        => #cleanup
       </k>
       <valstack>
         .ValStack
       </valstack>
       <curFrame>
         <locals>
-          .Map
+          _ => ?_
+          //.Map
         </locals>
-        <localIds>
+        <localIds> // DELETE
           .Map
         </localIds>
         <curModIdx>
-          _12:Int
+          CONTRACT_MODULE:Int
         </curModIdx>
-        <labelDepth>
-          3
+        <labelDepth> // DELETE
+          _ => ?_
         </labelDepth>
-        <labelIds>
+        <labelIds> // DELETE
           .Map
         </labelIds>
       </curFrame>
-      <moduleRegistry>
+      <moduleRegistry> // DELETE
         .Map
       </moduleRegistry>
-      <moduleIds>
+      <moduleIds> // DELETE
         .Map
       </moduleIds>
       <moduleInstances>
         <moduleInst>
           <modIdx>
-            _12
+            CONTRACT_MODULE
           </modIdx>
-          <exports>
+          <exports> // DELETE
             "main" |-> #freshId ( 0 )
             "memory" |-> #freshId ( 1 )
           </exports>
-          <typeIds>
+          <typeIds> // DELETE
             .Map
           </typeIds>
-          <types>
+          <types> // SPECIALIZE
             0 |-> [ i32  i32  .ValTypes ] -> [ .ValTypes ]
             1 |-> [ .ValTypes ] -> [ i32  .ValTypes ]
             2 |-> [ i32  i32  i32  .ValTypes ] -> [ .ValTypes ]
@@ -162,66 +163,67 @@ Config at node 208 is:
             4 |-> [ .ValTypes ] -> [ .ValTypes ]
             5 |-> [ i64  .ValTypes ] -> [ i64  .ValTypes ]
           </types>
-          <nextTypeIdx>
+          <nextTypeIdx> // DELETE
             6
           </nextTypeIdx>
-          <funcIds>
-            #freshId ( 0 ) |-> 7
-            $callDataCopy |-> 3
-            $do_balance |-> 8
-            $do_transfer |-> 9
-            $finish |-> 1
-            $getCallDataSize |-> 2
-            $getCaller |-> 6
-            $i64.reverse_bytes |-> 10
-            $revert |-> 0
-            $storageLoad |-> 4
-            $storageStore |-> 5
+          <funcIds> // SPECIALIZE
+            (#freshId ( 0 ) |-> 7)
+            (String2Identifier("$callDataCopy") |-> 3)
+            (String2Identifier("$do_balance") |-> 8)
+            (String2Identifier("$do_transfer") |-> 9)
+            (String2Identifier("$finish") |-> 1)
+            (String2Identifier("$getCallDataSize") |-> 2)
+            (String2Identifier("$getCaller") |-> 6)
+            (String2Identifier("$i64.reverse_bytes") |-> 10)
+            (String2Identifier("$revert") |-> 0)
+            (String2Identifier("$storageLoad") |-> 4)
+            (String2Identifier("$storageStore") |-> 5)
           </funcIds>
-          <funcAddrs>
-            0 |-> 0
-            1 |-> 1
-            2 |-> 2
-            3 |-> 3
-            4 |-> 4
-            5 |-> 5
-            6 |-> 6
-            7 |-> 7
-            8 |-> 8
-            9 |-> 9
-            10 |-> 10
+          <funcAddrs> // SPECIALIZE
+            (0 |-> 0)
+            (1 |-> 1)
+            (2 |-> 2)
+            (3 |-> 3)
+            (4 |-> 4)
+            (5 |-> 5)
+            (6 |-> 6)
+            (7 |-> 7)
+            (8 |-> 8)
+            (9 |-> 9)
+            (10 |-> 10)
           </funcAddrs>
-          <nextFuncIdx>
+          <nextFuncIdx> // DELETE
             11
-          </nextFuncIdx>
-          <tabIds>
+          </nextFuncIdx> // DELETE
+          <tabIds>   // DELETE
             .Map
           </tabIds>
-          <tabAddrs>
+          <tabAddrs> // DELETE
             .Map
           </tabAddrs>
           <memIds>
             #freshId ( 1 ) |-> 0
           </memIds>
           <memAddrs>
-            0 |-> _17:Int
+            0 |-> CONTRACT_MEMORY_ADDR:Int
           </memAddrs>
-          <globIds>
+          <globIds> // DELETE
             .Map
           </globIds>
-          <globalAddrs>
+          <globalAddrs> // DELETE
             .Map
           </globalAddrs>
-          <nextGlobIdx>
+          <nextGlobIdx> // DELETE
             0
           </nextGlobIdx>
         </moduleInst>
       </moduleInstances>
-      <nextModuleIdx>
-        _12 +Int 1
+      <nextModuleIdx> // DELETE
+        CONTRACT_MODULE +Int 1
       </nextModuleIdx>
       <mainStore>
-        <funcs>
+        <funcs> // SPECIALIZE THE ADDRESSES
+        // REMOVE ALL UNNEEDED FUNCTIONS
           <funcDef>
             <fAddr>
               0
@@ -236,7 +238,7 @@ Config at node 208 is:
               [ .ValTypes ]
             </fLocal>
             <fModInst>
-              _12
+              CONTRACT_MODULE
             </fModInst>
           </funcDef> <funcDef>
             <fAddr>
@@ -252,7 +254,7 @@ Config at node 208 is:
               [ .ValTypes ]
             </fLocal>
             <fModInst>
-              _12
+              CONTRACT_MODULE
             </fModInst>
           </funcDef> <funcDef>
             <fAddr>
@@ -268,7 +270,7 @@ Config at node 208 is:
               [ .ValTypes ]
             </fLocal>
             <fModInst>
-              _12
+              CONTRACT_MODULE
             </fModInst>
           </funcDef> <funcDef>
             <fAddr>
@@ -284,7 +286,7 @@ Config at node 208 is:
               [ .ValTypes ]
             </fLocal>
             <fModInst>
-              _12
+              CONTRACT_MODULE
             </fModInst>
           </funcDef> <funcDef>
             <fAddr>
@@ -300,7 +302,7 @@ Config at node 208 is:
               [ .ValTypes ]
             </fLocal>
             <fModInst>
-              _12
+              CONTRACT_MODULE
             </fModInst>
           </funcDef> <funcDef>
             <fAddr>
@@ -316,7 +318,7 @@ Config at node 208 is:
               [ .ValTypes ]
             </fLocal>
             <fModInst>
-              _12
+              CONTRACT_MODULE
             </fModInst>
           </funcDef> <funcDef>
             <fAddr>
@@ -332,14 +334,14 @@ Config at node 208 is:
               [ .ValTypes ]
             </fLocal>
             <fModInst>
-              _12
+              CONTRACT_MODULE
             </fModInst>
           </funcDef> <funcDef>
             <fAddr>
               7
             </fAddr>
             <fCode>
-              block .TypeDecls block .TypeDecls call $getCallDataSize  i32 . const 4  i32 . ge_u  br_if 0  i32 . const 0  i32 . const 0  call $revert  br 1  .EmptyStmts end  i32 . const 0  i32 . const 0  i32 . const 4  call $callDataCopy  block .TypeDecls i32 . const 0  i32 . load  i32 . const 436376473  i32 . eq  i32 . eqz  br_if 0  call $do_balance  br 1  .EmptyStmts end  block .TypeDecls i32 . const 0  i32 . load  i32 . const 3181327709  i32 . eq  i32 . eqz  br_if 0  call $do_transfer  br 1  .EmptyStmts end  i32 . const 0  i32 . const 0  call $revert  .EmptyStmts end  .EmptyStmts
+              block .TypeDecls block .TypeDecls call String2Identifier("$getCallDataSize")  i32 . const 4  i32 . ge_u  br_if 0  i32 . const 0  i32 . const 0  call String2Identifier("$revert")  br 1  .EmptyStmts end  i32 . const 0  i32 . const 0  i32 . const 4  call String2Identifier("$callDataCopy")  block .TypeDecls i32 . const 0  i32 . load  i32 . const 436376473  i32 . eq  i32 . eqz  br_if 0  call String2Identifier("$do_balance")  br 1  .EmptyStmts end  block .TypeDecls i32 . const 0  i32 . load  i32 . const 3181327709  i32 . eq  i32 . eqz  br_if 0  call String2Identifier("$do_transfer")  br 1  .EmptyStmts end  i32 . const 0  i32 . const 0  call String2Identifier("$revert")  .EmptyStmts end  .EmptyStmts
             </fCode>
             <fType>
               [ .ValTypes ] -> [ .ValTypes ]
@@ -348,14 +350,14 @@ Config at node 208 is:
               [ .ValTypes ]
             </fLocal>
             <fModInst>
-              _12
+              CONTRACT_MODULE
             </fModInst>
           </funcDef> <funcDef>
             <fAddr>
               8
             </fAddr>
             <fCode>
-              block .TypeDecls block .TypeDecls call $getCallDataSize  i32 . const 24  i32 . eq  br_if 0  i32 . const 0  i32 . const 0  call $revert  br 1  .EmptyStmts end  i32 . const 0  i32 . const 4  i32 . const 20  call $callDataCopy  i32 . const 0  i32 . const 32  call $storageLoad  i32 . const 32  i32 . const 32  i64 . load  call $i64.reverse_bytes  i64 . store  i32 . const 32  i32 . const 8  call $finish  .EmptyStmts end  .EmptyStmts
+              block .TypeDecls block .TypeDecls call String2Identifier("$getCallDataSize")  i32 . const 24  i32 . eq  br_if 0  i32 . const 0  i32 . const 0  call String2Identifier("$revert")  br 1  .EmptyStmts end  i32 . const 0  i32 . const 4  i32 . const 20  call String2Identifier("$callDataCopy")  i32 . const 0  i32 . const 32  call String2Identifier("$storageLoad")  i32 . const 32  i32 . const 32  i32 . const 8  call String2Identifier("$finish")  .EmptyStmts end  .EmptyStmts
             </fCode>
             <fType>
               [ .ValTypes ] -> [ .ValTypes ]
@@ -364,14 +366,15 @@ Config at node 208 is:
               [ .ValTypes ]
             </fLocal>
             <fModInst>
-              _12
+              CONTRACT_MODULE
             </fModInst>
           </funcDef> <funcDef>
             <fAddr>
               9
             </fAddr>
             <fCode>
-              block .TypeDecls block .TypeDecls call $getCallDataSize  i32 . const 32  i32 . eq  br_if 0  i32 . const 0  i32 . const 0  call $revert  br 1  .EmptyStmts end  i32 . const 0  call $getCaller  i32 . const 32  i32 . const 4  i32 . const 20  call $callDataCopy  i32 . const 64  i32 . const 24  i32 . const 8  call $callDataCopy  i32 . const 64  i64 . load  call $i64.reverse_bytes  local.set 0  i32 . const 0  i32 . const 64  call $storageLoad  i32 . const 64  i64 . load  local.set 1  i32 . const 32  i32 . const 64  call $storageLoad  i32 . const 64  i64 . load  local.set 2  block .TypeDecls local.get 0  local.get 1  i64 . le_u  br_if 0  i32 . const 0  i32 . const 0  call $revert  br 1  .EmptyStmts end  local.get 1  local.get 0  i64 . sub  local.set 1  local.get 2  local.get 0  i64 . add  local.set 2  i32 . const 64  local.get 1  i64 . store  i32 . const 0  i32 . const 64  call $storageStore  i32 . const 64  local.get 2  i64 . store  i32 . const 32  i32 . const 64  call $storageStore  .EmptyStmts end  .EmptyStmts
+              _
+              // block .TypeDecls block .TypeDecls call String2Identifier("$getCallDataSize")  i32 . const 32  i32 . eq  br_if 0  i32 . const 0  i32 . const 0  call String2Identifier("$revert")  br 1  .EmptyStmts end  i32 . const 0  call String2Identifier("$getCaller")  i32 . const 32  i32 . const 4  i32 . const 20  call String2Identifier("$callDataCopy")  i32 . const 64  i32 . const 24  i32 . const 8  call String2Identifier("$callDataCopy")  i32 . const 64  i64 . load  call String2Identifier("$i64.reverse_bytes")  local.set 0  i32 . const 0  i32 . const 64  call String2Identifier("$storageLoad")  i32 . const 64  i64 . load  local.set 1  i32 . const 32  i32 . const 64  call String2Identifier("$storageLoad")  i32 . const 64  i64 . load  local.set 2  block .TypeDecls local.get 0  local.get 1  i64 . le_u  br_if 0  i32 . const 0  i32 . const 0  call String2Identifier("$revert")  br 1  .EmptyStmts end  local.get 1  local.get 0  i64 . sub  local.set 1  local.get 2  local.get 0  i64 . add  local.set 2  i32 . const 64  local.get 1  i64 . store  i32 . const 0  i32 . const 64  call String2Identifier("$storageStore")  i32 . const 64  local.get 2  i64 . store  i32 . const 32  i32 . const 64  call String2Identifier("$storageStore")  .EmptyStmts end  .EmptyStmts
             </fCode>
             <fType>
               [ .ValTypes ] -> [ .ValTypes ]
@@ -380,7 +383,7 @@ Config at node 208 is:
               [ i64  i64  i64  .ValTypes ]
             </fLocal>
             <fModInst>
-              _12
+              CONTRACT_MODULE
             </fModInst>
           </funcDef> <funcDef>
             <fAddr>
@@ -396,23 +399,24 @@ Config at node 208 is:
               [ i64  i64  .ValTypes ]
             </fLocal>
             <fModInst>
-              _12
+              CONTRACT_MODULE
             </fModInst>
           </funcDef>
+          // ADD ...
         </funcs>
-        <nextFuncAddr>
+        <nextFuncAddr> // DELETE
           11
         </nextFuncAddr>
-        <tabs>
-          _200
-        </tabs>
-        <nextTabAddr>
-          _210
-        </nextTabAddr>
+//      <tabs> // DELETE
+//        _200
+//      </tabs>
+//      <nextTabAddr> // DELETE
+//        _210
+//      </nextTabAddr>
         <mems>
           <memInst>
             <mAddr>
-              _17
+              CONTRACT_MEMORY_ADDR
             </mAddr>
             <mmax>
               .Int
@@ -421,27 +425,26 @@ Config at node 208 is:
               1
             </msize>
             <mdata>
-              ByteMap <| 0 |-> 153
-              1 |-> 147
-              2 |-> 2
-              3 |-> 26 |>
+              CONTRACT_MEMORY_BYTE_MAP => ?_
             </mdata>
           </memInst>
+          // ADD ...
         </mems>
-        <nextMemAddr>
-          _17 +Int 1
-        </nextMemAddr>
-        <globals>
-          _220
-        </globals>
-        <nextGlobAddr>
-          _230
-        </nextGlobAddr>
+//      <nextMemAddr> // DELETE
+//        CONTRACT_MEMORY_ADDR +Int 1
+//      </nextMemAddr>
+//      <globals> // DELETE
+//        _220
+//      </globals>
+//      <nextGlobAddr> // DELETE
+//        _230
+//      </nextGlobAddr>
+        ...
       </mainStore>
-      <deterministicMemoryGrowth>
+      <deterministicMemoryGrowth> // DELETE
         DotVar10
       </deterministicMemoryGrowth>
-      <nextFreshId>
+      <nextFreshId> // DELETE
         2
       </nextFreshId>
     </wasm>
@@ -449,27 +452,6 @@ Config at node 208 is:
       .ParamStack
     </paramstack>
   </ewasm>
-#And
-  {
-    0 <=Int 4 +Int lengthBytes ( ADDRESS ) andBool 4 +Int lengthBytes ( ADDRESS ) <Int 4294967296
-  #Equals
-    true
-  }
-#And
-  {
-    4 +Int lengthBytes ( ADDRESS ) >=Int 4
-  #Equals
-    true
-  }
-#And
-  {
-    4 <=Int 4 +Int lengthBytes ( ADDRESS )
-  #Equals
-    true
-  }
-#And
-  {
-    lengthBytes ( ADDRESS )
-  #Equals
-    20
-  }
+  requires lengthBytes(ADDRESS) ==Int 20
+
+endmodule
