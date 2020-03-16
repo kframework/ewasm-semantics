@@ -11,5 +11,51 @@ requires "kewasm-lemmas.k"
 module KEWASM-LEMMAS
   imports EWASM-TEST
   imports KWASM-LEMMAS
+```
+
+Bytes
+-----
+
+Call data and return data comes in the form of `Bytes`.
+Several arguments are passed in a single byte sequence, and are accessed with offsets.
+To reason about the byte data, the following rules are helpful.
+
+```k
+  rule lengthBytes(B1 +Bytes B2) => lengthBytes(B1) +Int lengthBytes(B2) [simplification]
+
+  rule substrBytes(B1 +Bytes B2, START, END)
+    => substrBytes(B1, START, END)
+    requires lengthBytes(B1) >=Int END
+    [simplification]
+
+  rule substrBytes(B1 +Bytes B2, START, END)
+    => substrBytes(B2, START -Int lengthBytes(B1), END -Int lengthBytes(B1))
+    requires lengthBytes(B1) <=Int START
+    [simplification]
+
+  rule substrBytes(B1 +Bytes B2, START, END)
+    => substrBytes(B1, START,                               lengthBytes(B1))
+       +Bytes
+       substrBytes(B2, START -Int lengthBytes(B1), END -Int lengthBytes(B1))
+    requires notBool (lengthBytes(B1) >=Int END)
+     andBool notBool (lengthBytes(B1) <=Int START)
+     [simplification]
+
+  rule substrBytes(B, 0, END) => B
+    requires lengthBytes(B) ==Int END
+   [simplification]
+```
+
+The following lemmas tell us that a sequence of bytes, interpreted as an integer, is withing certain limits.
+
+```k
+  rule Bytes2Int(BS, _, _)  <Int N => true
+   requires N >=Int (1 <<Int (lengthBytes(BS) *Int 8))
+   [simplification]
+
+  rule 0 <=Int Bytes2Int(_, _, Unsigned) => true [simplification]
+```
+
+```k
 endmodule
 ```
