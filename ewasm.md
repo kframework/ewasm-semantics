@@ -264,7 +264,10 @@ Traps if `DATAOFFSET` + `LENGTH` exceeds the length of the call data.
     rule <k> eei.callDataCopy => #waiting(eei.callDataCopy) ... </k>
          <eeiK> . => EEI.getCallData </eeiK>
 
-    rule <k> #waiting(eei.callDataCopy) => #storeEeiResult(RESULTPTR, substrBytes(CALLDATA, DATAPTR, DATAPTR +Int LENGTH)) ... </k>
+    rule <k> #waiting(eei.callDataCopy)
+          => #storeEeiResult(RESULTPTR, LENGTH, substrBytes(CALLDATA, DATAPTR, DATAPTR +Int LENGTH))
+             ...
+        </k>
          <locals>
            0 |-> <i32> RESULTPTR
            1 |-> <i32> DATAPTR
