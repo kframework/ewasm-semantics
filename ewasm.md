@@ -226,7 +226,7 @@ An exception in the EEI translates into a `trap` in Wasm.
 #### `getCaller`
 
 Load the caller address (20 bytes) into memory at the spcified location.
-Adresses are integer value numbers, and are stored little-endian in memory.
+Addresses are integer value numbers, and are stored little-endian in memory.
 
 ```k
     syntax HostCall ::= "eei.getCaller"
