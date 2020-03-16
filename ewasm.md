@@ -234,7 +234,7 @@ Addresses are integer value numbers, and are stored little-endian in memory.
     rule <k> eei.getCaller => #waiting(eei.getCaller) ... </k>
          <eeiK> . => EEI.getCaller </eeiK>
 
-    rule <k> #waiting(eei.getCaller) => #storeEeiResult(RESULTPTR, 20, ADDR) ... </k>
+    rule <k> #waiting(eei.getCaller) => #storeEeiResult(RESULTPTR, 20, ADDR:Int) ... </k>
          <locals> 0 |-> <i32> RESULTPTR </locals>
          <eeiK> #result(ADDR) => . </eeiK>
 ```
@@ -299,7 +299,7 @@ From the executing account's storage, load the 32 bytes stored at the index spec
          <paramstack> INDEX : .ParamStack => .ParamStack </paramstack>
          <eeiK> . => EEI.getAccountStorage INDEX </eeiK>
 
-    rule <k> #waiting(eei.storageLoad) => #storeEeiResult(RESULTPTR, 32, VALUE) ... </k>
+    rule <k> #waiting(eei.storageLoad) => #storeEeiResult(RESULTPTR, 32, VALUE:Int) ... </k>
          <locals> ... 1 |-> <i32> RESULTPTR ... </locals>
          <eeiK> #result(VALUE) => . </eeiK>
 ```
