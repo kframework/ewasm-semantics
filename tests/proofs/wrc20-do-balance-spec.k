@@ -19,46 +19,17 @@ module WRC20-DO-BALANCE-SPEC
         _ => EVMC_SUCCESS
       </statusCode>
       <returnData>
-      // b""
         _ => ?_ // What should this be exactly?
       </returnData>
       <callState>
-        <callDepth> // DELETE
-          0
-        </callDepth>
         <acct>
           CONTRACT_ADDR
         </acct>
-        <program> // DELETE
-          .Code
-        </program>
-        <caller> // DELETE
-          ACCTFROM
-        </caller>
         <callData>
           Int2Bytes(4, 436376473, LE) +Bytes ADDRESS
         </callData>
-        <callValue>  // DELETE
-          0
-        </callValue>
-        <gas> //DELETE
-          0
-        </gas>
+        ...
       </callState>
-      <callStack> //DELETE
-        .List
-      </callStack>
-      <substate> // DELETE
-        <selfDestruct>
-          .Set
-        </selfDestruct>
-        <log>
-          .List
-        </log>
-        <refund>
-          0
-        </refund>
-      </substate>
       <accounts>
         <account>
           <id>
@@ -79,82 +50,29 @@ module WRC20-DO-BALANCE-SPEC
         </account>
         // ADD ...
       </accounts>
-      <accountsStack> // DELETE
-        .List
-      </accountsStack>
-      <tx> // DELETE
-        <gasPrice>
-          0
-        </gasPrice>
-        <origin>
-          0
-        </origin>
-      </tx>
-      <block> // DELETE
-        <hashes>
-          .List
-        </hashes>
-        <coinbase>
-          0
-        </coinbase>
-        <difficulty>
-          0
-        </difficulty>
-        <number>
-          0
-        </number>
-        <gasLimit>
-          0
-        </gasLimit>
-        <timestamp>
-          0
-        </timestamp>
-      </block>
+      ...
     </eei>
     <wasm>
       <k>
-        call String2Identifier("$do_balance") // ~> br 1  .EmptyStmts ~> label [ .ValTypes ] { .EmptyStmts } .ValStack ~> block .TypeDecls i32 . const 0  i32 . load  i32 . const 3181327709  i32 . eq  i32 . eqz  br_if 0  call $do_transfer  br 1  .EmptyStmts end  i32 . const 0  i32 . const 0  call $revert  .EmptyStmts ~> label [ .ValTypes ] { .EmptyStmts } .ValStack ~> label [ .ValTypes ] { .EmptyStmts } .ValStack ~> frame CONTRACT_MODULE .ValTypes .ValStack .Map 0 .Map
-        => #cleanup
+        call String2Identifier("$do_balance") => #cleanup ...
       </k>
-      <valstack>
-        .ValStack
-      </valstack>
       <curFrame>
         <locals>
           _ => ?_
-          //.Map
         </locals>
-        <localIds> // DELETE
-          .Map
-        </localIds>
         <curModIdx>
           CONTRACT_MODULE:Int
         </curModIdx>
-        <labelDepth> // DELETE
+        <labelDepth>
           _ => ?_
         </labelDepth>
-        <labelIds> // DELETE
-          .Map
-        </labelIds>
+        ...
       </curFrame>
-      <moduleRegistry> // DELETE
-        .Map
-      </moduleRegistry>
-      <moduleIds> // DELETE
-        .Map
-      </moduleIds>
       <moduleInstances>
         <moduleInst>
           <modIdx>
             CONTRACT_MODULE
           </modIdx>
-          <exports> // DELETE
-            "main" |-> #freshId ( 0 )
-            "memory" |-> #freshId ( 1 )
-          </exports>
-          <typeIds> // DELETE
-            .Map
-          </typeIds>
           <types> // SPECIALIZE
             0 |-> [ i32  i32  .ValTypes ] -> [ .ValTypes ]
             1 |-> [ .ValTypes ] -> [ i32  .ValTypes ]
@@ -163,9 +81,6 @@ module WRC20-DO-BALANCE-SPEC
             4 |-> [ .ValTypes ] -> [ .ValTypes ]
             5 |-> [ i64  .ValTypes ] -> [ i64  .ValTypes ]
           </types>
-          <nextTypeIdx> // DELETE
-            6
-          </nextTypeIdx>
           <funcIds> // SPECIALIZE
             (#freshId ( 0 ) |-> 7)
             (String2Identifier("$callDataCopy") |-> 3)
@@ -192,35 +107,15 @@ module WRC20-DO-BALANCE-SPEC
             (9 |-> 9)
             (10 |-> 10)
           </funcAddrs>
-          <nextFuncIdx> // DELETE
-            11
-          </nextFuncIdx> // DELETE
-          <tabIds>   // DELETE
-            .Map
-          </tabIds>
-          <tabAddrs> // DELETE
-            .Map
-          </tabAddrs>
           <memIds>
             #freshId ( 1 ) |-> 0
           </memIds>
           <memAddrs>
             0 |-> CONTRACT_MEMORY_ADDR:Int
           </memAddrs>
-          <globIds> // DELETE
-            .Map
-          </globIds>
-          <globalAddrs> // DELETE
-            .Map
-          </globalAddrs>
-          <nextGlobIdx> // DELETE
-            0
-          </nextGlobIdx>
+          ...
         </moduleInst>
       </moduleInstances>
-      <nextModuleIdx> // DELETE
-        CONTRACT_MODULE +Int 1
-      </nextModuleIdx>
       <mainStore>
         <funcs> // SPECIALIZE THE ADDRESSES
         // REMOVE ALL UNNEEDED FUNCTIONS
@@ -404,15 +299,6 @@ module WRC20-DO-BALANCE-SPEC
           </funcDef>
           // ADD ...
         </funcs>
-        <nextFuncAddr> // DELETE
-          11
-        </nextFuncAddr>
-//      <tabs> // DELETE
-//        _200
-//      </tabs>
-//      <nextTabAddr> // DELETE
-//        _210
-//      </nextTabAddr>
         <mems>
           <memInst>
             <mAddr>
@@ -430,23 +316,9 @@ module WRC20-DO-BALANCE-SPEC
           </memInst>
           // ADD ...
         </mems>
-//      <nextMemAddr> // DELETE
-//        CONTRACT_MEMORY_ADDR +Int 1
-//      </nextMemAddr>
-//      <globals> // DELETE
-//        _220
-//      </globals>
-//      <nextGlobAddr> // DELETE
-//        _230
-//      </nextGlobAddr>
         ...
       </mainStore>
-      <deterministicMemoryGrowth> // DELETE
-        DotVar10
-      </deterministicMemoryGrowth>
-      <nextFreshId> // DELETE
-        2
-      </nextFreshId>
+      ...
     </wasm>
     <paramstack>
       .ParamStack
