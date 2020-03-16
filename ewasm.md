@@ -164,19 +164,37 @@ The following function helps with this task.
 All byte values in Ewasm are a number of bytes divisible by 4, the same number of bytes as an i32, so storage will happen in increments of 4 bytes.
 Numbers are stored little-endian in Wasm, so that's the convention that's used when converting bytes to an integer, to ensure the bytes end up as given in memory.
 
+TODO: Try changing the Bytes version back, it is simpler.
+
 ```k
-    syntax Instrs ::= #storeEeiResult(Int, Int, Int) [function]
-                    | #storeEeiResult(Int, Bytes)    [function, klabel(storeEeiResultsBytes)]
- // -----------------------------------------------------------------------------------------
+    syntax Instrs ::= #storeEeiResult(Int, Int, Int)   [function]
+                    | #storeEeiResult(Int, Int, Bytes) [function, klabel(storeEeiResultsBytes)]
+ // -------------------------------------------------------------------------------------------
+    rule #storeEeiResult(STARTIDX, LENGTHBYTES, VALUE)
+      => (i32.const STARTIDX) (i64.const VALUE) (i64.store)
+         #storeEeiResult(STARTIDX +Int 8, LENGTHBYTES -Int 8, VALUE /Int (1 <<Int 64))
+      requires LENGTHBYTES >=Int 8
+
+    rule #storeEeiResult(STARTIDX, LENGTHBYTES, VALUE)
+      => (i32.const STARTIDX) (i32.const VALUE) (i32.store)
+         #storeEeiResult(STARTIDX +Int 4, LENGTHBYTES -Int 4, VALUE /Int (1 <<Int 32))
+      requires (notBool LENGTHBYTES >=Int 8)
+       andBool          LENGTHBYTES >=Int 4
+
     rule #storeEeiResult(STARTIDX, LENGTHBYTES, VALUE)
       => (i32.const STARTIDX) (i32.const VALUE) (i32.store8)
-         #storeEeiResult(STARTIDX +Int 1, LENGTHBYTES -Int 1, VALUE /Int 256)
-      requires LENGTHBYTES =/=Int 0
-    rule #storeEeiResult(_, LENGTHBYTES, _) => .Instrs
-      requires LENGTHBYTES  ==Int 0
+         #storeEeiResult(STARTIDX +Int 1, LENGTHBYTES -Int 1, VALUE /Int (1 <<Int 8))
+      requires (notBool LENGTHBYTES >=Int 8)
+       andBool (notBool LENGTHBYTES >=Int 4)
+       andBool (notBool LENGTHBYTES ==Int 0)
 
-    rule #storeEeiResult(STARTIDX, BS:Bytes)
-      => #storeEeiResult(STARTIDX, lengthBytes(BS), Bytes2Int(BS, LE, Unsigned))
+    rule #storeEeiResult(_, LENGTHBYTES, _:Int) => .Instrs
+      requires (notBool LENGTHBYTES >=Int 8)
+       andBool (notBool LENGTHBYTES >=Int 4)
+       andBool          LENGTHBYTES ==Int 0
+
+    rule #storeEeiResult(STARTIDX, LENGTH, BS:Bytes)
+      => #storeEeiResult(STARTIDX, LENGTH, Bytes2Int(BS, LE, Unsigned))
 ```
 
 The Wasm engine needs to not make any further progress while waiting for the EEI, since they are not meant to execute concurrently.
