@@ -167,31 +167,10 @@ Numbers are stored little-endian in Wasm, so that's the convention that's used w
 TODO: Try changing the Bytes version back, it is simpler.
 
 ```k
-    syntax Instrs ::= #storeEeiResult(Int, Int, Int)   [function]
-                    | #storeEeiResult(Int, Int, Bytes) [function, klabel(storeEeiResultsBytes)]
+    syntax Instr ::= #storeEeiResult(Int, Int, Int)   [function]
+                   | #storeEeiResult(Int, Int, Bytes) [function, klabel(storeEeiResultsBytes)]
  // -------------------------------------------------------------------------------------------
-    rule #storeEeiResult(STARTIDX, LENGTHBYTES, VALUE)
-      => (i32.const STARTIDX) (i64.const VALUE) (i64.store)
-         #storeEeiResult(STARTIDX +Int 8, LENGTHBYTES -Int 8, VALUE /Int (1 <<Int 64))
-      requires LENGTHBYTES >=Int 8
-
-    rule #storeEeiResult(STARTIDX, LENGTHBYTES, VALUE)
-      => (i32.const STARTIDX) (i32.const VALUE) (i32.store)
-         #storeEeiResult(STARTIDX +Int 4, LENGTHBYTES -Int 4, VALUE /Int (1 <<Int 32))
-      requires (notBool LENGTHBYTES >=Int 8)
-       andBool          LENGTHBYTES >=Int 4
-
-    rule #storeEeiResult(STARTIDX, LENGTHBYTES, VALUE)
-      => (i32.const STARTIDX) (i32.const VALUE) (i32.store8)
-         #storeEeiResult(STARTIDX +Int 1, LENGTHBYTES -Int 1, VALUE /Int (1 <<Int 8))
-      requires (notBool LENGTHBYTES >=Int 8)
-       andBool (notBool LENGTHBYTES >=Int 4)
-       andBool (notBool LENGTHBYTES ==Int 0)
-
-    rule #storeEeiResult(_, LENGTHBYTES, _:Int) => .Instrs
-      requires (notBool LENGTHBYTES >=Int 8)
-       andBool (notBool LENGTHBYTES >=Int 4)
-       andBool          LENGTHBYTES ==Int 0
+    rule #storeEeiResult(STARTIDX, LENGTHBYTES, VALUE) => store { LENGTHBYTES STARTIDX VALUE }
 
     rule #storeEeiResult(STARTIDX, LENGTH, BS:Bytes)
       => #storeEeiResult(STARTIDX, LENGTH, Bytes2Int(BS, LE, Unsigned))
