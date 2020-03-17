@@ -49,11 +49,23 @@ To reason about the byte data, the following rules are helpful.
 The following lemmas tell us that a sequence of bytes, interpreted as an integer, is withing certain limits.
 
 ```k
-  rule Bytes2Int(BS, _, _)  <Int N => true
+  rule Bytes2Int(BS, _, _) <Int N => true
    requires N >=Int (1 <<Int (lengthBytes(BS) *Int 8))
    [simplification]
 
   rule 0 <=Int Bytes2Int(_, _, Unsigned) => true [simplification]
+```
+
+When a value is within the range it is being wrapped to, we can remove the wrapping.
+
+```k
+// TODO: We should be able to remove this one, it combines the two above and the one below.
+  rule #wrap(BITLENGTH, Bytes2Int(BS, SIGN, Unsigned)) => Bytes2Int(BS, SIGN, Unsigned)
+    requires lengthBytes(BS) *Int 8 <=Int BITLENGTH
+    [simplification]
+
+    rule #wrap(WIDTH, N) => N requires 0 <=Int N andBool N <Int (1 <<Int WIDTH) [simplification]
+
 ```
 
 ```k
