@@ -35,9 +35,6 @@ module WRC20-DO-BALANCE-SPEC
           <id>
             CONTRACT_ADDR
           </id>
-          <balance>
-            0
-          </balance>
           <code>
             CONTRACT_MODULE:Int
           </code>
@@ -45,9 +42,7 @@ module WRC20-DO-BALANCE-SPEC
             (Bytes2Int (ADDRESS, LE, Unsigned) |-> BALANCE:Int)
             CONTRACT_STORAGE
           </storage>
-          <nonce>
-            0
-          </nonce>
+          ...
         </account>
         // ADD ...
       </accounts>
