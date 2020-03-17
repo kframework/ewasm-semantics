@@ -126,7 +126,7 @@ run_command="$1"; shift
 [[ ! -z ${1:-} ]] || usage_fatal "Must supply a file to work on."
 
 backend="llvm"
-[[ ! "$run_command" == 'prove' ]] || backend='java'
+[[ ! "$run_command" == 'prove' ]] || backend='haskell'
 [[ ! "$run_command" =~ klab*   ]] || backend='java'
 if [[ $# -gt 1 ]] && [[ $1 == '--backend' ]] || [[ $1 == '--definition' ]]; then
     backend="${2#wasm-}"
