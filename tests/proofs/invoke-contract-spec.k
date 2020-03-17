@@ -88,9 +88,12 @@ module INVOKE-CONTRACT-SPEC
         </block>
       </eei>
       <wasm>
-        <k> #createContract CONTRACT_ADDR:Int #wrc20
-         ~> #invokeContract ACCTFROM:Int CONTRACT_ADDR:Int
-                            (Int2Bytes(4, 436376473, LE) +Bytes ADDRESS:Bytes ) => .
+        <k>
+    #createContract CONTRACT_ADDR:Int
+    (module
+      ( memory ( export #unparseWasmString("\"memory\"") ) 1 )
+      (func String2Identifier("$main") ( export #unparseWasmString("\"main\"") ) .TypeDecls .LocalDecls .Instrs
+      )) ~> #invokeContract ACCTFROM:Int CONTRACT_ADDR:Int CALLDATA:Bytes => .
         </k>
         <valstack>
           .ValStack
@@ -129,7 +132,7 @@ module INVOKE-CONTRACT-SPEC
            .Bag => ?_
           </funcs>
           <nextFuncAddr>
-           0 => ?_
+           _ => ?_
           </nextFuncAddr>
           <mems>
            .Bag => ?_
@@ -148,6 +151,6 @@ module INVOKE-CONTRACT-SPEC
         .ParamStack
       </paramstack>
     </ewasm>
-    requires lengthBytes(ADDRESS) ==Int 20
+    requires true
     ensures true
 endmodule
