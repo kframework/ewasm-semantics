@@ -19,7 +19,7 @@ module WRC20-DO-BALANCE-SPEC
         _ => EVMC_SUCCESS
       </statusCode>
       <returnData>
-        _ => ?_ // What should this be exactly?
+        _ => Int2Bytes(8, BALANCE, LE)
       </returnData>
       <callState>
         <acct>
@@ -42,7 +42,8 @@ module WRC20-DO-BALANCE-SPEC
             CONTRACT_MODULE:Int
           </code>
           <storage>
-           WRC20_CONTRACT_STORAGE
+            (Bytes2Int (ADDRESS, LE, Unsigned) |-> BALANCE:Int)
+            CONTRACT_STORAGE
           </storage>
           <nonce>
             0
@@ -311,7 +312,7 @@ module WRC20-DO-BALANCE-SPEC
               1
             </msize>
             <mdata>
-              CONTRACT_MEMORY_BYTE_MAP => ?_
+              ByteMap <| .Map |> => ?_
             </mdata>
           </memInst>
           // ADD ...
@@ -325,5 +326,7 @@ module WRC20-DO-BALANCE-SPEC
     </paramstack>
   </ewasm>
   requires lengthBytes(ADDRESS) ==Int 20
+   andBool #inUnsignedRange(i64, BALANCE)
+
 
 endmodule
