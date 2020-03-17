@@ -60,6 +60,8 @@ When a value is within the range it is being wrapped to, we can remove the wrapp
 
 ```k
 // TODO: We should be able to remove this one, it combines the two above and the one below.
+// But the proof crashes when I try.
+// Figure out why.
   rule #wrap(BITLENGTH, Bytes2Int(BS, ENDIAN, Unsigned)) => Bytes2Int(BS, ENDIAN, Unsigned)
     requires lengthBytes(BS) *Int 8 <=Int BITLENGTH
     [simplification]
