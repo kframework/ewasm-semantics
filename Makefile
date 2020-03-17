@@ -191,7 +191,6 @@ test-simple: $(simple_tests:=.run)
 ### Proof Tests
 
 proof_tests:=$(wildcard tests/proofs/*-spec.k)
-slow_proof_tests:=tests/proofs/loops-spec.k
 quick_proof_tests:=$(filter-out $(slow_proof_tests), $(proof_tests))
 
 test-prove: $(proof_tests:=.prove)
