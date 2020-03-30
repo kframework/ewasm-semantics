@@ -171,9 +171,8 @@ Numbers are stored little-endian in Wasm, so that's the convention that's used w
     rule #storeEeiResult(STARTIDX, LENGTHBYTES, VALUE)
       => (i32.const STARTIDX) (i32.const VALUE) (i32.store8)
          #storeEeiResult(STARTIDX +Int 1, LENGTHBYTES -Int 1, VALUE /Int 256)
-      requires LENGTHBYTES =/=Int 0
-    rule #storeEeiResult(_, LENGTHBYTES, _) => .Instrs
-      requires LENGTHBYTES  ==Int 0
+      requires LENGTHBYTES >Int 0
+    rule #storeEeiResult(_, 0, _) => .Instrs
 
     rule #storeEeiResult(STARTIDX, BS:Bytes)
       => #storeEeiResult(STARTIDX, lengthBytes(BS), Bytes2Int(BS, LE, Unsigned))

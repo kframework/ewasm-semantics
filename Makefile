@@ -40,11 +40,11 @@ clean:
 # Build Dependencies (K Submodule)
 # --------------------------------
 
-wasm_files=test.k wasm.k data.k kwasm-lemmas.k
+wasm_files=test.k wasm.k data.k
 wasm_source_files:=$(patsubst %, $(wasm_submodule)/%, $(patsubst %.k, %.md, $(wasm_files)))
 eei_files:=eei.k
 eei_source_files:=$(patsubst %, $(eei_submodule)/%, $(patsubst %.k, %.md, $(eei_files)))
-ewasm_files:=ewasm-test.k driver.k ewasm.k kewasm-lemmas.k
+ewasm_files:=ewasm-test.k driver.k ewasm.k
 all_k_files:=$(ewasm_files) $(wasm_files) $(eei_files)
 
 deps: $(wasm_submodule)/make.timestamp $(eei_submodule)/make.timestamp definition-deps
@@ -147,9 +147,9 @@ $(haskell_kompiled): $(haskell_defn)
 # -------
 
 TEST_CONCRETE_BACKEND:=llvm
-TEST_SYMBOLIC_BACKEND:=haskell
+TEST_SYMBOLIC_BACKEND:=java
 TEST:=./kewasm
-KPROVE_MODULE:=KEWASM-LEMMAS
+KPROVE_MODULE:=KWASM-LEMMAS
 CHECK:=git --no-pager diff --no-index --ignore-all-space
 
 tests/%/make.timestamp:
