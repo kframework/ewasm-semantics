@@ -122,7 +122,7 @@ From the `#gatheredCall`, the parameters on the stack can be consumed and passed
  // ----------------------------------------------------
 
     syntax Instrs ::= "#gatherParams" "(" HostCall "," MemoryVariables ")"
- // --------------------------------------------------
+ // ----------------------------------------------------------------------
     rule <k> #gatherParams(HC,            .MemoryVariables) => #gatheredCall(HC)     ... </k>
     rule <k> #gatherParams(HC, (IDX, LEN) MS              ) => #gatherParams(HC, MS) ... </k>
          <paramstack> PSTACK => #getRange(DATA , IDX, LEN) : PSTACK </paramstack>
