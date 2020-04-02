@@ -39,8 +39,8 @@ module WRC20-DO-BALANCE-SPEC
             CONTRACT_MODULE:Int
           </code>
           <storage>
-            (Bytes2Int (ADDRESS, LE, Unsigned) |-> BALANCE:Int)
-            CONTRACT_STORAGE
+            Bytes2Int(ADDRESS, LE, Unsigned) |-> BALANCE:Int
+            CONTRACT_STORAGE:Map
           </storage>
           ...
         </account>
