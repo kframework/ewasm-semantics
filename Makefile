@@ -149,8 +149,12 @@ $(haskell_kompiled): $(haskell_defn)
 TEST_CONCRETE_BACKEND:=llvm
 TEST_SYMBOLIC_BACKEND:=java
 TEST:=./kewasm
-KPROVE_MODULE:=KWASM-LEMMAS
+KPROVE_MODULE:=KEWASM-LEMMAS
 CHECK:=git --no-pager diff --no-index --ignore-all-space
+haskell_backend_dir:=$(k_submodule)/haskell-backend/src/main/native/haskell-backend
+repl_bin_dir:=$(shell cd $(haskell_backend_dir) ; stack path --local-install-root)/bin
+
+tests/proofs/wrc20-do-balance-spec.k.%: KPROVE_MODULE=VERIFICATION
 
 tests/%/make.timestamp:
 	@echo "== submodule: $@"
@@ -179,6 +183,22 @@ tests/%.prove: tests/%
 
 tests/%.klab-prove: tests/%
 	$(TEST) klab-prove --backend $(TEST_SYMBOLIC_BACKEND) $< --format-failures --def-module $(KPROVE_MODULE)
+
+# For some reason, kprove needs to run inside the actual Haskell definition directory.
+# So we need to `cd` in and do `abspath` to get the correct names.
+tests/%.repl-script: tests/%
+	cd $(haskell_dir) && $(abspath $(k_bin)/kprove)                                                               \
+  -d . -m $(KPROVE_MODULE) --debug --dry-run                                                                    \
+  --haskell-backend-command '$(abspath $(repl_bin_dir))/kore-repl --repl-script $(abspath $(haskell_backend_dir))/dist/kast.kscript'  \
+  $(abspath $<)                    \
+  > $(abspath $@)
+
+# TODO: Exiting the REPL causes an abnormal exit.
+# So if we call this rule directly, the repl-script will get rebuilt every time.
+# One can save time by first calling %.repl-script and then %.run-repl, but ideally saving the script would be automatic.
+tests/%.run-repl: tests/%.repl-script
+	cd $(haskell_dir) && sh $(abspath $<)
+
 
 ### Execution Tests
 
