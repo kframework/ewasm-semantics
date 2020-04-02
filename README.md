@@ -5,10 +5,19 @@ K Semantics of Ewasm
 
 Prototype semantics of [Ewasm](https://github.com/ewasm/design) in the K framework.
 
-```
+```sh
 git submodule update --init --recursive
 make deps
 make build
+```
+
+# Proving
+
+Run proofs using `make` rules.
+
+```sh
+make tests/proofs/example-spec.k.prove     # Runs the proof for the spec in tests/proofs/example-spec.k.prove.
+make tests/proofs/example-spec.k.run-repl  # Starts an interactive REPL for running the same proof.
 ```
 
 # Structure
