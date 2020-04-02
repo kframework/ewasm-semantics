@@ -1,3 +1,8 @@
+### Support KEwasm development
+[Contribute to our Gitcoin Grant](https://gitcoin.co/grants/592/kewasm-and-kwasm)
+
+---
+
 K Semantics of Ewasm
 ====================
 
