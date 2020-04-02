@@ -16,7 +16,7 @@ module WRC20-DO-BALANCE-SPEC
         .
       </eeiK>
       <statusCode>
-        _ => EVMC_SUCCESS
+        .StatusCode => EVMC_SUCCESS
       </statusCode>
       <returnData>
         _ => Int2Bytes(8, BALANCE, LE)
