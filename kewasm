@@ -58,7 +58,7 @@ run_prove() {
     if $debug; then
         haskell_backend_command="$k_release_dir/bin/kore-repl --repl-script $ewasm_dir/kast.kscript"
     fi
-    kprove --directory "$backend_dir" "$run_file" "$@" --haskell-backend-command "$haskell_backend_command"
+    kprove --directory "$backend_dir" "$run_file" "$@" --haskell-backend-command "$haskell_backend_command" --debug
 }
 
 run_klab() {
