@@ -8,6 +8,7 @@ wasm_dir="${WASM_DIR:-$ewasm_dir/deps/wasm-semantics}"
 build_dir="$ewasm_dir/.build"
 defn_dir="$build_dir/defn"
 lib_dir="$build_dir/local/lib"
+haskell_backend_dir="$wasm_dir/deps/k/haskell-backend/src/main/native/haskell-backend"
 k_release_dir="${K_RELEASE:-$wasm_dir/deps/k/k-distribution/target/release/k}"
 
 export PATH="$k_release_dir/lib/native/linux:$k_release_dir/lib/native/linux64:$k_release_dir/bin/:$PATH"
@@ -53,7 +54,11 @@ run_kast() {
 
 run_prove() {
     export K_OPTS=-Xmx8G
-    kprove --directory "$backend_dir" "$run_file" "$@"
+    haskell_backend_command="$k_release_dir/bin/kore-exec"
+    if $debug; then
+        haskell_backend_command="$k_release_dir/bin/kore-repl --repl-script $haskell_backend_dir/dist/kast.kscript"
+    fi
+    kprove --directory "$backend_dir" "$run_file" "$@" --haskell-backend-command "$haskell_backend_command"
 }
 
 run_klab() {
@@ -87,12 +92,12 @@ view_klab() {
 
 usage() {
     echo "
-    usage: $0 run        [--backend (llvm|java|haskell)] <pgm>  <K args>*
-           $0 kast       [--backend (llvm|java)]         <pgm>  <output format> <K args>*
-           $0 prove      [--backend (java|haskell)]       <spec> <K args>* -m <def_module>
-           $0 klab-run                                    <pgm>  <K arg>*
-           $0 klab-prove                                  <spec> <K arg>* -m <def_module>
-           $0 klab-view                                   [<pgm>|<spec>]
+    usage: $0 run        [--backend (llvm|java|haskell)]      <pgm>  <K args>*
+           $0 kast       [--backend (llvm|java)]              <pgm>  <output format> <K args>*
+           $0 prove      [--backend (java|haskell)] [--debug] <spec> <K args>* -m <def_module>
+           $0 klab-run                                        <pgm>  <K arg>*
+           $0 klab-prove                                      <spec> <K arg>* -m <def_module>
+           $0 klab-view                                       [<pgm>|<spec>]
 
        $0 run   : Run a single WebAssembly program
        $0 kast  : Parse a single WebAssembly program and output it in supported format
@@ -126,14 +131,22 @@ run_command="$1"; shift
 [[ ! -z ${1:-} ]] || usage_fatal "Must supply a file to work on."
 
 backend="llvm"
-[[ ! "$run_command" == 'prove' ]] || backend='java'
+debug=false
+[[ ! "$run_command" == 'prove' ]] || backend='haskell'
 [[ ! "$run_command" =~ klab*   ]] || backend='java'
-if [[ $# -gt 1 ]] && [[ $1 == '--backend' ]] || [[ $1 == '--definition' ]]; then
-    backend="${2#wasm-}"
-    shift 2
-fi
+args=()
+while [[ $# -gt 0 ]]; do
+    arg="$1"
+    case $arg in
+        --backend)    args+=("$arg" "$2") ; backend="$2"      ; shift 2 ;;
+        --debug)      args+=("$arg")      ; debug=true        ; shift   ;;
+        *)            break                                             ;;
+    esac
+done
+
+[[ ! $debug ]] || [[ "$backend" == "haskell" ]] || fatal "Debug option only available for Haskell backend."
+
 backend_dir="$defn_dir/$backend"
-[[ ! "$backend" == "llvm" ]] || eval $(opam config env)
 
 # get the run file
 [[ ! -z ${1:-} ]] || usage_fatal "Must supply a file to run on."
