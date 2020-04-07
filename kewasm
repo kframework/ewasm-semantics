@@ -56,7 +56,7 @@ run_prove() {
     export K_OPTS=-Xmx8G
     haskell_backend_command="$k_release_dir/bin/kore-exec"
     if $debug; then
-        haskell_backend_command="$k_release_dir/bin/kore-repl --repl-script $haskell_backend_dir/dist/kast.kscript"
+        haskell_backend_command="$k_release_dir/bin/kore-repl --repl-script $ewasm_dir/kast.kscript"
     fi
     kprove --directory "$backend_dir" "$run_file" "$@" --haskell-backend-command "$haskell_backend_command"
 }
