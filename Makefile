@@ -184,21 +184,8 @@ tests/%.prove: tests/%
 tests/%.klab-prove: tests/%
 	$(TEST) klab-prove --backend $(TEST_SYMBOLIC_BACKEND) $< --format-failures --def-module $(KPROVE_MODULE)
 
-# For some reason, kprove needs to run inside the actual Haskell definition directory.
-# So we need to `cd` in and do `abspath` to get the correct names.
-tests/%.repl-script: tests/%
-	cd $(haskell_dir) && $(abspath $(k_bin)/kprove)                                                               \
-  -d . -m $(KPROVE_MODULE) --debug --dry-run                                                                    \
-  --haskell-backend-command '$(abspath $(repl_bin_dir))/kore-repl --repl-script $(abspath $(haskell_backend_dir))/dist/kast.kscript'  \
-  $(abspath $<)                    \
-  > $(abspath $@)
-
-# TODO: Exiting the REPL causes an abnormal exit.
-# So if we call this rule directly, the repl-script will get rebuilt every time.
-# One can save time by first calling %.repl-script and then %.run-repl, but ideally saving the script would be automatic.
-tests/%.run-repl: tests/%.repl-script
-	cd $(haskell_dir) && sh $(abspath $<)
-
+tests/%.prove-repl: tests/%
+	$(TEST) prove --backend $(TEST_SYMBOLIC_BACKEND) --debug $< --format-failures --def-module $(KPROVE_MODULE)
 
 ### Execution Tests
 
