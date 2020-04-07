@@ -151,10 +151,6 @@ TEST_SYMBOLIC_BACKEND:=java
 TEST:=./kewasm
 KPROVE_MODULE:=KEWASM-LEMMAS
 CHECK:=git --no-pager diff --no-index --ignore-all-space
-haskell_backend_dir:=$(k_submodule)/haskell-backend/src/main/native/haskell-backend
-repl_bin_dir:=$(shell cd $(haskell_backend_dir) ; stack path --local-install-root)/bin
-
-tests/proofs/wrc20-do-balance-spec.k.%: KPROVE_MODULE=VERIFICATION
 
 tests/%/make.timestamp:
 	@echo "== submodule: $@"
