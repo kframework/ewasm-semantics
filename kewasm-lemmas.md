@@ -65,8 +65,10 @@ When a value is within the range it is being wrapped to, we can remove the wrapp
     rule #wrap(BITLENGTH, Bytes2Int(BS, ENDIAN, Unsigned)) => Bytes2Int(BS, ENDIAN, Unsigned)
       requires lengthBytes(BS) *Int 8 <=Int BITLENGTH
       [simplification]
+```
 
-    rule #wrap(WIDTH, N) => N requires 0 <=Int N andBool N <Int (1 <<Int WIDTH) [simplification]
+```k
+    rule Bytes2Int ( ADDRESS , LE , Unsigned ) in_keys ( (Bytes2Int ( ADDRESS , LE , Unsigned ) |-> BALANCE:Int) CONTRACT_STORAGE ) => true [simplification]
 ```
 
 ```k
