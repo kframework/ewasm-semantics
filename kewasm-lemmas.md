@@ -68,7 +68,7 @@ When a value is within the range it is being wrapped to, we can remove the wrapp
 ```
 
 ```k
-    rule Bytes2Int ( ADDRESS , LE , Unsigned ) in_keys ( (Bytes2Int ( ADDRESS , LE , Unsigned ) |-> BALANCE:Int) CONTRACT_STORAGE ) => true [simplification]
+    rule K in_keys ((K |-> _) M) => true [simplification]
 ```
 
 ```k
