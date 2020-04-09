@@ -86,18 +86,19 @@ module WRC20-DO-BALANCE-SPEC
             (String2Identifier("$do_balance")      |-> 8)
             FUNCS:Map
           </funcIds>
-          <funcAddrs> // SPECIALIZE
-            (0 |-> 0)
-            (1 |-> 1)
-            (2 |-> 2)
-            (3 |-> 3)
-            (4 |-> 4)
-            (5 |-> 5)
-            (6 |-> 6)
-            (7 |-> 7)
-            (8 |-> 8)
-            (9 |-> 9)
-            (10 |-> 10)
+          <funcAddrs> // TODO: Remove unused functions from storage as well
+            (0 |-> REVERT_ADDR)
+            (1 |-> FINISH_ADDR)
+            (2 |-> GET_CALL_DATA_SIZE_ADDR)
+            (3 |-> CALL_DATA_COPY_ADDR)
+            (4 |-> STORAGE_LOAD_ADDR)
+//          (5 |-> 5)
+//          (6 |-> 6)
+//          (7 |-> 7)
+            (8 |-> DO_BALANCE_ADDR)
+//          (9 |-> 9)
+//          (10 |-> 10)
+            FUNC_ADDRS:Map
           </funcAddrs>
           <memIds>
             #freshId ( 1 ) |-> 0
@@ -113,7 +114,7 @@ module WRC20-DO-BALANCE-SPEC
         // REMOVE ALL UNNEEDED FUNCTIONS
           <funcDef>
             <fAddr>
-              0
+              REVERT_ADDR
             </fAddr>
             <fCode>
               eei.revert  .EmptyStmts
@@ -129,7 +130,7 @@ module WRC20-DO-BALANCE-SPEC
             </fModInst>
           </funcDef> <funcDef>
             <fAddr>
-              1
+              FINISH_ADDR
             </fAddr>
             <fCode>
               eei.finish  .EmptyStmts
@@ -145,7 +146,7 @@ module WRC20-DO-BALANCE-SPEC
             </fModInst>
           </funcDef> <funcDef>
             <fAddr>
-              2
+              GET_CALL_DATA_SIZE_ADDR
             </fAddr>
             <fCode>
               eei.getCallDataSize  .EmptyStmts
@@ -161,7 +162,7 @@ module WRC20-DO-BALANCE-SPEC
             </fModInst>
           </funcDef> <funcDef>
             <fAddr>
-              3
+              CALL_DATA_COPY_ADDR
             </fAddr>
             <fCode>
               eei.callDataCopy  .EmptyStmts
@@ -177,7 +178,7 @@ module WRC20-DO-BALANCE-SPEC
             </fModInst>
           </funcDef> <funcDef>
             <fAddr>
-              4
+              STORAGE_LOAD_ADDR
             </fAddr>
             <fCode>
               eei.storageLoad  .EmptyStmts
@@ -241,7 +242,7 @@ module WRC20-DO-BALANCE-SPEC
             </fModInst>
           </funcDef> <funcDef>
             <fAddr>
-              8
+              DO_BALANCE_ADDR
             </fAddr>
             <fCode>
               block .TypeDecls block .TypeDecls call String2Identifier("$getCallDataSize")  i32 . const 24  i32 . eq  br_if 0  i32 . const 0  i32 . const 0  call String2Identifier("$revert")  br 1  .EmptyStmts end  i32 . const 0  i32 . const 4  i32 . const 20  call String2Identifier("$callDataCopy")  i32 . const 0  i32 . const 32  call String2Identifier("$storageLoad")  i32 . const 32  i32 . const 32  i32 . const 8  call String2Identifier("$finish")  .EmptyStmts end  .EmptyStmts
@@ -318,6 +319,6 @@ module WRC20-DO-BALANCE-SPEC
   </ewasm>
   requires lengthBytes(ADDRESS) ==Int 20
    andBool #inUnsignedRange(i64, BALANCE)
-
+   andBool #distinctInts(REVERT_ADDR, FINISH_ADDR, GET_CALL_DATA_SIZE_ADDR, CALL_DATA_COPY_ADDR, STORAGE_LOAD_ADDR, DO_BALANCE_ADDR)
 
 endmodule
