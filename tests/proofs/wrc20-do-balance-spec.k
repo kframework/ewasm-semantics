@@ -69,14 +69,6 @@ module WRC20-DO-BALANCE-SPEC
           <modIdx>
             CONTRACT_MODULE
           </modIdx>
-          <types> // SPECIALIZE
-            0 |-> [ i32  i32  .ValTypes ] -> [ .ValTypes ]
-            1 |-> [ .ValTypes ] -> [ i32  .ValTypes ]
-            2 |-> [ i32  i32  i32  .ValTypes ] -> [ .ValTypes ]
-            3 |-> [ i32  .ValTypes ] -> [ .ValTypes ]
-            4 |-> [ .ValTypes ] -> [ .ValTypes ]
-            5 |-> [ i64  .ValTypes ] -> [ i64  .ValTypes ]
-          </types>
           <funcIds>
             (String2Identifier("$revert")          |-> 0)
             (String2Identifier("$finish")          |-> 1)
@@ -86,7 +78,7 @@ module WRC20-DO-BALANCE-SPEC
             (String2Identifier("$do_balance")      |-> 8)
             FUNCS:Map
           </funcIds>
-          <funcAddrs> // TODO: Remove unused functions from storage as well
+          <funcAddrs>
             (0 |-> REVERT_ADDR)
             (1 |-> FINISH_ADDR)
             (2 |-> GET_CALL_DATA_SIZE_ADDR)
@@ -105,8 +97,7 @@ module WRC20-DO-BALANCE-SPEC
         </moduleInst>
       </moduleInstances>
       <mainStore>
-        <funcs> // SPECIALIZE THE ADDRESSES
-        // REMOVE ALL UNNEEDED FUNCTIONS
+        <funcs>
           <funcDef>
             <fAddr>
               REVERT_ADDR
@@ -216,17 +207,15 @@ module WRC20-DO-BALANCE-SPEC
             <mAddr>
               CONTRACT_MEMORY_ADDR
             </mAddr>
-            <mmax>
-              .Int
-            </mmax>
             <msize>
               1
             </msize>
             <mdata>
               ByteMap <| .Map |> => ?_
             </mdata>
+            ...
           </memInst>
-          // ADD ...
+          ...
         </mems>
         ...
       </mainStore>
@@ -238,6 +227,11 @@ module WRC20-DO-BALANCE-SPEC
   </ewasm>
   requires lengthBytes(ADDRESS) ==Int 20
    andBool #inUnsignedRange(i64, BALANCE)
-   andBool #distinctInts(REVERT_ADDR, FINISH_ADDR, GET_CALL_DATA_SIZE_ADDR, CALL_DATA_COPY_ADDR, STORAGE_LOAD_ADDR, DO_BALANCE_ADDR)
+   andBool #distinctInts(REVERT_ADDR,
+                         FINISH_ADDR,
+                         GET_CALL_DATA_SIZE_ADDR,
+                         CALL_DATA_COPY_ADDR,
+                         STORAGE_LOAD_ADDR,
+                         DO_BALANCE_ADDR)
 
 endmodule
