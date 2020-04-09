@@ -22,9 +22,6 @@ To reason about the byte data, the following rules are helpful.
 
 ```k
     rule lengthBytes(B1 +Bytes B2) => lengthBytes(B1) +Int lengthBytes(B2) [simplification]
-    rule lengthBytes(substrBytes(BS, START, END)) => END -Int START
-      requires lengthBytes(BS) >=Int END
-      [simplification]
 
     rule substrBytes(B1 +Bytes B2, START, END)
       => substrBytes(B1, START, END)
