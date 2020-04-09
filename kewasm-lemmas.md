@@ -28,7 +28,6 @@ They will likely be upstreamed or replaced by something similar upstream in the 
     rule ((K1 |-> V) M) [ K2 ]   => M [ K2 ] requires K1 =/=K K2 [simplification]
 ```
 
-
 Helpers
 -------
 
