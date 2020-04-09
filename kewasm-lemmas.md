@@ -69,6 +69,8 @@ When a value is within the range it is being wrapped to, we can remove the wrapp
 
 ```k
     rule K in_keys ((K |-> _) M) => true [simplification]
+    rule ((K  |-> V) M) [ K  ]   => V                            [simplification]
+    rule ((K1 |-> V) M) [ K2 ]   => M [ K2 ] requires K1 =/=K K2 [simplification]
 ```
 
 ```k

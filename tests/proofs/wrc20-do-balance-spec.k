@@ -77,18 +77,14 @@ module WRC20-DO-BALANCE-SPEC
             4 |-> [ .ValTypes ] -> [ .ValTypes ]
             5 |-> [ i64  .ValTypes ] -> [ i64  .ValTypes ]
           </types>
-          <funcIds> // SPECIALIZE
-            (#freshId ( 0 ) |-> 7)
-            (String2Identifier("$callDataCopy") |-> 3)
-            (String2Identifier("$do_balance") |-> 8)
-            (String2Identifier("$do_transfer") |-> 9)
-            (String2Identifier("$finish") |-> 1)
+          <funcIds>
+            (String2Identifier("$revert")          |-> 0)
+            (String2Identifier("$finish")          |-> 1)
             (String2Identifier("$getCallDataSize") |-> 2)
-            (String2Identifier("$getCaller") |-> 6)
-            (String2Identifier("$i64.reverse_bytes") |-> 10)
-            (String2Identifier("$revert") |-> 0)
-            (String2Identifier("$storageLoad") |-> 4)
-            (String2Identifier("$storageStore") |-> 5)
+            (String2Identifier("$callDataCopy")    |-> 3)
+            (String2Identifier("$storageLoad")     |-> 4)
+            (String2Identifier("$do_balance")      |-> 8)
+            FUNCS:Map
           </funcIds>
           <funcAddrs> // SPECIALIZE
             (0 |-> 0)
