@@ -25,7 +25,7 @@ module WRC20-DO-BALANCE-SPEC
                  CONTRACT_ADDR
                </acct>
                <callData>
-                 Int2Bytes(4, 436376473, LE) +Bytes ADDRESS
+                 SELECTOR +Bytes ADDRESS
                </callData>
                ...
              </callState>
@@ -224,7 +224,8 @@ module WRC20-DO-BALANCE-SPEC
              .ParamStack
            </paramstack>
          </ewasm>
-      requires lengthBytes(ADDRESS) ==Int 20
-        andBool #inUnsignedRange(i64, BALANCE)
+      requires lengthBytes(SELECTOR) ==Int 4
+       andBool lengthBytes(ADDRESS)  ==Int 20
+       andBool #inUnsignedRange(i64, BALANCE)
 
 endmodule
