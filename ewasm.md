@@ -164,16 +164,14 @@ The following function helps with this task.
 All byte values in Ewasm are a number of bytes divisible by 4, the same number of bytes as an i32, so storage will happen in increments of 4 bytes.
 Numbers are stored little-endian in Wasm, so that's the convention that's used when converting bytes to an integer, to ensure the bytes end up as given in memory.
 
-TODO: Try changing the Bytes version back, it is simpler.
-
 ```k
-    syntax Instr ::= #storeEeiResult(Int, Int, Int)   [function]
-                   | #storeEeiResult(Int, Int, Bytes) [function, klabel(storeEeiResultsBytes)]
- // -------------------------------------------------------------------------------------------
+    syntax Instr ::= #storeEeiResult(Int, Int, Int) [function]
+                   | #storeEeiResult(Int, Bytes)    [function, klabel(storeEeiResultsBytes)]
+ // ----------------------------------------------------------------------------------------
     rule #storeEeiResult(STARTIDX, LENGTHBYTES, VALUE) => store { LENGTHBYTES STARTIDX VALUE }
 
-    rule #storeEeiResult(STARTIDX, LENGTH, BS:Bytes)
-      => #storeEeiResult(STARTIDX, LENGTH, Bytes2Int(BS, LE, Unsigned))
+    rule #storeEeiResult(STARTIDX, BS:Bytes)
+      => #storeEeiResult(STARTIDX, lengthBytes(BS), Bytes2Int(BS, LE, Unsigned))
 ```
 
 The Wasm engine needs to not make any further progress while waiting for the EEI, since they are not meant to execute concurrently.
@@ -244,7 +242,7 @@ Traps if `DATAOFFSET` + `LENGTH` exceeds the length of the call data.
          <eeiK> . => EEI.getCallData </eeiK>
 
     rule <k> #waiting(eei.callDataCopy)
-          => #storeEeiResult(RESULTPTR, LENGTH, substrBytes(CALLDATA, DATAPTR, DATAPTR +Int LENGTH))
+          => #storeEeiResult(RESULTPTR, substrBytes(CALLDATA, DATAPTR, DATAPTR +Int LENGTH))
              ...
         </k>
          <locals>
