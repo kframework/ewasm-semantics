@@ -13,6 +13,22 @@ module KEWASM-LEMMAS
   imports KWASM-LEMMAS
 ```
 
+Maps
+----
+
+These lemmas are needed for our symbolic map accesses to work for now.
+They will likely be upstreamed or replaced by something similar upstream in the future.
+
+```k
+    rule K in_keys (.Map)         => false                            [simplification]
+    rule K in_keys ((K  |-> _) M) => true                             [simplification]
+    rule K in_keys ((K' |-> _) M) => K in_keys (M)  requires K =/=K K'  [simplification]
+
+    rule ((K  |-> V) M) [ K  ]   => V                            [simplification]
+    rule ((K1 |-> V) M) [ K2 ]   => M [ K2 ] requires K1 =/=K K2 [simplification]
+```
+
+
 Helpers
 -------
 
@@ -75,18 +91,9 @@ The following lemmas tell us that a sequence of bytes, interpreted as an integer
 When a value is within the range it is being wrapped to, we can remove the wrapping.
 
 ```k
-// TODO: We should be able to remove this one, it combines the two above and the one below.
-// But the proof crashes when I try.
-// Figure out why.
     rule #wrap(BITLENGTH, Bytes2Int(BS, ENDIAN, Unsigned)) => Bytes2Int(BS, ENDIAN, Unsigned)
       requires lengthBytes(BS) *Int 8 <=Int BITLENGTH
       [simplification]
-```
-
-```k
-    rule K in_keys ((K |-> _) M) => true [simplification]
-    rule ((K  |-> V) M) [ K  ]   => V                            [simplification]
-    rule ((K1 |-> V) M) [ K2 ]   => M [ K2 ] requires K1 =/=K K2 [simplification]
 ```
 
 ```k
