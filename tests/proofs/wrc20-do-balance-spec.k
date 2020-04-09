@@ -92,12 +92,7 @@ module WRC20-DO-BALANCE-SPEC
             (2 |-> GET_CALL_DATA_SIZE_ADDR)
             (3 |-> CALL_DATA_COPY_ADDR)
             (4 |-> STORAGE_LOAD_ADDR)
-//          (5 |-> 5)
-//          (6 |-> 6)
-//          (7 |-> 7)
             (8 |-> DO_BALANCE_ADDR)
-//          (9 |-> 9)
-//          (10 |-> 10)
             FUNC_ADDRS:Map
           </funcAddrs>
           <memIds>
@@ -128,7 +123,8 @@ module WRC20-DO-BALANCE-SPEC
             <fModInst>
               CONTRACT_MODULE
             </fModInst>
-          </funcDef> <funcDef>
+          </funcDef>
+          <funcDef>
             <fAddr>
               FINISH_ADDR
             </fAddr>
@@ -144,7 +140,8 @@ module WRC20-DO-BALANCE-SPEC
             <fModInst>
               CONTRACT_MODULE
             </fModInst>
-          </funcDef> <funcDef>
+          </funcDef>
+          <funcDef>
             <fAddr>
               GET_CALL_DATA_SIZE_ADDR
             </fAddr>
@@ -160,7 +157,8 @@ module WRC20-DO-BALANCE-SPEC
             <fModInst>
               CONTRACT_MODULE
             </fModInst>
-          </funcDef> <funcDef>
+          </funcDef>
+          <funcDef>
             <fAddr>
               CALL_DATA_COPY_ADDR
             </fAddr>
@@ -176,7 +174,8 @@ module WRC20-DO-BALANCE-SPEC
             <fModInst>
               CONTRACT_MODULE
             </fModInst>
-          </funcDef> <funcDef>
+          </funcDef>
+          <funcDef>
             <fAddr>
               STORAGE_LOAD_ADDR
             </fAddr>
@@ -192,55 +191,8 @@ module WRC20-DO-BALANCE-SPEC
             <fModInst>
               CONTRACT_MODULE
             </fModInst>
-          </funcDef> <funcDef>
-            <fAddr>
-              5
-            </fAddr>
-            <fCode>
-              eei.storageStore  .EmptyStmts
-            </fCode>
-            <fType>
-              [ i32  i32  .ValTypes ] -> [ .ValTypes ]
-            </fType>
-            <fLocal>
-              [ .ValTypes ]
-            </fLocal>
-            <fModInst>
-              CONTRACT_MODULE
-            </fModInst>
-          </funcDef> <funcDef>
-            <fAddr>
-              6
-            </fAddr>
-            <fCode>
-              eei.getCaller  .EmptyStmts
-            </fCode>
-            <fType>
-              [ i32  .ValTypes ] -> [ .ValTypes ]
-            </fType>
-            <fLocal>
-              [ .ValTypes ]
-            </fLocal>
-            <fModInst>
-              CONTRACT_MODULE
-            </fModInst>
-          </funcDef> <funcDef>
-            <fAddr>
-              7
-            </fAddr>
-            <fCode>
-              block .TypeDecls block .TypeDecls call String2Identifier("$getCallDataSize")  i32 . const 4  i32 . ge_u  br_if 0  i32 . const 0  i32 . const 0  call String2Identifier("$revert")  br 1  .EmptyStmts end  i32 . const 0  i32 . const 0  i32 . const 4  call String2Identifier("$callDataCopy")  block .TypeDecls i32 . const 0  i32 . load  i32 . const 436376473  i32 . eq  i32 . eqz  br_if 0  call String2Identifier("$do_balance")  br 1  .EmptyStmts end  block .TypeDecls i32 . const 0  i32 . load  i32 . const 3181327709  i32 . eq  i32 . eqz  br_if 0  call String2Identifier("$do_transfer")  br 1  .EmptyStmts end  i32 . const 0  i32 . const 0  call String2Identifier("$revert")  .EmptyStmts end  .EmptyStmts
-            </fCode>
-            <fType>
-              [ .ValTypes ] -> [ .ValTypes ]
-            </fType>
-            <fLocal>
-              [ .ValTypes ]
-            </fLocal>
-            <fModInst>
-              CONTRACT_MODULE
-            </fModInst>
-          </funcDef> <funcDef>
+          </funcDef>
+          <funcDef>
             <fAddr>
               DO_BALANCE_ADDR
             </fAddr>
@@ -256,41 +208,8 @@ module WRC20-DO-BALANCE-SPEC
             <fModInst>
               CONTRACT_MODULE
             </fModInst>
-          </funcDef> <funcDef>
-            <fAddr>
-              9
-            </fAddr>
-            <fCode>
-              _
-              // block .TypeDecls block .TypeDecls call String2Identifier("$getCallDataSize")  i32 . const 32  i32 . eq  br_if 0  i32 . const 0  i32 . const 0  call String2Identifier("$revert")  br 1  .EmptyStmts end  i32 . const 0  call String2Identifier("$getCaller")  i32 . const 32  i32 . const 4  i32 . const 20  call String2Identifier("$callDataCopy")  i32 . const 64  i32 . const 24  i32 . const 8  call String2Identifier("$callDataCopy")  i32 . const 64  i64 . load  call String2Identifier("$i64.reverse_bytes")  local.set 0  i32 . const 0  i32 . const 64  call String2Identifier("$storageLoad")  i32 . const 64  i64 . load  local.set 1  i32 . const 32  i32 . const 64  call String2Identifier("$storageLoad")  i32 . const 64  i64 . load  local.set 2  block .TypeDecls local.get 0  local.get 1  i64 . le_u  br_if 0  i32 . const 0  i32 . const 0  call String2Identifier("$revert")  br 1  .EmptyStmts end  local.get 1  local.get 0  i64 . sub  local.set 1  local.get 2  local.get 0  i64 . add  local.set 2  i32 . const 64  local.get 1  i64 . store  i32 . const 0  i32 . const 64  call String2Identifier("$storageStore")  i32 . const 64  local.get 2  i64 . store  i32 . const 32  i32 . const 64  call String2Identifier("$storageStore")  .EmptyStmts end  .EmptyStmts
-            </fCode>
-            <fType>
-              [ .ValTypes ] -> [ .ValTypes ]
-            </fType>
-            <fLocal>
-              [ i64  i64  i64  .ValTypes ]
-            </fLocal>
-            <fModInst>
-              CONTRACT_MODULE
-            </fModInst>
-          </funcDef> <funcDef>
-            <fAddr>
-              10
-            </fAddr>
-            <fCode>
-              block .TypeDecls loop .TypeDecls local.get 1  i64 . const 8  i64 . ge_u  br_if 1  local.get 0  i64 . const 56  local.get 1  i64 . const 8  i64 . mul  i64 . sub  i64 . shl  i64 . const 56  i64 . shr_u  i64 . const 56  i64 . const 8  local.get 1  i64 . mul  i64 . sub  i64 . shl  local.get 2  i64 . add  local.set 2  local.get 1  i64 . const 1  i64 . add  local.set 1  br 0  .EmptyStmts end  .EmptyStmts end  local.get 2  .EmptyStmts
-            </fCode>
-            <fType>
-              [ i64  .ValTypes ] -> [ i64  .ValTypes ]
-            </fType>
-            <fLocal>
-              [ i64  i64  .ValTypes ]
-            </fLocal>
-            <fModInst>
-              CONTRACT_MODULE
-            </fModInst>
           </funcDef>
-          // ADD ...
+          ...
         </funcs>
         <mems>
           <memInst>
