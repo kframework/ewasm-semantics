@@ -226,11 +226,5 @@ module WRC20-DO-BALANCE-SPEC
          </ewasm>
       requires lengthBytes(ADDRESS) ==Int 20
         andBool #inUnsignedRange(i64, BALANCE)
-        andBool #distinctInts(REVERT_ADDR,
-                              FINISH_ADDR,
-                              GET_CALL_DATA_SIZE_ADDR,
-                              CALL_DATA_COPY_ADDR,
-                              STORAGE_LOAD_ADDR,
-                              DO_BALANCE_ADDR)
 
 endmodule

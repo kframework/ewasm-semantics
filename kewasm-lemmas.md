@@ -28,22 +28,6 @@ They will likely be upstreamed or replaced by something similar upstream in the 
     rule ((K1 |-> V) M) [ K2 ]   => M [ K2 ] requires K1 =/=K K2 [simplification]
 ```
 
-Helpers
--------
-
-```k
-    syntax Ints ::= List{Int, ","}
-    syntax Bool ::= "#distinctInts" "(" Ints ")" [function, functional]
-                   | Int "distinct_from" Ints     [function, functional]
- // --------------------------------------------------------------------
-    rule #distinctInts(.Ints)  => true
-    rule #distinctInts(I , IS) => I distinct_from IS andBool #distinctInts(IS)
-
-    rule I distinct_from .Ints => true
-    rule I distinct_from I' , IS => I =/=Int I' andBool I distinct_from IS
-
-```
-
 Bytes
 -----
 
