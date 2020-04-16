@@ -167,9 +167,9 @@ Numbers are stored little-endian in Wasm, so that's the convention that's used w
 TODO: Try changing the Bytes version back, it is simpler.
 
 ```k
-    syntax Instr ::= #storeEeiResult(Int, Int, Int)   [function]
-                   | #storeEeiResult(Int, Int, Bytes) [function, klabel(storeEeiResultsBytes)]
- // -------------------------------------------------------------------------------------------
+    syntax Instr ::= #storeEeiResult(Int, Int, Int)   [function, functional]
+                   | #storeEeiResult(Int, Int, Bytes) [function, functional]
+ // ------------------------------------------------------------------------
     rule #storeEeiResult(STARTIDX, LENGTHBYTES, VALUE) => store { LENGTHBYTES STARTIDX VALUE }
 
     rule #storeEeiResult(STARTIDX, LENGTH, BS:Bytes)
