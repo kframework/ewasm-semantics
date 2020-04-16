@@ -56,8 +56,9 @@ To reason about the byte data, the following rules are helpful.
        andBool notBool (lengthBytes(B1) <=Int START)
        [simplification]
 
-    rule substrBytes(B, 0, END) => B
-      requires lengthBytes(B) ==Int END
+    rule substrBytes(B, START, END) => B
+      requires START ==Int 0
+       andBool lengthBytes(B) ==Int END
       [simplification]
 ```
 
