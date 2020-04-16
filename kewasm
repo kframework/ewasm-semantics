@@ -144,7 +144,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-[[ ! $debug ]] || [[ "$backend" == "haskell" ]] || fatal "Debug option only available for Haskell backend."
+! $debug || [[ "$backend" == "haskell" ]] || fatal "Debug option only available for Haskell backend."
 
 backend_dir="$defn_dir/$backend"
 
