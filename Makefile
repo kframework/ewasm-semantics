@@ -152,7 +152,6 @@ TEST:=./kewasm
 KPROVE_MODULE:=KEWASM-LEMMAS
 KPROVE_OPTS:=
 CHECK:=git --no-pager diff --no-index --ignore-all-space
-PROVE_COMMAND:=prove
 
 tests/%/make.timestamp:
 	@echo "== submodule: $@"
