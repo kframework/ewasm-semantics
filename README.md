@@ -21,15 +21,20 @@ make build
 Run existing proofs using `make` rules.
 
 ```sh
-make tests/proofs/example-spec.k.prove     # Runs the proof for the spec in tests/proofs/example-spec.k.prove.
-make tests/proofs/example-spec.k.run-repl  # Starts an interactive REPL for running the same proof.
+make tests/proofs/example-spec.k.prove
+make tests/proofs/example-spec.k.repl
 ```
 
-Or you can run the prover on your own specification:
+You can run the prover on your own specification, with a lemmas module of your choice.
 
 ```sh
-./kewasm prove         <path>/<to>/<spec> -m LEMMAS-MODULE  # Runs the prover on the given spec, using LEMMAS-MODULE as the top-level sematics module.
-./kewasm prove --debug <path>/<to>/<spec> -m LEMMAS-MODULE  # Starts an interactive REPL for running the same proof.
+./kewasm prove <path>/<to>/<spec> -m <LEMMAS-MODULE>  # Runs the prover on the given spec, using LEMMAS-MODULE as the top-level sematics module.
+```
+
+You can add the `--repl` flag to run the proof in an interactive REPL, where you can step through the proof and explore its branches.
+
+```sh
+./kewasm prove <path>/<to>/<spec> -m <LEMMAS-MODULE>  # Runs the prover on the given spec, using LEMMAS-MODULE as the top-level sematics module.
 ```
 
 # Structure
