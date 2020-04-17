@@ -55,10 +55,10 @@ run_kast() {
 run_prove() {
     export K_OPTS=-Xmx8G
     haskell_backend_command="$k_release_dir/bin/kore-exec"
-    if $debug; then
+    if $repl; then
         haskell_backend_command="$k_release_dir/bin/kore-repl --repl-script $ewasm_dir/kast.kscript"
     fi
-    kprove --directory "$backend_dir" "$run_file" "$@" --haskell-backend-command "$haskell_backend_command" --debug
+    kprove --directory "$backend_dir" "$run_file" "$@" --haskell-backend-command "$haskell_backend_command"
 }
 
 run_klab() {
@@ -94,7 +94,7 @@ usage() {
     echo "
     usage: $0 run        [--backend (llvm|java|haskell)]      <pgm>  <K args>*
            $0 kast       [--backend (llvm|java)]              <pgm>  <output format> <K args>*
-           $0 prove      [--backend (java|haskell)] [--debug] <spec> <K args>* -m <def_module>
+           $0 prove      [--backend (java|haskell)] [--repl]  <spec> <K args>* -m <def_module>
            $0 klab-run                                        <pgm>  <K arg>*
            $0 klab-prove                                      <spec> <K arg>* -m <def_module>
            $0 klab-view                                       [<pgm>|<spec>]
@@ -131,7 +131,7 @@ run_command="$1"; shift
 [[ ! -z ${1:-} ]] || usage_fatal "Must supply a file to work on."
 
 backend="llvm"
-debug=false
+repl=false
 [[ ! "$run_command" == 'prove' ]] || backend='haskell'
 [[ ! "$run_command" =~ klab*   ]] || backend='java'
 args=()
@@ -139,12 +139,12 @@ while [[ $# -gt 0 ]]; do
     arg="$1"
     case $arg in
         --backend)    args+=("$arg" "$2") ; backend="$2"      ; shift 2 ;;
-        --debug)      args+=("$arg")      ; debug=true        ; shift   ;;
+        --repl)       args+=("$arg")      ; repl=true         ; shift   ;;
         *)            break                                             ;;
     esac
 done
 
-! $debug || [[ "$backend" == "haskell" ]] || fatal "Debug option only available for Haskell backend."
+! $repl || [[ "$backend" == "haskell" ]] || fatal "REPL option only available for Haskell backend."
 
 backend_dir="$defn_dir/$backend"
 

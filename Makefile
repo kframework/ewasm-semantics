@@ -150,8 +150,9 @@ TEST_CONCRETE_BACKEND:=llvm
 TEST_SYMBOLIC_BACKEND:=haskell
 TEST:=./kewasm
 KPROVE_MODULE:=KEWASM-LEMMAS
-KPROVE_OPTIONS:=
+KPROVE_OPTS:=
 CHECK:=git --no-pager diff --no-index --ignore-all-space
+PROVE_COMMAND:=prove
 
 tests/%/make.timestamp:
 	@echo "== submodule: $@"
@@ -176,10 +177,10 @@ tests/%.parse: tests/%
 	rm -rf $@-out
 
 tests/%.prove: tests/%
-	$(TEST) prove --backend $(TEST_SYMBOLIC_BACKEND) $< --format-failures --def-module $(KPROVE_MODULE) $(KPROVE_OPTIONS)
+	$(TEST) prove --backend $(TEST_SYMBOLIC_BACKEND) $(filter --repl, $(KPROVE_OPTS)) $< --format-failures --def-module $(KPROVE_MODULE) $(filter-out --repl, $(KPROVE_OPTS))
 
 tests/%.klab-prove: tests/%
-	$(TEST) klab-prove --backend $(TEST_SYMBOLIC_BACKEND) $< --format-failures --def-module $(KPROVE_MODULE) $(KPROVE_OPTIONS)
+	$(TEST) klab-prove --backend java                $(filter --repl, $(KPROVE_OPTS)) $< --format-failures --def-module $(KPROVE_MODULE) $(filter-out --repl, $(KPROVE_OPTS))
 
 ### Execution Tests
 
