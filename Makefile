@@ -150,6 +150,7 @@ TEST_CONCRETE_BACKEND:=llvm
 TEST_SYMBOLIC_BACKEND:=haskell
 TEST:=./kewasm
 KPROVE_MODULE:=KEWASM-LEMMAS
+KPROVE_OPTIONS:=
 CHECK:=git --no-pager diff --no-index --ignore-all-space
 
 tests/%/make.timestamp:
@@ -175,13 +176,10 @@ tests/%.parse: tests/%
 	rm -rf $@-out
 
 tests/%.prove: tests/%
-	$(TEST) prove --backend $(TEST_SYMBOLIC_BACKEND) $< --format-failures --def-module $(KPROVE_MODULE)
+	$(TEST) prove --backend $(TEST_SYMBOLIC_BACKEND) $< --format-failures --def-module $(KPROVE_MODULE) $(KPROVE_OPTIONS)
 
 tests/%.klab-prove: tests/%
-	$(TEST) klab-prove --backend $(TEST_SYMBOLIC_BACKEND) $< --format-failures --def-module $(KPROVE_MODULE)
-
-tests/%.prove-repl: tests/%
-	$(TEST) prove --backend $(TEST_SYMBOLIC_BACKEND) --debug $< --format-failures --def-module $(KPROVE_MODULE)
+	$(TEST) klab-prove --backend $(TEST_SYMBOLIC_BACKEND) $< --format-failures --def-module $(KPROVE_MODULE) $(KPROVE_OPTIONS)
 
 ### Execution Tests
 
