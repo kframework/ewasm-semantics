@@ -150,8 +150,9 @@ TEST_CONCRETE_BACKEND:=llvm
 TEST_SYMBOLIC_BACKEND:=haskell
 TEST:=./kewasm
 KPROVE_MODULE:=KEWASM-LEMMAS
-tests/proofs/wrc20-do-balance-spec.k.prove: KPROVE_MODULE=VERIFICATION
 CHECK:=git --no-pager diff --no-index --ignore-all-space
+
+tests/proofs/wrc20-do-balance-spec.k.prove: KPROVE_MODULE=VERIFICATION
 
 tests/%/make.timestamp:
 	@echo "== submodule: $@"
