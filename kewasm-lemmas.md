@@ -36,29 +36,6 @@ To reason about the byte data, the following rules are helpful.
 
 ```k
     rule lengthBytes(B1 +Bytes B2) => lengthBytes(B1) +Int lengthBytes(B2) [simplification]
-
-    rule substrBytes(B1 +Bytes B2, START, END)
-      => substrBytes(B1, START, END)
-      requires lengthBytes(B1) >=Int END
-      [simplification]
-
-    rule substrBytes(B1 +Bytes B2, START, END)
-      => substrBytes(B2, START -Int lengthBytes(B1), END -Int lengthBytes(B1))
-      requires lengthBytes(B1) <=Int START
-      [simplification]
-
-    rule substrBytes(B1 +Bytes B2, START, END)
-      => substrBytes(B1, START,                               lengthBytes(B1))
-         +Bytes
-         substrBytes(B2, START -Int lengthBytes(B1), END -Int lengthBytes(B1))
-      requires notBool (lengthBytes(B1) >=Int END)
-       andBool notBool (lengthBytes(B1) <=Int START)
-       [simplification]
-
-    rule substrBytes(B, START, END) => B
-      requires START ==Int 0
-       andBool lengthBytes(B) ==Int END
-      [simplification]
 ```
 
 The following lemmas tell us that a sequence of bytes, interpreted as an integer, is withing certain limits.
@@ -76,6 +53,42 @@ When a value is within the range it is being wrapped to, we can remove the wrapp
 ```k
     rule #wrap(BITLENGTH, Bytes2Int(BS, ENDIAN, Unsigned)) => Bytes2Int(BS, ENDIAN, Unsigned)
       requires lengthBytes(BS) *Int 8 <=Int BITLENGTH
+      [simplification]
+```
+
+### Subsequences of Bytes
+
+`substrBytes(BS, X, Y)` returns the subsequence of `BS` from `X` to `Y`, including index `X` but not index `Y`.
+It is a partial function, and only defined when `Y` is larger or equal to `X` and the length of `BS` is less than or equal to `Y`.
+
+The identity of the substring operation is when `START` is 0 and `END` is the length of the byte sequence.
+
+```k
+    rule substrBytes(B, START, END) => B
+      requires START ==Int 0
+       andBool lengthBytes(B) ==Int END
+      [simplification]
+```
+
+The following lemmas tell us how `substrBytes` works over concatenation of bytes sequnces.
+
+```k
+    rule substrBytes(B1 +Bytes B2, START, END)
+      => substrBytes(B1, START, END)
+      requires END <=Int lengthBytes(B1)
+      [simplification]
+
+    rule substrBytes(B1 +Bytes B2, START, END)
+      => substrBytes(B2, START -Int lengthBytes(B1), END -Int lengthBytes(B1))
+      requires lengthBytes(B1) <=Int START
+      [simplification]
+
+    rule substrBytes(B1 +Bytes B2, START, END)
+      => substrBytes(B1, START,                               lengthBytes(B1))
+         +Bytes
+         substrBytes(B2, START -Int lengthBytes(B1), END -Int lengthBytes(B1))
+      requires notBool (lengthBytes(B1) >=Int END)
+       andBool notBool (lengthBytes(B1) <=Int START)
       [simplification]
 ```
 
