@@ -60,6 +60,16 @@ When a value is within the range it is being wrapped to, we can remove the wrapp
 
 `substrBytes(BS, X, Y)` returns the subsequence of `BS` from `X` to `Y`, including index `X` but not index `Y`.
 It is a partial function, and only defined when `Y` is larger or equal to `X` and the length of `BS` is less than or equal to `Y`.
+The following lemma tells the prover when it can conclude that the function is defined.
+
+```k
+    rule #Ceil(substrBytes(@B, @START, @END))
+      => { @START <=Int @END #Equals true }
+         #And
+         { lengthBytes(@B) <=Int @END #Equals true }
+         #And #Ceil(@B) #And #Ceil(@START) #And #Ceil(@END)
+      [anywhere]
+```
 
 The identity of the substring operation is when `START` is 0 and `END` is the length of the byte sequence.
 
