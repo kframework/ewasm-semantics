@@ -1,4 +1,5 @@
 requires "kewasm-lemmas.k"
+requires "wrc20.k"
 
 module VERIFICATION
     imports KEWASM-LEMMAS
