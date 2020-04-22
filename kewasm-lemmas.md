@@ -81,6 +81,7 @@ The identity of the substring operation is when `START` is 0 and `END` is the le
 ```
 
 The following lemmas tell us how `substrBytes` works over concatenation of bytes sequnces.
+TODO: The last two don't make the expression smaller, which may be an issue?
 
 ```k
     rule substrBytes(B1 +Bytes B2, START, END)
