@@ -24,7 +24,7 @@ export LUA_PATH
         defn defn-llvm defn-haskell \
         definition-deps wasm-definitions eei-definitions \
         build build-llvm build-haskell \
-        test test-execution test-simple test-prove test-klab-prove \
+        test test-execution test-simple test-prove \
         media presentations reports
 
 all: build
@@ -157,9 +157,6 @@ tests/%.parse: tests/%
 tests/%.prove: tests/%
 	$(TEST) prove --backend $(TEST_SYMBOLIC_BACKEND) $(filter --repl, $(KPROVE_OPTS)) $< --format-failures --def-module $(KPROVE_MODULE) $(filter-out --repl, $(KPROVE_OPTS))
 
-tests/%.klab-prove: tests/%
-	$(TEST) klab-prove --backend java                $(filter --repl, $(KPROVE_OPTS)) $< --format-failures --def-module $(KPROVE_MODULE) $(filter-out --repl, $(KPROVE_OPTS))
-
 ### Execution Tests
 
 test-execution: test-simple
@@ -176,6 +173,3 @@ quick_proof_tests:=$(filter-out $(slow_proof_tests), $(proof_tests))
 
 test-prove: $(proof_tests:=.prove)
 
-### KLab interactive
-
-test-klab-prove: $(quick_proof_tests:=.klab-prove)
