@@ -21,10 +21,10 @@ export LUA_PATH
 
 .PHONY: all clean \
         deps haskell-deps \
-        defn defn-llvm defn-java defn-haskell \
+        defn defn-llvm defn-haskell \
         definition-deps wasm-definitions eei-definitions \
-        build build-llvm build-java build-haskell \
-        test test-execution test-simple test-prove test-klab-prove \
+        build build-llvm build-haskell \
+        test test-execution test-simple test-prove \
         media presentations reports
 
 all: build
@@ -52,12 +52,10 @@ deps: $(wasm_submodule)/make.timestamp $(eei_submodule)/make.timestamp definitio
 definition-deps: wasm-definitions eei-definitions
 
 wasm-definitions:
-	$(wasm_make) -B defn-java
 	$(wasm_make) -B defn-llvm
 	$(wasm_make) -B defn-haskell
 
 eei-definitions: $(eei_source_files)
-	$(eei_make) -B defn-java
 	$(eei_make) -B defn-llvm
 	$(eei_make) -B defn-haskell
 
@@ -77,10 +75,6 @@ llvm_dir:=$(defn_dir)/llvm
 llvm_defn:=$(patsubst %, $(llvm_dir)/%, $(all_k_files))
 llvm_kompiled:=$(llvm_dir)/ewasm-test-kompiled/interpreter
 
-java_dir:=$(defn_dir)/java
-java_defn:=$(patsubst %, $(java_dir)/%, $(all_k_files))
-java_kompiled:=$(java_dir)/ewasm-test-kompiled/compiled.txt
-
 haskell_dir:=$(defn_dir)/haskell
 haskell_defn:=$(patsubst %, $(haskell_dir)/%, $(all_k_files))
 haskell_kompiled:=$(haskell_dir)/ewasm-test-kompiled/definition.kore
@@ -90,17 +84,11 @@ syntax_module=EWASM-TEST-SYNTAX
 
 # Tangle definition from *.md files
 
-defn: defn-llvm defn-java defn-haskell
+defn: defn-llvm defn-haskell
 defn-llvm: $(llvm_defn)
-defn-java: $(java_defn)
 defn-haskell: $(haskell_defn)
 
 $(llvm_dir)/%.k: %.md $(tangler)
-	@echo "==  tangle: $@"
-	mkdir -p $(dir $@)
-	pandoc --from markdown --to $(tangler) --metadata=code:.k $< > $@
-
-$(java_dir)/%.k: %.md $(tangler)
 	@echo "==  tangle: $@"
 	mkdir -p $(dir $@)
 	pandoc --from markdown --to $(tangler) --metadata=code:.k $< > $@
@@ -114,9 +102,8 @@ $(haskell_dir)/%.k: %.md $(tangler)
 
 KOMPILE_OPTS :=
 
-build: build-llvm build-java build-haskell
+build: build-llvm build-haskell
 build-llvm: $(llvm_kompiled)
-build-java: $(java_kompiled)
 build-haskell: $(haskell_kompiled)
 
 $(llvm_kompiled): $(llvm_defn)
@@ -124,14 +111,6 @@ $(llvm_kompiled): $(llvm_defn)
 	$(k_bin)/kompile --backend llvm            \
 	    --directory $(llvm_dir) -I $(llvm_dir) \
 	    --main-module $(main_module)           \
-	    --syntax-module $(syntax_module) $<    \
-	    $(KOMPILE_OPTS)
-
-$(java_kompiled): $(java_defn)
-	@echo "== kompile: $@"
-	$(k_bin)/kompile --backend java            \
-	    --directory $(java_dir) -I $(java_dir) \
-	    --main-module   $(main_module)         \
 	    --syntax-module $(syntax_module) $<    \
 	    $(KOMPILE_OPTS)
 
@@ -150,6 +129,7 @@ TEST_CONCRETE_BACKEND:=llvm
 TEST_SYMBOLIC_BACKEND:=haskell
 TEST:=./kewasm
 KPROVE_MODULE:=KEWASM-LEMMAS
+KPROVE_OPTS:=
 CHECK:=git --no-pager diff --no-index --ignore-all-space
 
 tests/proofs/wrc20-do-balance-spec.k.prove: KPROVE_MODULE=VERIFICATION
@@ -177,10 +157,7 @@ tests/%.parse: tests/%
 	rm -rf $@-out
 
 tests/%.prove: tests/%
-	$(TEST) prove --backend $(TEST_SYMBOLIC_BACKEND) $< --format-failures --def-module $(KPROVE_MODULE)
-
-tests/%.klab-prove: tests/%
-	$(TEST) klab-prove --backend $(TEST_SYMBOLIC_BACKEND) $< --format-failures --def-module $(KPROVE_MODULE)
+	$(TEST) prove --backend $(TEST_SYMBOLIC_BACKEND) $(filter --repl, $(KPROVE_OPTS)) $< --format-failures --def-module $(KPROVE_MODULE) $(filter-out --repl, $(KPROVE_OPTS))
 
 ### Execution Tests
 
@@ -197,6 +174,3 @@ quick_proof_tests:=$(filter-out $(slow_proof_tests), $(proof_tests))
 
 test-prove: $(proof_tests:=.prove)
 
-### KLab interactive
-
-test-klab-prove: $(quick_proof_tests:=.klab-prove)
