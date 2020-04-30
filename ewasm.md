@@ -164,8 +164,6 @@ The following function helps with this task.
 All byte values in Ewasm are a number of bytes divisible by 4, the same number of bytes as an i32, so storage will happen in increments of 4 bytes.
 Numbers are stored little-endian in Wasm, so that's the convention that's used when converting bytes to an integer, to ensure the bytes end up as given in memory.
 
-TODO: Try changing the Bytes version back, it is simpler.
-
 ```k
     syntax Instr ::= #storeEeiResult(Int, Int, Int)   [function, functional]
                    | #storeEeiResult(Int, Int, Bytes) [function, functional]
