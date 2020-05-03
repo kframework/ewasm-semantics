@@ -16,6 +16,9 @@ wasm_clean:=make --directory $(wasm_submodule) clean
 eei_make:=make --directory $(eei_submodule) DEFN_DIR=../../$(defn_dir)
 eei_clean:=make --directory $(eei_submodule) clean
 
+PATH=$(k_bin):$PATH
+export PATH
+
 LUA_PATH=$(pandoc_tangle_submodule)/?.lua;;
 export LUA_PATH
 
@@ -108,7 +111,7 @@ build-haskell: $(haskell_kompiled)
 
 $(llvm_kompiled): $(llvm_defn)
 	@echo "== kompile: $@"
-	$(k_bin)/kompile --backend llvm            \
+	kompile --backend llvm                     \
 	    --directory $(llvm_dir) -I $(llvm_dir) \
 	    --main-module $(main_module)           \
 	    --syntax-module $(syntax_module) $<    \
@@ -116,7 +119,7 @@ $(llvm_kompiled): $(llvm_defn)
 
 $(haskell_kompiled): $(haskell_defn)
 	@echo "== kompile: $@"
-	$(k_bin)/kompile --backend haskell               \
+	kompile --backend haskell                        \
 	    --directory $(haskell_dir) -I $(haskell_dir) \
 	    --main-module   $(main_module)               \
 	    --syntax-module $(syntax_module) $<          \
