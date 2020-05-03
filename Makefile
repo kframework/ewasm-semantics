@@ -16,7 +16,7 @@ wasm_clean:=make --directory $(wasm_submodule) clean
 eei_make:=make --directory $(eei_submodule) DEFN_DIR=../../$(defn_dir)
 eei_clean:=make --directory $(eei_submodule) clean
 
-PATH=$(k_bin):$(PATH)
+PATH:=$(k_bin):$(PATH)
 export PATH
 
 LUA_PATH=$(pandoc_tangle_submodule)/?.lua;;
