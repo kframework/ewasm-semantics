@@ -279,9 +279,9 @@ From the executing account's storage, load the 32 bytes stored at the index spec
          <paramstack> INDEX : .ParamStack => .ParamStack </paramstack>
          <eeiK> . => EEI.getAccountStorage INDEX </eeiK>
 
-    rule <k> #waiting(eei.storageLoad) => #storeEeiResult(RESULTPTR, 32, VALUE:Int) ... </k>
+    rule <k> #waiting(eei.storageLoad) => #storeEeiResult(RESULTPTR, 32, VALUE) ... </k>
          <locals> ... 1 |-> <i32> RESULTPTR ... </locals>
-         <eeiK> #result(VALUE) => . </eeiK>
+         <eeiK> #result(VALUE:Int) => . </eeiK>
 ```
 
 #### `storageStore`
