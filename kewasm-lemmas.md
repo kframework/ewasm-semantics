@@ -19,8 +19,8 @@ These lemmas are needed for our symbolic map accesses to work for now.
 They will likely be upstreamed or replaced by something similar upstream in the future.
 
 ```k
-    rule K in_keys (.Map)         => false                            [simplification]
-    rule K in_keys ((K  |-> _) M) => true                             [simplification]
+    rule K in_keys (.Map)         => false                              [simplification]
+    rule K in_keys ((K  |-> _) M) => true                               [simplification]
     rule K in_keys ((K' |-> _) M) => K in_keys (M)  requires K =/=K K'  [simplification]
 
     rule ((K  |-> V) M) [ K  ]   => V                            [simplification]
