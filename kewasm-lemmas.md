@@ -92,7 +92,6 @@ TODO: The last two don't make the expression smaller, which may be an issue?
     rule substrBytes(B1 +Bytes B2, START, END)
       => substrBytes(B2, START -Int lengthBytes(B1), END -Int lengthBytes(B1))
       requires lengthBytes(B1) <=Int START
-      [simplification]
 
     rule substrBytes(B1 +Bytes B2, START, END)
       => substrBytes(B1, START,                               lengthBytes(B1))
@@ -100,7 +99,6 @@ TODO: The last two don't make the expression smaller, which may be an issue?
          substrBytes(B2, START -Int lengthBytes(B1), END -Int lengthBytes(B1))
       requires notBool (lengthBytes(B1) >=Int END)
        andBool notBool (lengthBytes(B1) <=Int START)
-      [simplification]
 ```
 
 ```k
