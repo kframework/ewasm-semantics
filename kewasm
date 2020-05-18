@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 export K_OPTS=-Xmx55G
 export KWASM_DIR=$(pwd)
 export KWASM_DEFN_DIR=$(pwd)/.build/defn
