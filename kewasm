@@ -5,5 +5,4 @@ set -euo pipefail
 export K_OPTS=-Xmx55G
 export KWASM_DIR=$(pwd)
 export KWASM_DEFN_DIR=$(pwd)/.build/defn
-export K_RELEASE=$KWASM_DIR/deps/wasm-semantics/deps/k/k-distribution/target/release/k
 deps/wasm-semantics/kwasm "$@"
