@@ -1,25 +1,33 @@
 # Settings
 # --------
 
-deps_dir:=deps
-wasm_submodule:=$(deps_dir)/wasm-semantics
-eei_submodule:=$(deps_dir)/eei-semantics
-k_submodule:=$(wasm_submodule)/deps/k
-pandoc_tangle_submodule:=$(wasm_submodule)/deps/pandoc-tangle
-k_bin:=$(k_submodule)/k-distribution/target/release/k/bin
-tangler:=$(pandoc_tangle_submodule)/tangle.lua
-build_dir:=.build
-defn_dir:=$(build_dir)/defn
-kompiled_dir_name:=ewasm-test
-wasm_make:=make --directory $(wasm_submodule) DEFN_DIR=../../$(defn_dir)
-wasm_clean:=make --directory $(wasm_submodule) clean
-eei_make:=make --directory $(eei_submodule) DEFN_DIR=../../$(defn_dir)
-eei_clean:=make --directory $(eei_submodule) clean
+deps_dir       := deps
+wasm_submodule := $(deps_dir)/wasm-semantics
+eei_submodule  := $(deps_dir)/eei-semantics
+k_submodule    := $(wasm_submodule)/deps/k
 
-PATH:=$(k_bin):$(PATH)
+ifneq (,$(wildcard $(k_submodule)/k-distribution/target/release/k/bin/*))
+    K_RELEASE ?= $(abspath $(k_submodule)/k-distribution/target/release/k)
+else
+    K_RELEASE ?= $(dir $(shell which kompile))..
+endif
+K_BIN := $(K_RELEASE)/bin
+K_LIB := $(K_RELEASE)/lib/kframework
+export K_RELEASE
+
+PATH:=$(K_BIN):$(abspath $(wasm_submodule)):$(PATH)
 export PATH
 
-LUA_PATH=$(pandoc_tangle_submodule)/?.lua;;
+build_dir         := .build
+defn_dir          := $(build_dir)/defn
+kompiled_dir_name := ewasm-test
+
+wasm_make := make --directory $(wasm_submodule) DEFN_DIR=../../$(defn_dir)
+eei_make  := make --directory $(eei_submodule)  DEFN_DIR=../../$(defn_dir)
+
+pandoc_tangle_submodule := $(wasm_submodule)/deps/pandoc-tangle
+tangler                 := $(pandoc_tangle_submodule)/tangle.lua
+LUA_PATH                := $(pandoc_tangle_submodule)/?.lua;;
 export LUA_PATH
 
 .PHONY: all clean \
