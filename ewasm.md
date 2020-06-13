@@ -2,7 +2,7 @@ Ewasm Specification
 =================
 
 ```k
-require "wasm.md"
+require "wasm-text.md"
 require "eei.md"
 
 module EWASM-SYNTAX
