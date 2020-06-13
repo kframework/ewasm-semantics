@@ -11,7 +11,6 @@ pipeline {
       when { changeRequest() }
       steps { script { currentBuild.displayName = "PR ${env.CHANGE_ID}: ${env.CHANGE_TITLE}" } }
     }
-    stage('Definition Deps') { steps { sh 'make definition-deps -j4' } }
     stage('Build')           { steps { sh 'make build -j4'           } }
     stage('Test') {
       options { timeout(time: 15, unit: 'MINUTES') }
