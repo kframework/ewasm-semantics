@@ -1,10 +1,10 @@
 # Settings
 # --------
 
-deps_dir       := deps
-wasm_submodule := $(deps_dir)/wasm-semantics
-eei_submodule  := $(deps_dir)/eei-semantics
-k_submodule    := $(wasm_submodule)/deps/k
+deps_dir        := deps
+KWASM_SUBMODULE := $(deps_dir)/wasm-semantics
+eei_submodule   := $(deps_dir)/eei-semantics
+k_submodule     := $(KWASM_SUBMODULE)/deps/k
 
 ifneq (,$(wildcard $(k_submodule)/k-distribution/target/release/k/bin/*))
     K_RELEASE ?= $(abspath $(k_submodule)/k-distribution/target/release/k)
@@ -15,17 +15,17 @@ K_BIN := $(K_RELEASE)/bin
 K_LIB := $(K_RELEASE)/lib/kframework
 export K_RELEASE
 
-PATH:=$(K_BIN):$(abspath $(wasm_submodule)):$(PATH)
+PATH:=$(K_BIN):$(abspath $(KWASM_SUBMODULE)):$(PATH)
 export PATH
 
 build_dir         := .build
-defn_dir          := $(build_dir)/defn
+DEFN_DIR          := $(build_dir)/defn
 kompiled_dir_name := ewasm-test
 
-wasm_make := make --directory $(wasm_submodule) DEFN_DIR=../../$(defn_dir)
-eei_make  := make --directory $(eei_submodule)  DEFN_DIR=../../$(defn_dir)
+KWASM_MAKE := make --directory $(KWASM_SUBMODULE) BUILD_DIR=../../$(BUILD_DIR) RELEASE=$(RELEASE)
+eei_make   := make --directory $(eei_submodule)   DEFN_DIR=../../$(DEFN_DIR)
 
-pandoc_tangle_submodule := $(wasm_submodule)/deps/pandoc-tangle
+pandoc_tangle_submodule := $(KWASM_SUBMODULE)/deps/pandoc-tangle
 tangler                 := $(pandoc_tangle_submodule)/tangle.lua
 LUA_PATH                := $(pandoc_tangle_submodule)/?.lua;;
 export LUA_PATH
@@ -34,7 +34,7 @@ export LUA_PATH
         deps haskell-deps \
         defn defn-llvm defn-haskell \
         definition-deps wasm-definitions eei-definitions \
-        build build-llvm build-haskell \
+        build \
         test test-execution test-simple test-prove \
         media presentations reports
 
@@ -42,96 +42,72 @@ all: build
 
 clean:
 	rm -rf $(build_dir)
-	rm -f $(wasm_submodule)/make.timestamp
+	rm -f $(KWASM_SUBMODULE)/make.timestamp
 	rm -f $(eei_submodule)/make.timestamp
 	git submodule update --init --recursive
-	$(MAKE) clean -C $(wasm_submodule)
+	$(MAKE) clean -C $(KWASM_SUBMODULE)
 	$(MAKE) clean -C $(eei_submodule)
 
 # Build Dependencies (K Submodule)
 # --------------------------------
 
-wasm_files=test.k wasm.k wasm-text.k data.k kwasm-lemmas.k
-wasm_source_files:=$(patsubst %, $(wasm_submodule)/%, $(patsubst %.k, %.md, $(wasm_files)))
-eei_files:=eei.k
-eei_source_files:=$(patsubst %, $(eei_submodule)/%, $(patsubst %.k, %.md, $(eei_files)))
-ewasm_files:=ewasm-test.k driver.k ewasm.k kewasm-lemmas.k
+wasm_files=test.md wasm.md wasm-text.md data.md kwasm-lemmas.md
+wasm_source_files:=$(patsubst %, $(KWASM_SUBMODULE)/%, $(wasm_files))
+eei_files:=eei.md
+eei_source_files:=$(patsubst %, $(eei_submodule)/%, $(eei_files))
+ewasm_files:=ewasm-test.md driver.md ewasm.md kewasm-lemmas.md
+ewasm_source_files:=$(ewasm_files)
 all_k_files:=$(ewasm_files) $(wasm_files) $(eei_files)
 
-deps: $(wasm_submodule)/make.timestamp $(eei_submodule)/make.timestamp definition-deps
+llvm_dir:=$(DEFN_DIR)/llvm
+llvm_defn:=$(patsubst %, $(llvm_dir)/%, $(all_k_files))
 
-definition-deps: wasm-definitions eei-definitions
+haskell_dir:=$(DEFN_DIR)/haskell
+haskell_defn:=$(patsubst %, $(haskell_dir)/%, $(all_k_files))
+
+definition-deps: eei-definitions
+deps: $(KWASM_SUBMODULE)/make.timestamp $(eei_submodule)/make.timestamp definition-deps
 
 wasm-definitions:
-	$(wasm_make) -B defn-llvm
-	$(wasm_make) -B defn-haskell
+	$(KWASM_MAKE) -B defn-llvm
+	$(KWASM_MAKE) -B defn-haskell
 
 eei-definitions: $(eei_source_files)
 	$(eei_make) -B defn-llvm
 	$(eei_make) -B defn-haskell
 
-$(wasm_submodule)/make.timestamp: $(wasm_source_files)
-	git submodule update --init --recursive
-	$(wasm_make) deps
-	touch $(wasm_submodule)/make.timestamp
+$(KWASM_SUBMODULE)/make.timestamp: $(wasm_source_files)
+	$(KWASM_MAKE) deps
+	touch $(KWASM_SUBMODULE)/make.timestamp
 
 $(eei_submodule)/make.timestamp: $(eei_source_files)
-	git submodule update --init --recursive
 	touch $(eei_submodule)/make.timestamp
 
 # Building Definition
 # -------------------
 
-llvm_dir:=$(defn_dir)/llvm
-llvm_defn:=$(patsubst %, $(llvm_dir)/%, $(all_k_files))
-llvm_kompiled:=$(llvm_dir)/ewasm-test-kompiled/interpreter
-
-haskell_dir:=$(defn_dir)/haskell
-haskell_defn:=$(patsubst %, $(haskell_dir)/%, $(all_k_files))
-haskell_kompiled:=$(haskell_dir)/ewasm-test-kompiled/definition.kore
-
-main_module=EWASM-TEST
-syntax_module=EWASM-TEST-SYNTAX
-
-# Tangle definition from *.md files
-
-defn: defn-llvm defn-haskell
-defn-llvm: $(llvm_defn)
-defn-haskell: $(haskell_defn)
-
-$(llvm_dir)/%.k: %.md $(tangler)
-	@echo "==  tangle: $@"
-	mkdir -p $(dir $@)
-	pandoc --from markdown --to $(tangler) --metadata=code:.k $< > $@
-
-$(haskell_dir)/%.k: %.md $(tangler)
-	@echo "==  tangle: $@"
-	mkdir -p $(dir $@)
-	pandoc --from markdown --to $(tangler) --metadata=code:.k $< > $@
+MAIN_MODULE=EWASM-TEST
+MAIN_SYNTAX_MODULE=EWASM-TEST-SYNTAX
+MAIN_DEFN_FILE=ewasm-test
 
 # Build definitions
 
 KOMPILE_OPTS :=
 
 build: build-llvm build-haskell
-build-llvm: $(llvm_kompiled)
-build-haskell: $(haskell_kompiled)
 
-$(llvm_kompiled): $(llvm_defn)
-	@echo "== kompile: $@"
-	kompile --backend llvm                     \
-	    --directory $(llvm_dir) -I $(llvm_dir) \
-	    --main-module $(main_module)           \
-	    --syntax-module $(syntax_module) $<    \
-	    $(KOMPILE_OPTS)
-
-$(haskell_kompiled): $(haskell_defn)
-	@echo "== kompile: $@"
-	kompile --backend haskell                        \
-	    --directory $(haskell_dir) -I $(haskell_dir) \
-	    --main-module   $(main_module)               \
-	    --syntax-module $(syntax_module) $<          \
-	    $(KOMPILE_OPTS)
+build-%:
+	cp $(eei_source_files) $(ewasm_source_files) $(KWASM_SUBMODULE)
+	$(KWASM_MAKE) build-$*                               \
+	    DEFN_DIR=../../$(DEFN_DIR)                       \
+	    llvm_main_module=$(MAIN_MODULE)                  \
+	    llvm_syntax_module=$(MAIN_SYNTAX_MODULE)         \
+	    llvm_main_file=$(MAIN_DEFN_FILE)                 \
+	    haskell_main_module=$(MAIN_MODULE)               \
+	    haskell_syntax_module=$(MAIN_SYNTAX_MODULE)      \
+	    haskell_main_file=$(MAIN_DEFN_FILE)              \
+	    EXTRA_SOURCE_FILES="$(eei_files) $(ewasm_files)"        \
+	    KOMPILE_OPTS="$(KOMPILE_OPTS)"
 
 # Testing
 # -------

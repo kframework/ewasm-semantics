@@ -4,8 +4,8 @@ Testing
 We make use of the testing module for Wasm, which will let us make assertions about the Wasm runtime state.
 
 ```k
-requires "test.k" // WASM-TEST
-requires "driver.k"
+requires "test.md" // WASM-TEST
+requires "driver.md"
 
 module EWASM-TEST-SYNTAX
    imports WASM-TEST-SYNTAX

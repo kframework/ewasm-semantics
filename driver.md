@@ -2,8 +2,8 @@ Ethereum Simulation
 ===================
 
 ```k
-require "ewasm.k"
-require "data.k"
+require "ewasm.md"
+require "data.md"
 
 module DRIVER-SYNTAX
     imports EWASM-SYNTAX

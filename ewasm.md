@@ -2,8 +2,8 @@ Ewasm Specification
 =================
 
 ```k
-require "wasm.k"
-require "eei.k"
+require "wasm.md"
+require "eei.md"
 
 module EWASM-SYNTAX
     imports WASM-TEXT-SYNTAX

@@ -1,4 +1,4 @@
-requires "kewasm-lemmas.k"
+requires "kewasm-lemmas.md"
 
 module INVOKE-CONTRACT-SPEC
   imports KEWASM-LEMMAS
