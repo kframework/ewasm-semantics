@@ -2,11 +2,11 @@ Ewasm Specification
 =================
 
 ```k
-require "wasm-text.md"
+require "wasm.md"
 require "eei.md"
 
 module EWASM-SYNTAX
-    imports WASM-TEXT-SYNTAX
+    imports WASM-SYNTAX
     imports EWASM
 endmodule
 ```
@@ -19,7 +19,7 @@ Ewasm consists of a WebAssembly (Wasm) semantics, and an Ethereum Environment In
 
 ```k
     imports EEI
-    imports WASM-TEXT
+    imports WASM
 ```
 
 The configuration composes both the top level cells of the Wasm and EEI semantics.

@@ -2,16 +2,19 @@ Ethereum Simulation
 ===================
 
 ```k
+require "wasm-text.md"
 require "ewasm.md"
 require "data.md"
 
 module DRIVER-SYNTAX
     imports EWASM-SYNTAX
+    imports WASM-TEXT-SYNTAX
     imports DRIVER
 endmodule
 
 module DRIVER
     imports EWASM
+    imports WASM-TEXT
 ```
 
 An Ewasm program is the invocation of an Ethereum contract containing Ewasm code.
