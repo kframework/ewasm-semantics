@@ -58,8 +58,5 @@ module INVOKE-CONTRACT-SPEC
          </nextMemAddr>
          ...
        </mainStore>
-       <nextFreshId>
-           0 => ?_
-       </nextFreshId>
 
 endmodule
