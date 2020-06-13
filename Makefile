@@ -51,7 +51,7 @@ clean:
 # Build Dependencies (K Submodule)
 # --------------------------------
 
-wasm_files=test.k wasm.k data.k kwasm-lemmas.k
+wasm_files=test.k wasm.k wasm-text.k data.k kwasm-lemmas.k
 wasm_source_files:=$(patsubst %, $(wasm_submodule)/%, $(patsubst %.k, %.md, $(wasm_files)))
 eei_files:=eei.k
 eei_source_files:=$(patsubst %, $(eei_submodule)/%, $(patsubst %.k, %.md, $(eei_files)))

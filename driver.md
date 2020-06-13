@@ -7,7 +7,6 @@ require "data.k"
 
 module DRIVER-SYNTAX
     imports EWASM-SYNTAX
-    imports WASM-SYNTAX
     imports DRIVER
 endmodule
 
@@ -111,7 +110,7 @@ Setting up the blockchain state
 ```k
     syntax EthereumCommand ::= "#createContract" CallData ModuleDecl
  // ----------------------------------------------------------------
-    rule <k> #createContract ADDRESS CODE => CODE ~> #storeModuleAt CallData2Int(ADDRESS) ... </k>
+    rule <k> #createContract ADDRESS CODE => text2abstract(CODE .Stmts) ~> #storeModuleAt CallData2Int(ADDRESS) ... </k>
 
     syntax EthereumCommand ::= "#storeModuleAt" CallData
  // ----------------------------------------------------
