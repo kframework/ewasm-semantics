@@ -51,7 +51,7 @@ clean:
 # Build Dependencies (K Submodule)
 # --------------------------------
 
-wasm_files=test.k wasm.k data.k kwasm-lemmas.k
+wasm_files=test.k wasm.k data.k kwasm-lemmas.k wrc20.k
 wasm_source_files:=$(patsubst %, $(wasm_submodule)/%, $(patsubst %.k, %.md, $(wasm_files)))
 eei_files:=eei.k
 eei_source_files:=$(patsubst %, $(eei_submodule)/%, $(patsubst %.k, %.md, $(eei_files)))
@@ -143,6 +143,8 @@ KPROVE_MODULE:=KEWASM-LEMMAS
 KPROVE_OPTS:=
 CHECK:=git --no-pager diff --no-index --ignore-all-space
 
+tests/proofs/wrc20-do-balance-spec.k.prove: KPROVE_MODULE=VERIFICATION
+
 tests/%/make.timestamp:
 	@echo "== submodule: $@"
 	git submodule update --init -- tests/$*
@@ -179,7 +181,6 @@ test-simple: $(simple_tests:=.run)
 ### Proof Tests
 
 proof_tests:=$(wildcard tests/proofs/*-spec.k)
-slow_proof_tests:=tests/proofs/loops-spec.k
 quick_proof_tests:=$(filter-out $(slow_proof_tests), $(proof_tests))
 
 test-prove: $(proof_tests:=.prove)

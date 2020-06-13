@@ -165,13 +165,13 @@ All byte values in Ewasm are a number of bytes divisible by 4, the same number o
 Numbers are stored little-endian in Wasm, so that's the convention that's used when converting bytes to an integer, to ensure the bytes end up as given in memory.
 
 ```k
-    syntax Instr ::= #storeEeiResult(Int, Int, Int) [function]
-                   | #storeEeiResult(Int, Bytes)    [function, klabel(storeEeiResultsBytes)]
- // ----------------------------------------------------------------------------------------
+    syntax Instr ::= #storeEeiResult(Int, Int, Int)   [function, functional]
+                   | #storeEeiResult(Int, Int, Bytes) [function, functional]
+ // ------------------------------------------------------------------------
     rule #storeEeiResult(STARTIDX, LENGTHBYTES, VALUE) => store { LENGTHBYTES STARTIDX VALUE }
 
-    rule #storeEeiResult(STARTIDX, BS:Bytes)
-      => #storeEeiResult(STARTIDX, lengthBytes(BS), Bytes2Int(BS, LE, Unsigned))
+    rule #storeEeiResult(STARTIDX, LENGTH, BS:Bytes)
+      => #storeEeiResult(STARTIDX, LENGTH, Bytes2Int(BS, LE, Unsigned))
 ```
 
 The Wasm engine needs to not make any further progress while waiting for the EEI, since they are not meant to execute concurrently.
@@ -203,7 +203,7 @@ An exception in the EEI translates into a `trap` in Wasm.
 #### `getCaller`
 
 Load the caller address (20 bytes) into memory at the spcified location.
-Adresses are integer value numbers, and are stored little-endian in memory.
+Addresses are integer value numbers, and are stored little-endian in memory.
 
 ```k
     syntax HostCall ::= "eei.getCaller"
@@ -211,7 +211,7 @@ Adresses are integer value numbers, and are stored little-endian in memory.
     rule <k> eei.getCaller => #waiting(eei.getCaller) ... </k>
          <eeiK> . => EEI.getCaller </eeiK>
 
-    rule <k> #waiting(eei.getCaller) => #storeEeiResult(RESULTPTR, 20, ADDR) ... </k>
+    rule <k> #waiting(eei.getCaller) => #storeEeiResult(RESULTPTR, 20, ADDR:Int) ... </k>
          <locals> 0 |-> <i32> RESULTPTR </locals>
          <eeiK> #result(ADDR) => . </eeiK>
 ```
@@ -241,7 +241,10 @@ Traps if `DATAOFFSET` + `LENGTH` exceeds the length of the call data.
     rule <k> eei.callDataCopy => #waiting(eei.callDataCopy) ... </k>
          <eeiK> . => EEI.getCallData </eeiK>
 
-    rule <k> #waiting(eei.callDataCopy) => #storeEeiResult(RESULTPTR, substrBytes(CALLDATA, DATAPTR, DATAPTR +Int LENGTH)) ... </k>
+    rule <k> #waiting(eei.callDataCopy)
+          => #storeEeiResult(RESULTPTR, LENGTH, substrBytes(CALLDATA, DATAPTR, DATAPTR +Int LENGTH))
+         ...
+         </k>
          <locals>
            0 |-> <i32> RESULTPTR
            1 |-> <i32> DATAPTR
@@ -278,7 +281,7 @@ From the executing account's storage, load the 32 bytes stored at the index spec
 
     rule <k> #waiting(eei.storageLoad) => #storeEeiResult(RESULTPTR, 32, VALUE) ... </k>
          <locals> ... 1 |-> <i32> RESULTPTR ... </locals>
-         <eeiK> #result(VALUE) => . </eeiK>
+         <eeiK> #result(VALUE:Int) => . </eeiK>
 ```
 
 #### `storageStore`
