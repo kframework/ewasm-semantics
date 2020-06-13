@@ -72,7 +72,7 @@ Then, when a `HostCall` instruction is encountered, parameters are gathered from
 
 ```k
     rule <k> ( import MODNAME FNAME (func OID:OptionalId TUSE:TypeUse) )
-          => ( func OID TUSE .LocalDecls #eeiFunction(FNAME) .Instrs )
+          => #func(... type: TUSE, locals: .LocalDecls, body: #eeiFunction(FNAME) .Instrs, metadata: #meta(... id: OID, localIds: .Map))
          ...
          </k>
       requires MODNAME ==K #ethereumModule
