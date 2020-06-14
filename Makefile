@@ -110,7 +110,7 @@ tests/%.parse: tests/%
 	$(CHECK) $@-expected $@-out
 	rm -rf $@-out
 
-tests/%.prove: tests/% $(KWASM_SUBMODULE)/$(KRPOVE_MODULE_FILE)
+tests/%.prove: tests/% $(KWASM_SUBMODULE)/$(KPROVE_MODULE_FILE)
 	$(TEST) prove --backend $(TEST_SYMBOLIC_BACKEND) $(filter --repl, $(KPROVE_OPTS)) $< --format-failures --def-module $(KPROVE_MODULE) $(filter-out --repl, $(KPROVE_OPTS))
 
 ### Execution Tests
