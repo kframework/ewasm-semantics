@@ -93,11 +93,6 @@ KPROVE_MODULE_FILE=kewasm-lemmas.md
 KPROVE_OPTS:=
 CHECK:=git --no-pager diff --no-index --ignore-all-space
 
-tests/%/make.timestamp:
-	@echo "== submodule: $@"
-	git submodule update --init -- tests/$*
-	touch $@
-
 test: test-execution test-prove
 
 # Generic Test Harnesses
