@@ -3,7 +3,7 @@
 
 DEPS_DIR        := deps
 KWASM_SUBMODULE := $(DEPS_DIR)/wasm-semantics
-eei_submodule   := $(DEPS_DIR)/eei-semantics
+EEI_SUBMODULE   := $(DEPS_DIR)/eei-semantics
 k_submodule     := $(KWASM_SUBMODULE)/deps/k
 
 ifneq (,$(wildcard $(k_submodule)/k-distribution/target/release/k/bin/*))
@@ -24,9 +24,10 @@ kompiled_dir_name := ewasm-test
 
 KWASM_MAKE := make --directory $(KWASM_SUBMODULE) BUILD_DIR=../../$(BUILD_DIR) RELEASE=$(RELEASE)
 
-.PHONY: all clean \
-        deps defn build \
-        test test-execution test-simple test-prove \
+.PHONY: all clean deps                  \
+        build build-llvm build-haskell  \
+        test test-execution test-simple \
+        test-prove                      \
         media presentations reports
 
 all: build
@@ -35,18 +36,20 @@ clean:
 	rm -rf $(build_dir)
 	rm -f $(KWASM_SUBMODULE)/make.timestamp
 	rm -f $(KWASM_SUBMODULE)/make.timestamp
-	rm -f $(eei_submodule)/make.timestamp
+	rm -f $(EEI_SUBMODULE)/make.timestamp
 	git submodule update --init --recursive
 	$(MAKE) clean -C $(KWASM_SUBMODULE)
-	$(MAKE) clean -C $(eei_submodule)
+	$(MAKE) clean -C $(EEI_SUBMODULE)
 
 # Build Dependencies (K Submodule)
 # --------------------------------
 
 EEI_FILES:=eei.md
-EEI_SOURCE_FILES:=$(patsubst %, $(eei_submodule)/%, $(EEI_FILES))
+EEI_SOURCE_FILES:=$(patsubst %, $(EEI_SUBMODULE)/%, $(EEI_FILES))
 EWASM_FILES:=ewasm-test.md driver.md ewasm.md kewasm-lemmas.md
 EWASM_SOURCE_FILES:=$(EWASM_FILES)
+EXTRA_FILES:=$(EEI_FILES) $(EWASM_FILES)
+EXTRA_SOURCE_FILES:=$(patsubst %, $(KWASM_SUBMODULE)/%, $(EXTRA_FILES))
 
 deps:
 	$(KWASM_MAKE) deps
@@ -64,18 +67,23 @@ KOMPILE_OPTS :=
 
 build: build-llvm build-haskell
 
-build-%:
-	cp $(EEI_SOURCE_FILES) $(EWASM_SOURCE_FILES) $(KWASM_SUBMODULE)
-	$(KWASM_MAKE) build-$*                               \
-	    DEFN_DIR=../../$(DEFN_DIR)                       \
-	    llvm_main_module=$(MAIN_MODULE)                  \
-	    llvm_syntax_module=$(MAIN_SYNTAX_MODULE)         \
-	    llvm_main_file=$(MAIN_DEFN_FILE)                 \
-	    haskell_main_module=$(MAIN_MODULE)               \
-	    haskell_syntax_module=$(MAIN_SYNTAX_MODULE)      \
-	    haskell_main_file=$(MAIN_DEFN_FILE)              \
-	    EXTRA_SOURCE_FILES="$(EEI_FILES) $(EWASM_FILES)" \
+build-%: $(EXTRA_SOURCE_FILES)
+	$(KWASM_MAKE) build-$*                           \
+	    DEFN_DIR=../../$(DEFN_DIR)                   \
+	    llvm_main_module=$(MAIN_MODULE)              \
+	    llvm_syntax_module=$(MAIN_SYNTAX_MODULE)     \
+	    llvm_main_file=$(MAIN_DEFN_FILE)             \
+	    haskell_main_module=$(MAIN_MODULE)           \
+	    haskell_syntax_module=$(MAIN_SYNTAX_MODULE)  \
+	    haskell_main_file=$(MAIN_DEFN_FILE)          \
+	    EXTRA_SOURCE_FILES="$(EXTRA_FILES)"          \
 	    KOMPILE_OPTS="$(KOMPILE_OPTS)"
+
+$(KWASM_SUBMODULE)/%.md: %.md
+	cp $< $@
+
+$(KWASM_SUBMODULE)/%.md: $(EEI_SUBMODULE)/%.md
+	cp $< $@
 
 # Testing
 # -------
