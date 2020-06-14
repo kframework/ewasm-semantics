@@ -1,9 +1,9 @@
 # Settings
 # --------
 
-build_dir := .build
+BUILD_DIR := .build
 DEPS_DIR  := deps
-DEFN_DIR  := $(build_dir)/defn
+DEFN_DIR  := $(BUILD_DIR)/defn
 
 KWASM_SUBMODULE := $(DEPS_DIR)/wasm-semantics
 EEI_SUBMODULE   := $(DEPS_DIR)/eei-semantics
@@ -33,7 +33,7 @@ KWASM_MAKE := make --directory $(KWASM_SUBMODULE) BUILD_DIR=../../$(BUILD_DIR) R
 all: build
 
 clean:
-	rm -rf $(build_dir)
+	rm -rf $(BUILD_DIR)
 	git submodule update --init --recursive
 	$(MAKE) clean -C $(KWASM_SUBMODULE)
 	$(MAKE) clean -C $(EEI_SUBMODULE)
