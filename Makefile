@@ -1,7 +1,10 @@
 # Settings
 # --------
 
-DEPS_DIR        := deps
+build_dir := .build
+DEPS_DIR  := deps
+DEFN_DIR  := $(build_dir)/defn
+
 KWASM_SUBMODULE := $(DEPS_DIR)/wasm-semantics
 EEI_SUBMODULE   := $(DEPS_DIR)/eei-semantics
 k_submodule     := $(KWASM_SUBMODULE)/deps/k
@@ -18,9 +21,6 @@ export K_RELEASE
 PATH:=$(K_BIN):$(abspath $(KWASM_SUBMODULE)):$(PATH)
 export PATH
 
-build_dir         := .build
-DEFN_DIR          := $(build_dir)/defn
-kompiled_dir_name := ewasm-test
 
 KWASM_MAKE := make --directory $(KWASM_SUBMODULE) BUILD_DIR=../../$(BUILD_DIR) RELEASE=$(RELEASE)
 
@@ -34,9 +34,6 @@ all: build
 
 clean:
 	rm -rf $(build_dir)
-	rm -f $(KWASM_SUBMODULE)/make.timestamp
-	rm -f $(KWASM_SUBMODULE)/make.timestamp
-	rm -f $(EEI_SUBMODULE)/make.timestamp
 	git submodule update --init --recursive
 	$(MAKE) clean -C $(KWASM_SUBMODULE)
 	$(MAKE) clean -C $(EEI_SUBMODULE)
