@@ -25,7 +25,7 @@ export PATH
 KWASM_MAKE := make --directory $(KWASM_SUBMODULE) BUILD_DIR=../../$(BUILD_DIR) RELEASE=$(RELEASE)
 
 .PHONY: all clean deps                  \
-        build                           \
+        build build-%                   \
         test test-execution test-simple \
         test-prove                      \
         media presentations reports
