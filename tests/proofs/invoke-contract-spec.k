@@ -1,4 +1,4 @@
-requires "kewasm-lemmas.k"
+requires "kewasm-lemmas.md"
 
 module INVOKE-CONTRACT-SPEC
   imports KEWASM-LEMMAS
@@ -58,8 +58,5 @@ module INVOKE-CONTRACT-SPEC
          </nextMemAddr>
          ...
        </mainStore>
-       <nextFreshId>
-           0 => ?_
-       </nextFreshId>
 
 endmodule

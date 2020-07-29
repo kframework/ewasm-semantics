@@ -2,11 +2,11 @@ Ewasm Specification
 =================
 
 ```k
-require "wasm.k"
-require "eei.k"
+require "wasm.md"
+require "eei.md"
 
 module EWASM-SYNTAX
-    imports WASM-TOKEN-SYNTAX
+    imports WASM-SYNTAX
     imports EWASM
 endmodule
 ```
@@ -72,7 +72,7 @@ Then, when a `HostCall` instruction is encountered, parameters are gathered from
 
 ```k
     rule <k> ( import MODNAME FNAME (func OID:OptionalId TUSE:TypeUse) )
-          => ( func OID TUSE .LocalDecls #eeiFunction(FNAME) .Instrs )
+          => #func(... type: TUSE, locals: .LocalDecls, body: #eeiFunction(FNAME) .Instrs, metadata: #meta(... id: OID, localIds: .Map))
          ...
          </k>
       requires MODNAME ==K #ethereumModule

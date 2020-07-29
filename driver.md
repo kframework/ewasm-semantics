@@ -2,17 +2,19 @@ Ethereum Simulation
 ===================
 
 ```k
-require "ewasm.k"
-require "data.k"
+require "wasm-text.md"
+require "ewasm.md"
+require "data.md"
 
 module DRIVER-SYNTAX
     imports EWASM-SYNTAX
-    imports WASM-SYNTAX
+    imports WASM-TEXT-SYNTAX
     imports DRIVER
 endmodule
 
 module DRIVER
     imports EWASM
+    imports WASM-TEXT
 ```
 
 An Ewasm program is the invocation of an Ethereum contract containing Ewasm code.
@@ -111,7 +113,7 @@ Setting up the blockchain state
 ```k
     syntax EthereumCommand ::= "#createContract" CallData ModuleDecl
  // ----------------------------------------------------------------
-    rule <k> #createContract ADDRESS CODE => CODE ~> #storeModuleAt CallData2Int(ADDRESS) ... </k>
+    rule <k> #createContract ADDRESS CODE => text2abstract(CODE .Stmts) ~> #storeModuleAt CallData2Int(ADDRESS) ... </k>
 
     syntax EthereumCommand ::= "#storeModuleAt" CallData
  // ----------------------------------------------------
