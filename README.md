@@ -1,5 +1,7 @@
-### Support KEwasm development
-[Contribute to our Gitcoin Grant](https://gitcoin.co/grants/592/kewasm-and-kwasm)
+# This project has been archived (2023-03-23)
+
+See [KWasm](https://github.com/runtimeverification/wasm-semantics) for the core semantics of WebAssembly.
+At this time (2023-03-23) it is being used for [Elrond/MetaverseX semantics](https://github.com/runtimeverification/elrond-semantics).
 
 ---
 
